@@ -17,6 +17,9 @@ public class MainFrame extends JFrame implements CattleController.CattleViewList
     private JLabel statusLabel;
     private JButton scanCattleButton;
 
+    // Referencia da ultima tela ativa para callbacks
+    private CattleFormFrame activeCattleForm;
+
     public MainFrame(User loggedUser, CattleController cattleController) {
         this.loggedUser = loggedUser;
         this.cattleController = cattleController;
@@ -31,7 +34,7 @@ public class MainFrame extends JFrame implements CattleController.CattleViewList
     private void setupUI() {
         setTitle("Sistema de Vacinação - Menu Principal");
         setLayout(new BorderLayout(10, 10));
-        setPreferredSize(new Dimension(600, 400));
+        setPreferredSize(new Dimension(850, 400));
 
         // Topo / Header
         JPanel headerPanel = new JPanel(new BorderLayout());
@@ -68,7 +71,7 @@ public class MainFrame extends JFrame implements CattleController.CattleViewList
         // Centro (Botoes Gigantes)
         JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 80));
 
-        scanCattleButton = new JButton("<html><center>LER TAG DO ANIMAL<br>(Aproximar Leitor)</center></html>");
+        scanCattleButton = new JButton("<html><center>IDENTIFICAR / VACINAR<br>(Aproximar Leitor)</center></html>");
         scanCattleButton.setPreferredSize(new Dimension(200, 100));
         scanCattleButton.setFont(new Font("Arial", Font.BOLD, 14));
         scanCattleButton.addActionListener(e -> {
@@ -80,11 +83,34 @@ public class MainFrame extends JFrame implements CattleController.CattleViewList
         listButton.setPreferredSize(new Dimension(200, 100));
         listButton.setFont(new Font("Arial", Font.BOLD, 14));
         listButton.addActionListener(e -> {
-            CattleListFrame listFrame = new CattleListFrame(cattleController.getApiService(), cattleController);
+            CattleListFrame listFrame = new CattleListFrame(cattleController.getApiService(), cattleController,
+                    loggedUser, this);
             listFrame.setVisible(true);
         });
 
+        JButton manualRegisterButton = new JButton(
+                "<html><center>CADASTRAR ANIMAL<br>(Sem Uso do Crachá)</center></html>");
+        manualRegisterButton.setPreferredSize(new Dimension(200, 100));
+        manualRegisterButton.setFont(new Font("Arial", Font.BOLD, 14));
+        manualRegisterButton.addActionListener(e -> {
+            statusLabel.setText("Preparando formulário manual...");
+
+            // Gera uma TAG automática garantindo até 16 bytes: "C" + Epoch timestamp
+            String generatedTag = "C" + System.currentTimeMillis();
+            if (generatedTag.length() > 16) {
+                generatedTag = generatedTag.substring(0, 16);
+            }
+
+            Cattle newCattle = new Cattle();
+            newCattle.setRfidTag(generatedTag);
+
+            System.out.println("-> Abrindo Formulário Manual do Gado para: " + generatedTag);
+            activeCattleForm = new CattleFormFrame(newCattle, true, true, cattleController, loggedUser);
+            activeCattleForm.setVisible(true);
+        });
+
         centerPanel.add(scanCattleButton);
+        centerPanel.add(manualRegisterButton);
         centerPanel.add(listButton);
         add(centerPanel, BorderLayout.CENTER);
 
@@ -110,10 +136,9 @@ public class MainFrame extends JFrame implements CattleController.CattleViewList
     @Override
     public void onRfidReadSuccess(Cattle cattle, boolean isNew) {
         SwingUtilities.invokeLater(() -> {
-            statusLabel.setText((isNew ? "Novo Animal " : "Animal Encontrado ") + " (" + cattle.getRfidTag() + ")");
-            // Abre o formulário enviando os dados pro preenchimento
-            System.out.println("-> Abrindo Formulário do Gado para: " + cattle.getRfidTag());
-            CattleFormFrame form = new CattleFormFrame(cattle, isNew, cattleController, loggedUser);
+            statusLabel.setText("Animal Encontrado (" + cattle.getRfidTag() + ")");
+            System.out.println("-> Abrindo Formulário de Vacina para: " + cattle.getRfidTag());
+            VaccineFormFrame form = new VaccineFormFrame(cattle, cattleController, loggedUser);
             form.setVisible(true);
         });
     }
@@ -128,26 +153,52 @@ public class MainFrame extends JFrame implements CattleController.CattleViewList
 
     @Override
     public void onRfidWriteSuccess() {
-        // Ignorado no MainMenu, usado no FormView
-        SwingUtilities.invokeLater(() -> statusLabel.setText("Tag gravada com sucesso!"));
+        SwingUtilities.invokeLater(() -> {
+            statusLabel.setText("Tag gravada com sucesso!");
+            if (activeCattleForm != null && activeCattleForm.isVisible()) {
+                activeCattleForm.onTagWriteSuccess();
+            }
+        });
     }
 
     @Override
     public void onRfidWriteError(String message) {
         SwingUtilities.invokeLater(() -> {
-            statusLabel.setText("Erro Gravação: " + message);
+            statusLabel.setText("Erro de Escrita: " + message);
+            JOptionPane.showMessageDialog(this,
+                    message + "\nPosicione a TAG sob o leitor corretamente e tente novamente.", "Erro ao Gravar RFID",
+                    JOptionPane.ERROR_MESSAGE);
+            if (activeCattleForm != null && activeCattleForm.isVisible()) {
+                activeCattleForm.resetSubmitButton();
+            }
         });
     }
 
     @Override
     public void onApiSaveSuccess() {
-        SwingUtilities.invokeLater(() -> statusLabel.setText("Dados do Animal salvos na base!"));
+        SwingUtilities.invokeLater(() -> {
+            statusLabel.setText("Dados salvos no mock db com sucesso.");
+            JOptionPane.showMessageDialog(this, "Registro concluído e salvo no banco de dados!", "Sucesso",
+                    JOptionPane.INFORMATION_MESSAGE);
+            if (activeCattleForm != null && activeCattleForm.isVisible()) {
+                activeCattleForm.dispose();
+                activeCattleForm = null;
+            }
+        });
     }
 
     @Override
     public void onApiSaveError(String message) {
         SwingUtilities.invokeLater(() -> {
             statusLabel.setText("Falha no Banco: " + message);
+            JOptionPane.showMessageDialog(this, message, "Erro Base de Dados", JOptionPane.ERROR_MESSAGE);
+            if (activeCattleForm != null && activeCattleForm.isVisible()) {
+                activeCattleForm.resetSubmitButton();
+            }
         });
+    }
+
+    public void setActiveCattleForm(CattleFormFrame activeCattleForm) {
+        this.activeCattleForm = activeCattleForm;
     }
 }

@@ -33,7 +33,7 @@ class CattleApiServiceTest {
 
     @Test
     void testSaveNewCattle() {
-        Cattle newCattle = new Cattle("TAG_NOVO", "Bezerro", 100.0, LocalDate.now(), "joao_vet");
+        Cattle newCattle = new Cattle("TAG_NOVO", "Bezerro", 100.0, LocalDate.now());
         boolean result = apiService.saveCattle(newCattle);
         assertTrue(result);
 
@@ -43,7 +43,7 @@ class CattleApiServiceTest {
 
     @Test
     void testUpdateExistingCattle() {
-        Cattle updatedCattle = new Cattle("TAG_BOI_100", "Mimosa Atualizada", 460.0, LocalDate.now(), "joao_vet");
+        Cattle updatedCattle = new Cattle("TAG_BOI_100", "Mimosa Atualizada", 460.0, LocalDate.now());
         boolean result = apiService.saveCattle(updatedCattle);
         assertTrue(result);
 
@@ -57,6 +57,6 @@ class CattleApiServiceTest {
     @Test
     void testSaveInvalidCattle() {
         assertFalse(apiService.saveCattle(null));
-        assertFalse(apiService.saveCattle(new Cattle(null, "Sem tag", 200, LocalDate.now(), "user")));
+        assertFalse(apiService.saveCattle(new Cattle(null, "Sem tag", 200, LocalDate.now())));
     }
 }

@@ -8,23 +8,26 @@ import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 
 public class CattleFormFrame extends JFrame {
 
     private final Cattle cattle;
     private final boolean isNew;
+    private final boolean isManual;
     private final CattleController controller;
     private final User loggedUser;
 
     private JTextField nameField;
     private JTextField weightField;
     private JTextField dateField;
-    private JButton submitButton;
+    private JButton writeTagButton;
+    private JButton saveDbButton;
 
-    public CattleFormFrame(Cattle cattle, boolean isNew, CattleController controller, User loggedUser) {
+    public CattleFormFrame(Cattle cattle, boolean isNew, boolean isManual, CattleController controller,
+            User loggedUser) {
         this.cattle = cattle;
         this.isNew = isNew;
+        this.isManual = isManual;
         this.controller = controller;
         this.loggedUser = loggedUser;
 
@@ -64,8 +67,10 @@ public class CattleFormFrame extends JFrame {
         weightField = new JTextField();
         formPanel.add(weightField);
 
-        formPanel.add(new JLabel("Última Vacinação (DD/MM/AAAA):"));
+        formPanel.add(new JLabel("Data de Cadastro (DD/MM/AAAA):"));
         dateField = new JTextField();
+        dateField.setEditable(false);
+        dateField.setBackground(Color.LIGHT_GRAY);
         formPanel.add(dateField);
 
         add(formPanel, BorderLayout.CENTER);
@@ -73,63 +78,95 @@ public class CattleFormFrame extends JFrame {
         // Botoes Pannel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-        // Botao de gravar no chip foi removido. A definicao da tag agora eh feita
-        // manualmente no log.
+        writeTagButton = new JButton("1. Gravar Identidade na Tag Física");
+        writeTagButton.addActionListener(e -> writeTagAction());
+        // Apenas habilita gravação física se for manual
+        writeTagButton.setVisible(isManual);
+        buttonPanel.add(writeTagButton);
 
-        JButton logButton = new JButton("Logs");
-        logButton.addActionListener(e -> {
-            SerialLogFrame logFrame = new SerialLogFrame(controller.getSerialService());
-            logFrame.setVisible(true);
-        });
-        buttonPanel.add(logButton);
-
-        submitButton = new JButton("Salvar no Banco");
-        submitButton.addActionListener(e -> saveAction());
-        buttonPanel.add(submitButton);
+        saveDbButton = new JButton("2. Salvar no Banco de Dados");
+        saveDbButton.addActionListener(e -> saveDbAction());
+        saveDbButton.setEnabled(!isManual); // Bloqueia salvar no DB se for manual até a tag gravar
+        buttonPanel.add(saveDbButton);
 
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
     private void populateFields() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         if (!isNew) {
             nameField.setText(cattle.getName() != null ? cattle.getName() : "");
             weightField.setText(cattle.getWeight() > 0 ? String.valueOf(cattle.getWeight()) : "");
-            if (cattle.getLastVaccinationDate() != null) {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                dateField.setText(cattle.getLastVaccinationDate().format(formatter));
+            if (cattle.getRegistrationDate() != null) {
+                dateField.setText(cattle.getRegistrationDate().format(formatter));
+            } else {
+                dateField.setText(LocalDate.now().format(formatter));
             }
+        } else {
+            dateField.setText(LocalDate.now().format(formatter));
+            cattle.setRegistrationDate(LocalDate.now());
         }
     }
 
-    private void saveAction() {
+    private void writeTagAction() {
         try {
             double weight = 0.0;
             if (!weightField.getText().trim().isEmpty()) {
                 weight = Double.parseDouble(weightField.getText().replace(",", "."));
             }
 
-            LocalDate date = null;
-            if (!dateField.getText().trim().isEmpty()) {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                date = LocalDate.parse(dateField.getText().trim(), formatter);
-            }
-
             cattle.setName(nameField.getText().trim());
             cattle.setWeight(weight);
-            cattle.setLastVaccinationDate(date);
-            cattle.setVaccinatorUser(loggedUser.getUsername());
 
-            controller.saveCattleData(cattle);
-            JOptionPane.showMessageDialog(this, "Dados do animal salvos com sucesso!", "Sucesso",
-                    JOptionPane.INFORMATION_MESSAGE);
-            this.dispose();
+            if (isManual) {
+                writeTagButton.setEnabled(false);
+                writeTagButton.setText("Gravando na Tag...");
+                controller.requestWriteTag(cattle.getRfidTag());
+            }
 
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Peso inválido. Use formato número decimal.", "Erro de Digitação",
                     JOptionPane.ERROR_MESSAGE);
-        } catch (DateTimeParseException ex) {
-            JOptionPane.showMessageDialog(this, "Data inválida. Use formato DD/MM/AAAA.", "Erro de Digitação",
-                    JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void saveDbAction() {
+        try {
+            double weight = 0.0;
+            if (!weightField.getText().trim().isEmpty()) {
+                weight = Double.parseDouble(weightField.getText().replace(",", "."));
+            }
+
+            cattle.setName(nameField.getText().trim());
+            cattle.setWeight(weight);
+
+            controller.saveCattleData(cattle);
+
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Peso inválido. Use formato número decimal.", "Erro de Digitação",
+                    JOptionPane.ERROR_MESSAGE);
+            saveDbButton.setEnabled(true);
+        }
+    }
+
+    // Callback para quando a gravação física der erro
+    public void resetSubmitButton() {
+        writeTagButton.setEnabled(true);
+        writeTagButton.setText("Tentar Gravar Tag Novamente");
+    }
+
+    // Callback para sucesso físico
+    public void onTagWriteSuccess() {
+        writeTagButton.setEnabled(false);
+        writeTagButton.setText("Tag Gravada!");
+        writeTagButton.setBackground(new Color(144, 238, 144)); // Verde claro
+
+        saveDbButton.setEnabled(true);
+        saveDbAction(); // Salva automaticamente ao dar sucesso
+    }
+
+    // Getter para os dados montados
+    public Cattle getPendingCattle() {
+        return cattle;
     }
 }

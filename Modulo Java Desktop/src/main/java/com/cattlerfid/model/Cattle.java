@@ -6,15 +6,13 @@ public class Cattle {
     private String rfidTag;
     private String name;
     private double weight;
-    private LocalDate lastVaccinationDate;
-    private String vaccinatorUser; // Session user who applied the vaccine
+    private LocalDate registrationDate;
 
-    public Cattle(String rfidTag, String name, double weight, LocalDate lastVaccinationDate, String vaccinatorUser) {
+    public Cattle(String rfidTag, String name, double weight, LocalDate registrationDate) {
         this.rfidTag = rfidTag;
         this.name = name;
         this.weight = weight;
-        this.lastVaccinationDate = lastVaccinationDate;
-        this.vaccinatorUser = vaccinatorUser;
+        this.registrationDate = registrationDate;
     }
 
     public Cattle() {
@@ -44,19 +42,11 @@ public class Cattle {
         this.weight = weight;
     }
 
-    public LocalDate getLastVaccinationDate() {
-        return lastVaccinationDate;
+    public LocalDate getRegistrationDate() {
+        return registrationDate;
     }
 
-    public void setLastVaccinationDate(LocalDate lastVaccinationDate) {
-        this.lastVaccinationDate = lastVaccinationDate;
-    }
-
-    public String getVaccinatorUser() {
-        return vaccinatorUser;
-    }
-
-    public void setVaccinatorUser(String vaccinatorUser) {
-        this.vaccinatorUser = vaccinatorUser;
+    public void setRegistrationDate(LocalDate registrationDate) {
+        this.registrationDate = registrationDate;
     }
 }

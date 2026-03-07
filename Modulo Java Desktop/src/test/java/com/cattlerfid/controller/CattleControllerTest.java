@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class CattleControllerTest {
@@ -47,9 +46,57 @@ class CattleControllerTest {
     }
 
     @Test
+    void testRequestWriteTagNotConnected() {
+        when(serialServiceMock.isOpen()).thenReturn(false);
+        controller.requestWriteTag("C1234567890");
+
+        verify(viewListenerMock).onRfidWriteError(anyString());
+        verify(serialServiceMock, never()).requestWrite(anyString());
+    }
+
+    @Test
+    void testRequestWriteTagConnected() {
+        controller.requestWriteTag("C1234567890");
+        verify(serialServiceMock).requestRead(); // Agora ele lê primeiro antes de gravar
+    }
+
+    @Test
+    void testHandleMessageWriteReadUserTagBlocked() {
+        // Simula o pedido pre-gravação
+        controller.requestWriteTag("C123456");
+        // Arduino devolve que leu uma TAG de usuario
+        controller.handleIncomingSerialMessage("RES:OK:V_ADMIN_01:FW:92");
+
+        verify(viewListenerMock).onRfidWriteError(contains("Bloqueado"));
+        verify(serialServiceMock, never()).requestWrite(anyString());
+    }
+
+    @Test
+    void testHandleMessageWriteReadNewTagAllowed() {
+        // Simula o pedido pre-gravação
+        controller.requestWriteTag("C123456");
+        // Arduino devolve a TAG que lá estava (vazia, de animal, ou desconhecida)
+        controller.handleIncomingSerialMessage("RES:OK:C_OLD_TAG:FW:92");
+
+        // O comando write real entra em ação
+        verify(serialServiceMock).requestWrite("C123456");
+    }
+
+    @Test
+    void testHandleMessageWriteReadNoTagError() {
+        // Simula o pedido pre-gravação
+        controller.requestWriteTag("C123456");
+        // Arduino tenta ler mas não acha tag
+        controller.handleIncomingSerialMessage("RES:ERR:NO_TAG:FW:92");
+
+        verify(viewListenerMock).onRfidWriteError(contains("Nenhuma Tag detectada"));
+        verify(serialServiceMock, never()).requestWrite(anyString());
+    }
+
+    @Test
     void testHandleMessageReadSuccessExistingCattle() {
         String simulatedSerialMsg = "RES:OK:C       VACA_001:FW:92";
-        Cattle existingCattle = new Cattle("C       VACA_001", "Mimosa", 400, LocalDate.now(), "vet");
+        Cattle existingCattle = new Cattle("C       VACA_001", "Mimosa", 400, LocalDate.now());
 
         when(apiServiceMock.getCattleByTag("C       VACA_001")).thenReturn(Optional.of(existingCattle));
 
@@ -68,11 +115,12 @@ class CattleControllerTest {
         controller.handleIncomingSerialMessage(simulatedSerialMsg);
 
         verify(apiServiceMock).getCattleByTag("C       DESCONHE");
-        verify(viewListenerMock).onRfidReadSuccess(any(Cattle.class), eq(true));
+        verify(viewListenerMock)
+                .onRfidReadError("Animal não encontrado na base de dados. Por favor, cadastre-o primeiro.");
 
         Cattle c = controller.getCurrentEditingCattle();
-        assertNotNull(c);
-        assertEquals("C       DESCONHE", c.getRfidTag());
+        assertNull(c,
+                "O animal não deve ser instanciado em modo de leitura se a tag for nova (agora bloqueado para o Vaccine Form)");
     }
 
     @Test
@@ -121,6 +169,35 @@ class CattleControllerTest {
         controller.saveCattleData(newCattle);
 
         verify(viewListenerMock).onApiSaveError("Falha ao salvar animal na base de dados (Mock API).");
+    }
+
+    @Test
+    void testSaveVaccineDataSuccess() {
+        com.cattlerfid.model.Vaccine vaccine = new com.cattlerfid.model.Vaccine();
+        Cattle cattle = new Cattle("C123", "Boi", 100.0, LocalDate.now());
+
+        when(apiServiceMock.saveVaccine(vaccine)).thenReturn(true);
+        when(apiServiceMock.saveCattle(cattle)).thenReturn(true);
+
+        controller.saveVaccineData(vaccine, cattle, 150.0);
+
+        assertEquals(150.0, cattle.getWeight());
+        verify(apiServiceMock).saveVaccine(vaccine);
+        verify(apiServiceMock).saveCattle(cattle);
+        verify(viewListenerMock).onApiSaveSuccess();
+    }
+
+    @Test
+    void testSaveVaccineDataError() {
+        com.cattlerfid.model.Vaccine vaccine = new com.cattlerfid.model.Vaccine();
+        Cattle cattle = new Cattle("C123", "Boi", 100.0, LocalDate.now());
+
+        when(apiServiceMock.saveVaccine(vaccine)).thenReturn(false);
+        when(apiServiceMock.saveCattle(cattle)).thenReturn(true);
+
+        controller.saveVaccineData(vaccine, cattle, 150.0);
+
+        verify(viewListenerMock).onApiSaveError("Falha ao registrar a vacina no banco de dados.");
     }
 
     @Test

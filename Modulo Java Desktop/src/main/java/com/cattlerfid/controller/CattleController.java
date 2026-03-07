@@ -15,6 +15,7 @@ public class CattleController {
     // View Callbacks
     private CattleViewListener viewListener;
     private Cattle currentEditingCattle;
+    private String pendingWriteData = null;
     private final Consumer<String> serialListener = this::handleIncomingSerialMessage;
 
     public interface CattleViewListener {
@@ -58,15 +59,15 @@ public class CattleController {
         serialService.requestRead();
     }
 
-    // 2. Inicia um pedido para gravar dados diretamente no Chip da Tag (ex: Nome do
-    // animal)
+    // 2. Inicia um pedido para verificar a tag pre-gravação
     public void requestWriteTag(String dataToWrite) {
         if (!serialService.isOpen()) {
             if (viewListener != null)
                 viewListener.onRfidWriteError("Porta Serial não conectada.");
             return;
         }
-        serialService.requestWrite(dataToWrite);
+        this.pendingWriteData = dataToWrite;
+        serialService.requestRead(); // Valida fisicamente primeiro
     }
 
     // 3. Salva os dados completos do formulario (Mocked Database/API)
@@ -78,6 +79,22 @@ public class CattleController {
         } else {
             if (viewListener != null)
                 viewListener.onApiSaveError("Falha ao salvar animal na base de dados (Mock API).");
+        }
+    }
+
+    // 4. Salva a vacina aplicada e atualiza o peso do animal
+    public void saveVaccineData(com.cattlerfid.model.Vaccine vaccine, Cattle cattle, double currentWeight) {
+        boolean vaccineSuccess = apiService.saveVaccine(vaccine);
+
+        cattle.setWeight(currentWeight);
+        boolean cattleSuccess = apiService.saveCattle(cattle);
+
+        if (vaccineSuccess && cattleSuccess) {
+            if (viewListener != null)
+                viewListener.onApiSaveSuccess();
+        } else {
+            if (viewListener != null)
+                viewListener.onApiSaveError("Falha ao registrar a vacina no banco de dados.");
         }
     }
 
@@ -94,10 +111,39 @@ public class CattleController {
                     if (viewListener != null)
                         viewListener.onRfidWriteSuccess();
                 } else if (parts.length > 2) {
-                    processTagRead(parts[2].trim());
+                    String readTag = parts[2].trim();
+                    if (pendingWriteData != null) {
+                        // Modo pre-gravação
+                        if (readTag.startsWith("V")) {
+                            pendingWriteData = null; // aborta gravação
+                            if (viewListener != null) {
+                                viewListener.onRfidWriteError(
+                                        "Bloqueado: Não é permitido sobrescrever uma Tag de Usuário.");
+                            }
+                        } else {
+                            serialService.requestWrite(pendingWriteData);
+                            pendingWriteData = null;
+                        }
+                    } else {
+                        processTagRead(readTag);
+                    }
                 }
             } else if (parts[1].equals("ERR")) {
                 String cmdError = parts[2];
+
+                // Se der erro durante a leitura pre-gravação
+                if (pendingWriteData != null) {
+                    pendingWriteData = null;
+                    if (viewListener != null) {
+                        if (cmdError.equals("NO_TAG")) {
+                            viewListener.onRfidWriteError("Nenhuma Tag detectada para gravação.");
+                        } else {
+                            viewListener.onRfidWriteError("Erro de leitura antes de gravar: " + cmdError);
+                        }
+                    }
+                    return;
+                }
+
                 if (viewListener != null) {
                     if (cmdError.equals("WRITE_FAILED")) {
                         viewListener.onRfidWriteError("Erro no barramento SPI ao gravar dados na Tag.");
@@ -136,10 +182,8 @@ public class CattleController {
             if (viewListener != null)
                 viewListener.onRfidReadSuccess(currentEditingCattle, false);
         } else {
-            currentEditingCattle = new Cattle();
-            currentEditingCattle.setRfidTag(rfidTag);
             if (viewListener != null)
-                viewListener.onRfidReadSuccess(currentEditingCattle, true);
+                viewListener.onRfidReadError("Animal não encontrado na base de dados. Por favor, cadastre-o primeiro.");
         }
     }
 
