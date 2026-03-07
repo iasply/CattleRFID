@@ -30,15 +30,12 @@ public class ApplicationFrame extends JFrame implements NavigationManager {
     public void showPanel(String name, JPanel panel) {
         // Remove painel se ja existir com este nome para evitar duplicidade de estado
         // no card
-        Component[] components = containerPanel.getComponents();
-        for (Component c : components) {
-            // Nota: O CardLayout usa uma string magica interna mas nao eh facilmente
-            // iteravel por nome.
-            // Para garantir componentes novos limpos, sempre vamos adicionar e dar show.
-            // Como paineis antigos nao sao mais referenciados e serao removidos de
-            // handlers,
-            // a performance é mantida.
-        }
+        // Nota: O CardLayout usa uma string magica interna mas nao eh facilmente
+        // iteravel por nome.
+        // Para garantir componentes novos limpos, sempre vamos adicionar e dar show.
+        // Como paineis antigos nao sao mais referenciados e serao removidos de
+        // handlers,
+        // a performance é mantida.
 
         containerPanel.add(panel, name);
         cardLayout.show(containerPanel, name);

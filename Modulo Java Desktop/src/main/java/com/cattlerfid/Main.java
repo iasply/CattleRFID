@@ -5,14 +5,15 @@ import com.cattlerfid.service.AuthenticationService;
 import com.cattlerfid.service.SerialService;
 import com.cattlerfid.view.ApplicationFrame;
 import com.cattlerfid.view.ConnectionPanel;
+import com.formdev.flatlaf.FlatLightLaf;
 
 import javax.swing.*;
 
 public class Main {
     public static void main(String[] args) {
-        // Look & Feel do Sistema Operacional nativo
+        // Look & Feel moderno (FlatLaf)
         try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            UIManager.setLookAndFeel(new FlatLightLaf());
         } catch (Exception e) {
             e.printStackTrace();
         }

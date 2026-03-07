@@ -6,6 +6,8 @@ import com.cattlerfid.model.User;
 import com.cattlerfid.controller.LoginController;
 import com.cattlerfid.service.AuthenticationService;
 
+import com.cattlerfid.view.utils.UIStyles;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -33,18 +35,21 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
     private void setupUI() {
         setLayout(new BorderLayout(10, 10));
 
+        // Background
+        setBackground(UIStyles.BACKGROUND);
+
         // Topo / Header
         JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(Color.DARK_GRAY);
+        headerPanel.setBackground(UIStyles.PRIMARY);
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        JLabel welcomeLabel = new JLabel("  Usuário: " + loggedUser.getFullName() + " (VET)");
-        welcomeLabel.setForeground(Color.WHITE);
-        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        JLabel welcomeLabel = new JLabel("Usuário: " + loggedUser.getFullName() + " (Veterinário)");
+        welcomeLabel.setForeground(UIStyles.TEXT_LIGHT);
+        welcomeLabel.setFont(UIStyles.SUBHEADER_FONT);
         headerPanel.add(welcomeLabel, BorderLayout.WEST);
 
         // Botão de Logout para Retornar ao LoginPanel
-        JButton logoutButton = new JButton("Sair (Logout)");
-        logoutButton.setFont(new Font("Arial", Font.BOLD, 12));
+        JButton logoutButton = UIStyles.createBackButton("Sair (Logout)");
         logoutButton.addActionListener(e -> {
             int confirm = JOptionPane.showConfirmDialog(this, "Tem certeza que deseja deslogar do sistema?", "Logout",
                     JOptionPane.YES_NO_OPTION);
@@ -65,28 +70,22 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
 
         // Centro (Botoes Gigantes)
         JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 80));
+        centerPanel.setBackground(UIStyles.BACKGROUND);
 
-        scanCattleButton = new JButton("<html><center>IDENTIFICAR / VACINAR<br>(Aproximar Leitor)</center></html>");
-        scanCattleButton.setPreferredSize(new Dimension(200, 100));
-        scanCattleButton.setFont(new Font("Arial", Font.BOLD, 14));
+        scanCattleButton = UIStyles.createPrimaryButton("<html><center>IDENTIFICAR<br>E VACINAR</center></html>");
+        scanCattleButton.setPreferredSize(new Dimension(220, 120));
+        scanCattleButton.setFont(UIStyles.HEADER_FONT);
+        scanCattleButton.setBackground(new Color(230, 81, 0)); // Resembles vibrant Orange
         scanCattleButton.addActionListener(e -> {
             statusLabel.setText("Aproxime a Tag do Animal...");
             cattleController.requestReadTag();
         });
 
-        JButton listButton = new JButton("<html><center>LISTAR GADO<br>(Mock Database)</center></html>");
-        listButton.setPreferredSize(new Dimension(200, 100));
-        listButton.setFont(new Font("Arial", Font.BOLD, 14));
-        listButton.addActionListener(e -> {
-            CattleListPanel listPanel = new CattleListPanel(cattleController.getApiService(), cattleController,
-                    loggedUser, navManager, this);
-            navManager.showPanel("List", listPanel);
-        });
-
-        JButton manualRegisterButton = new JButton(
-                "<html><center>CADASTRAR ANIMAL<br>(Sem Uso do Crachá)</center></html>");
-        manualRegisterButton.setPreferredSize(new Dimension(200, 100));
-        manualRegisterButton.setFont(new Font("Arial", Font.BOLD, 14));
+        JButton manualRegisterButton = UIStyles
+                .createPrimaryButton("<html><center>CADASTRAR<br>MANUAL</center></html>");
+        manualRegisterButton.setPreferredSize(new Dimension(220, 120));
+        manualRegisterButton.setFont(UIStyles.HEADER_FONT);
+        manualRegisterButton.setBackground(UIStyles.SUCCESS);
         manualRegisterButton.addActionListener(e -> {
             statusLabel.setText("Preparando formulário manual...");
 
@@ -105,6 +104,16 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
             navManager.showPanel("ManualRegister", activeCattleForm);
         });
 
+        JButton listButton = UIStyles.createPrimaryButton("<html><center>LISTAR<br>REBANHO</center></html>");
+        listButton.setPreferredSize(new Dimension(220, 120));
+        listButton.setFont(UIStyles.HEADER_FONT);
+        listButton.setBackground(UIStyles.PRIMARY);
+        listButton.addActionListener(e -> {
+            CattleListPanel listPanel = new CattleListPanel(cattleController.getApiService(), cattleController,
+                    loggedUser, navManager, this);
+            navManager.showPanel("List", listPanel);
+        });
+
         centerPanel.add(scanCattleButton);
         centerPanel.add(manualRegisterButton);
         centerPanel.add(listButton);
@@ -112,11 +121,14 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
 
         // Bottom Status
         JPanel bottomPanel = new JPanel(new BorderLayout());
+        bottomPanel.setBackground(UIStyles.SECONDARY);
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+
         statusLabel = new JLabel(" Sistema Pronto.", SwingConstants.LEFT);
-        statusLabel.setBorder(BorderFactory.createBevelBorder(1));
+        statusLabel.setFont(UIStyles.BODY_FONT);
 
         JButton logButton = new JButton("Ver Logs Serial");
-        logButton.setFont(new Font("Arial", Font.BOLD, 12));
+        logButton.setFont(new Font("Arial", Font.PLAIN, 10));
         logButton.addActionListener(e -> {
             SerialLogFrame logFrame = new SerialLogFrame(cattleController.getSerialService());
             logFrame.setVisible(true);

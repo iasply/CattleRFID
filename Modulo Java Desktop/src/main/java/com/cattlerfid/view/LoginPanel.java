@@ -5,6 +5,8 @@ import com.cattlerfid.controller.ConnectionController;
 import com.cattlerfid.service.AuthenticationService;
 import com.cattlerfid.model.User;
 
+import com.cattlerfid.view.utils.UIStyles;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -27,14 +29,17 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
     private void setupUI() {
         setLayout(new BorderLayout(10, 10));
 
+        // Background
+        setBackground(UIStyles.BACKGROUND);
+
         // Header
         JPanel headerPanel = new JPanel(new BorderLayout());
-        JLabel titleLabel = new JLabel("Acesso via Crachá RFID", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        headerPanel.setBackground(UIStyles.BACKGROUND);
+        JLabel titleLabel = UIStyles.createTitleLabel("Acesso via Crachá RFID");
         headerPanel.add(titleLabel, BorderLayout.CENTER);
 
-        JButton backButton = new JButton("< Voltar");
-        backButton.setFont(new Font("Arial", Font.PLAIN, 10));
+        JButton backButton = UIStyles.createBackButton("< Voltar");
+        backButton.setPreferredSize(new Dimension(100, 35));
         backButton.addActionListener(e -> {
             controller.detachSerial();
 
@@ -58,20 +63,31 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
         add(headerPanel, BorderLayout.NORTH);
 
         // Center Panel (Status e Leitura)
-        JPanel centerPanel = new JPanel(new GridLayout(2, 1, 5, 5));
-        centerPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        JPanel centerPanel = new JPanel(new GridLayout(2, 1, 5, 20));
+        centerPanel.setBorder(UIStyles.createCardBorder());
+        centerPanel.setBackground(Color.WHITE);
 
         statusLabel = new JLabel("Aguardando conexão...", SwingConstants.CENTER);
-        statusLabel.setForeground(Color.DARK_GRAY);
+        statusLabel.setFont(UIStyles.BODY_FONT);
+        statusLabel.setForeground(UIStyles.TEXT_DARK);
         centerPanel.add(statusLabel);
 
-        readCardButton = new JButton("Aproximar Crachá (READ)");
-        readCardButton.setFont(new Font("Arial", Font.BOLD, 14));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.setBackground(Color.WHITE);
+        readCardButton = UIStyles.createPrimaryButton("Aproximar Crachá (READ)");
+        readCardButton.setPreferredSize(new Dimension(250, 50));
         readCardButton.setEnabled(false);
         readCardButton.addActionListener(e -> controller.requestCardLogin());
-        centerPanel.add(readCardButton);
+        buttonPanel.add(readCardButton);
 
-        add(centerPanel, BorderLayout.CENTER);
+        centerPanel.add(buttonPanel);
+
+        // Wrapper for centering
+        JPanel wrapperPanel = new JPanel(new GridBagLayout());
+        wrapperPanel.setBackground(UIStyles.BACKGROUND);
+        wrapperPanel.add(centerPanel);
+
+        add(wrapperPanel, BorderLayout.CENTER);
     }
 
     // Callbacks do Controller

@@ -5,6 +5,8 @@ import com.cattlerfid.controller.LoginController;
 import com.cattlerfid.service.AuthenticationService;
 import com.cattlerfid.service.SerialService;
 
+import com.cattlerfid.view.utils.UIStyles;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -34,10 +36,13 @@ public class ConnectionPanel extends JPanel implements ConnectionController.Conn
         setLayout(new BorderLayout(10, 10));
         // Panels do not have setTitle, pack, etc.
 
+        // Background
+        setBackground(UIStyles.BACKGROUND);
+
         // Header
         JPanel headerPanel = new JPanel(new BorderLayout());
-        JLabel titleLabel = new JLabel("Configuração de Hardware", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        headerPanel.setBackground(UIStyles.BACKGROUND);
+        JLabel titleLabel = UIStyles.createTitleLabel("Configuração de Hardware");
         headerPanel.add(titleLabel, BorderLayout.CENTER);
 
         JButton logButton = new JButton("Ver Logs Serial");
@@ -50,19 +55,28 @@ public class ConnectionPanel extends JPanel implements ConnectionController.Conn
         add(headerPanel, BorderLayout.NORTH);
 
         // Center Panel (Config e Status)
-        JPanel centerPanel = new JPanel(new GridLayout(3, 1, 5, 5));
-        centerPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        JPanel centerPanel = new JPanel(new GridLayout(3, 1, 5, 15));
+        centerPanel.setBorder(UIStyles.createCardBorder());
+        centerPanel.setBackground(Color.WHITE);
 
-        JPanel portPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        portPanel.add(new JLabel("Porta Serial (Arduino):"));
+        JPanel portPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
+        portPanel.setBackground(Color.WHITE);
+
+        JLabel portLabel = new JLabel("Porta Serial (Arduino):");
+        portLabel.setFont(UIStyles.LABEL_FONT);
+        portPanel.add(portLabel);
+
         portSelector = new JComboBox<>(SerialService.getAvailablePorts());
+        portSelector.setFont(UIStyles.BODY_FONT);
         portPanel.add(portSelector);
 
-        connectPortButton = new JButton("Conectar");
+        connectPortButton = UIStyles.createPrimaryButton("Conectar");
+        connectPortButton.setPreferredSize(new Dimension(130, 35));
         connectPortButton.addActionListener(e -> connectSerial());
         portPanel.add(connectPortButton);
 
-        disconnectButton = new JButton("Desconectar");
+        disconnectButton = UIStyles.createBackButton("Desconectar");
+        disconnectButton.setPreferredSize(new Dimension(130, 35));
         disconnectButton.setEnabled(false);
         disconnectButton.addActionListener(e -> controller.disconnectSerial());
         portPanel.add(disconnectButton);
@@ -70,16 +84,26 @@ public class ConnectionPanel extends JPanel implements ConnectionController.Conn
         centerPanel.add(portPanel);
 
         statusLabel = new JLabel("Aguardando conexão...", SwingConstants.CENTER);
-        statusLabel.setForeground(Color.DARK_GRAY);
+        statusLabel.setFont(UIStyles.BODY_FONT);
+        statusLabel.setForeground(UIStyles.TEXT_DARK);
         centerPanel.add(statusLabel);
 
-        testReadButton = new JButton("Realizar Teste Inicial de Leitura");
-        testReadButton.setFont(new Font("Arial", Font.BOLD, 14));
+        JPanel testPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        testPanel.setBackground(Color.WHITE);
+        testReadButton = UIStyles.createPrimaryButton("Realizar Teste Inicial de Leitura");
+        testReadButton.setPreferredSize(new Dimension(300, 45));
         testReadButton.setEnabled(false);
         testReadButton.addActionListener(e -> controller.requestTestRead());
-        centerPanel.add(testReadButton);
+        testPanel.add(testReadButton);
 
-        add(centerPanel, BorderLayout.CENTER);
+        centerPanel.add(testPanel);
+
+        // Wrapper for true centering
+        JPanel wrapperPanel = new JPanel(new GridBagLayout());
+        wrapperPanel.setBackground(UIStyles.BACKGROUND);
+        wrapperPanel.add(centerPanel);
+
+        add(wrapperPanel, BorderLayout.CENTER);
     }
 
     private void connectSerial() {

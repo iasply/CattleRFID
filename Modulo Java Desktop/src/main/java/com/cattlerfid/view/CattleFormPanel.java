@@ -4,6 +4,8 @@ import com.cattlerfid.controller.CattleController;
 import com.cattlerfid.model.Cattle;
 import com.cattlerfid.model.User;
 
+import com.cattlerfid.view.utils.UIStyles;
+
 import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDate;
@@ -42,14 +44,18 @@ public class CattleFormPanel extends JPanel {
 
     private void setupUI() {
         setLayout(new BorderLayout(10, 10));
+        setBackground(UIStyles.BACKGROUND);
 
         // Header Title
         JPanel headerPanel = new JPanel(new BorderLayout());
-        JLabel titleLabel = new JLabel(isNew ? "Novo Cadastro de Animal" : "Editando Animal", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        headerPanel.setBackground(UIStyles.BACKGROUND);
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JLabel titleLabel = UIStyles.createTitleLabel(isNew ? "Novo Cadastro de Animal" : "Editando Animal");
         headerPanel.add(titleLabel, BorderLayout.CENTER);
 
-        JButton backButton = new JButton("< Voltar");
+        JButton backButton = UIStyles.createBackButton("< Voltar");
+        backButton.setPreferredSize(new Dimension(100, 30));
         backButton.addActionListener(e -> {
             // Aborta edição e volta
             if (parentMainPanel != null) {
@@ -60,48 +66,101 @@ public class CattleFormPanel extends JPanel {
         headerPanel.add(backButton, BorderLayout.WEST);
         add(headerPanel, BorderLayout.NORTH);
 
-        // Form Pannel
-        JPanel formPanel = new JPanel(new GridLayout(6, 2, 5, 10));
-        formPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
+        // Form Container with Card Styling
+        JPanel cardPanel = new JPanel(new GridBagLayout());
+        cardPanel.setBackground(Color.WHITE);
+        cardPanel.setBorder(UIStyles.createCardBorder());
 
-        formPanel.add(new JLabel("RFID Tag (Apenas Leitura):"));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        // RFID Tag
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        JLabel tagLabel = new JLabel("RFID Tag:");
+        tagLabel.setFont(UIStyles.LABEL_FONT);
+        cardPanel.add(tagLabel, gbc);
+
+        gbc.gridx = 1;
         JTextField tagField = new JTextField(cattle.getRfidTag());
+        tagField.setFont(UIStyles.BODY_FONT);
         tagField.setEditable(false);
-        tagField.setBackground(Color.LIGHT_GRAY);
-        formPanel.add(tagField);
+        tagField.setBackground(UIStyles.SECONDARY);
+        cardPanel.add(tagField, gbc);
 
-        formPanel.add(new JLabel("Responsável (Apenas Leitura):"));
+        // Responsável
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        JLabel respLabel = new JLabel("Responsável:");
+        respLabel.setFont(UIStyles.LABEL_FONT);
+        cardPanel.add(respLabel, gbc);
+
+        gbc.gridx = 1;
         JTextField userField = new JTextField(loggedUser.getFullName());
+        userField.setFont(UIStyles.BODY_FONT);
         userField.setEditable(false);
-        userField.setBackground(Color.LIGHT_GRAY);
-        formPanel.add(userField);
+        userField.setBackground(UIStyles.SECONDARY);
+        cardPanel.add(userField, gbc);
 
-        formPanel.add(new JLabel("Nome / Apelido:"));
+        // Nome
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        JLabel nameLabel = new JLabel("Nome / Apelido:");
+        nameLabel.setFont(UIStyles.LABEL_FONT);
+        cardPanel.add(nameLabel, gbc);
+
+        gbc.gridx = 1;
         nameField = new JTextField();
-        formPanel.add(nameField);
+        nameField.setFont(UIStyles.BODY_FONT);
+        cardPanel.add(nameField, gbc);
 
-        formPanel.add(new JLabel("Peso (kg):"));
+        // Peso
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        JLabel weightLabel = new JLabel("Peso (kg):");
+        weightLabel.setFont(UIStyles.LABEL_FONT);
+        cardPanel.add(weightLabel, gbc);
+
+        gbc.gridx = 1;
         weightField = new JTextField();
-        formPanel.add(weightField);
+        weightField.setFont(UIStyles.BODY_FONT);
+        cardPanel.add(weightField, gbc);
 
-        formPanel.add(new JLabel("Data de Cadastro (DD/MM/AAAA):"));
+        // Data
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        JLabel dateLabel = new JLabel("Data de Cadastro:");
+        dateLabel.setFont(UIStyles.LABEL_FONT);
+        cardPanel.add(dateLabel, gbc);
+
+        gbc.gridx = 1;
         dateField = new JTextField();
+        dateField.setFont(UIStyles.BODY_FONT);
         dateField.setEditable(false);
-        dateField.setBackground(Color.LIGHT_GRAY);
-        formPanel.add(dateField);
+        dateField.setBackground(UIStyles.SECONDARY);
+        cardPanel.add(dateField, gbc);
 
-        add(formPanel, BorderLayout.CENTER);
+        // Wrapper for true centering
+        JPanel wrapperPanel = new JPanel(new GridBagLayout());
+        wrapperPanel.setBackground(UIStyles.BACKGROUND);
+        wrapperPanel.add(cardPanel);
+
+        add(wrapperPanel, BorderLayout.CENTER);
 
         // Botoes Pannel
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 10));
+        buttonPanel.setBackground(UIStyles.BACKGROUND);
 
-        writeTagButton = new JButton("1. Gravar Identidade na Tag Física");
+        writeTagButton = UIStyles.createPrimaryButton("1. Gravar Tag Física");
+        writeTagButton.setPreferredSize(new Dimension(220, 40));
         writeTagButton.addActionListener(e -> writeTagAction());
         // Apenas habilita gravação física se for manual
         writeTagButton.setVisible(isManual);
         buttonPanel.add(writeTagButton);
 
-        saveDbButton = new JButton("2. Salvar no Banco de Dados");
+        saveDbButton = UIStyles.createSuccessButton("2. Salvar no Banco");
+        saveDbButton.setPreferredSize(new Dimension(220, 40));
         saveDbButton.addActionListener(e -> saveDbAction());
         saveDbButton.setEnabled(!isManual || !isNew); // Habilita direto se for edição ou se não for manual
         buttonPanel.add(saveDbButton);

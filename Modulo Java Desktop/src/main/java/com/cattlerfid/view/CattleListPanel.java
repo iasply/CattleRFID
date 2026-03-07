@@ -2,9 +2,11 @@ package com.cattlerfid.view;
 
 import com.cattlerfid.model.Cattle;
 import com.cattlerfid.service.CattleApiService;
+import com.cattlerfid.view.utils.UIStyles;
 
 import com.cattlerfid.model.User;
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.time.format.DateTimeFormatter;
@@ -34,10 +36,20 @@ public class CattleListPanel extends JPanel {
     }
 
     private void setupUI() {
-        setLayout(new BorderLayout(10, 10));
+        setLayout(new BorderLayout(15, 15));
+        setBackground(UIStyles.BACKGROUND);
 
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        topPanel.add(new JLabel("Abaixo estao listados os animais mockados pela API remota:"));
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBackground(UIStyles.BACKGROUND);
+        topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JLabel titleLabel = UIStyles.createTitleLabel("Listagem do Rebanho");
+        topPanel.add(titleLabel, BorderLayout.WEST);
+
+        JLabel descLabel = new JLabel("Visualizando registros da base de dados remota.");
+        descLabel.setFont(UIStyles.BODY_FONT);
+        topPanel.add(descLabel, BorderLayout.SOUTH);
+
         add(topPanel, BorderLayout.NORTH);
 
         // Configuração da Tabela
@@ -51,30 +63,57 @@ public class CattleListPanel extends JPanel {
 
         table = new JTable(tableModel);
         table.setFillsViewportHeight(true);
-        table.setRowHeight(25);
+        table.setRowHeight(35);
         table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
+        table.setFont(UIStyles.BODY_FONT);
+        table.getTableHeader().setFont(UIStyles.SUBHEADER_FONT);
+        table.getTableHeader().setBackground(UIStyles.PRIMARY);
+        table.getTableHeader().setForeground(Color.WHITE);
+
+        // Alternating row colors
+        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (!isSelected) {
+                    c.setBackground(row % 2 == 0 ? Color.WHITE : UIStyles.BACKGROUND);
+                }
+                return c;
+            }
+        });
 
         refreshTable();
 
         JScrollPane scrollPane = new JScrollPane(table);
-        add(scrollPane, BorderLayout.CENTER);
+        scrollPane.setBorder(BorderFactory.createLineBorder(UIStyles.SECONDARY));
+
+        JPanel centerWrapper = new JPanel(new BorderLayout());
+        centerWrapper.setBackground(UIStyles.BACKGROUND);
+        centerWrapper.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
+        centerWrapper.add(scrollPane, BorderLayout.CENTER);
+
+        add(centerWrapper, BorderLayout.CENTER);
 
         // Botoes extra
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-
-        JButton editButton = new JButton("Editar Animal Selecionado");
-        editButton.addActionListener(e -> openEditDialog());
-        bottomPanel.add(editButton);
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
+        bottomPanel.setBackground(UIStyles.BACKGROUND);
 
         JButton logButton = new JButton("Logs Serial");
+        logButton.setFont(new Font("Arial", Font.PLAIN, 10));
         logButton.addActionListener(e -> {
             SerialLogFrame logFrame = new SerialLogFrame(controller.getSerialService());
             logFrame.setVisible(true);
         });
         bottomPanel.add(logButton);
 
-        JButton closeBtn = new JButton("< Voltar para Menu");
+        JButton editButton = UIStyles.createSuccessButton("Editar Selecionado");
+        editButton.setPreferredSize(new Dimension(200, 35));
+        editButton.addActionListener(e -> openEditDialog());
+        bottomPanel.add(editButton);
+
+        JButton closeBtn = UIStyles.createBackButton("< Menu");
+        closeBtn.setPreferredSize(new Dimension(100, 35));
         closeBtn.addActionListener(e -> {
             navManager.showPanel("Main", parentMainPanel);
         });
