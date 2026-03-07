@@ -9,7 +9,7 @@ import java.awt.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class CattleFormFrame extends JFrame {
+public class CattleFormPanel extends JPanel {
 
     private final Cattle cattle;
     private final boolean isNew;
@@ -17,31 +17,48 @@ public class CattleFormFrame extends JFrame {
     private final CattleController controller;
     private final User loggedUser;
 
+    private final NavigationManager navManager;
+    private final MainPanel parentMainPanel;
+
     private JTextField nameField;
     private JTextField weightField;
     private JTextField dateField;
     private JButton writeTagButton;
     private JButton saveDbButton;
 
-    public CattleFormFrame(Cattle cattle, boolean isNew, boolean isManual, CattleController controller,
-            User loggedUser) {
+    public CattleFormPanel(Cattle cattle, boolean isNew, boolean isManual, CattleController controller,
+            User loggedUser, NavigationManager navManager, MainPanel parentMainPanel) {
         this.cattle = cattle;
         this.isNew = isNew;
         this.isManual = isManual;
         this.controller = controller;
         this.loggedUser = loggedUser;
+        this.navManager = navManager;
+        this.parentMainPanel = parentMainPanel;
 
         setupUI();
         populateFields();
-        pack();
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
 
     private void setupUI() {
-        setTitle(isNew ? "Novo Cadastro de Animal" : "Editando Animal");
         setLayout(new BorderLayout(10, 10));
-        setPreferredSize(new Dimension(400, 350));
+
+        // Header Title
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        JLabel titleLabel = new JLabel(isNew ? "Novo Cadastro de Animal" : "Editando Animal", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        headerPanel.add(titleLabel, BorderLayout.CENTER);
+
+        JButton backButton = new JButton("< Voltar");
+        backButton.addActionListener(e -> {
+            // Aborta edição e volta
+            if (parentMainPanel != null) {
+                parentMainPanel.setActiveCattleForm(null); // Clear ref
+            }
+            navManager.showPanel("Main", parentMainPanel);
+        });
+        headerPanel.add(backButton, BorderLayout.WEST);
+        add(headerPanel, BorderLayout.NORTH);
 
         // Form Pannel
         JPanel formPanel = new JPanel(new GridLayout(6, 2, 5, 10));
@@ -86,7 +103,7 @@ public class CattleFormFrame extends JFrame {
 
         saveDbButton = new JButton("2. Salvar no Banco de Dados");
         saveDbButton.addActionListener(e -> saveDbAction());
-        saveDbButton.setEnabled(!isManual); // Bloqueia salvar no DB se for manual até a tag gravar
+        saveDbButton.setEnabled(!isManual || !isNew); // Habilita direto se for edição ou se não for manual
         buttonPanel.add(saveDbButton);
 
         add(buttonPanel, BorderLayout.SOUTH);
@@ -163,6 +180,12 @@ public class CattleFormFrame extends JFrame {
 
         saveDbButton.setEnabled(true);
         saveDbAction(); // Salva automaticamente ao dar sucesso
+
+        // Transição de sucesso
+        if (parentMainPanel != null) {
+            parentMainPanel.setActiveCattleForm(null);
+        }
+        navManager.showPanel("Main", parentMainPanel);
     }
 
     // Getter para os dados montados

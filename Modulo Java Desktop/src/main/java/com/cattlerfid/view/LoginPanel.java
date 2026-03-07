@@ -8,27 +8,24 @@ import com.cattlerfid.model.User;
 import javax.swing.*;
 import java.awt.*;
 
-public class LoginFrame extends JFrame implements LoginController.LoginViewListener {
+public class LoginPanel extends JPanel implements LoginController.LoginViewListener {
 
     private final LoginController controller;
+    private final NavigationManager navManager;
 
     private JLabel statusLabel;
     private JButton readCardButton;
 
-    public LoginFrame(LoginController controller) {
+    public LoginPanel(LoginController controller, NavigationManager navManager) {
         this.controller = controller;
+        this.navManager = navManager;
         this.controller.setViewListener(this);
 
         setupUI();
-        pack();
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
     private void setupUI() {
-        setTitle("Sistema de Vacinação - RFID Login");
         setLayout(new BorderLayout(10, 10));
-        setPreferredSize(new Dimension(450, 250));
 
         // Header
         JPanel headerPanel = new JPanel(new BorderLayout());
@@ -39,8 +36,6 @@ public class LoginFrame extends JFrame implements LoginController.LoginViewListe
         JButton backButton = new JButton("< Voltar");
         backButton.setFont(new Font("Arial", Font.PLAIN, 10));
         backButton.addActionListener(e -> {
-            setVisible(false);
-            dispose();
             controller.detachSerial();
 
             // Desliga a porta para liberá-la antes de voltar pro scanner raw de hardware
@@ -48,8 +43,8 @@ public class LoginFrame extends JFrame implements LoginController.LoginViewListe
 
             AuthenticationService authService = new AuthenticationService();
             ConnectionController connController = new ConnectionController(controller.getSerialService());
-            ConnectionFrame connFrame = new ConnectionFrame(connController, authService);
-            connFrame.setVisible(true);
+            ConnectionPanel connPanel = new ConnectionPanel(connController, authService, navManager);
+            navManager.showPanel("Connection", connPanel);
         });
         headerPanel.add(backButton, BorderLayout.WEST);
 
@@ -87,17 +82,21 @@ public class LoginFrame extends JFrame implements LoginController.LoginViewListe
                     "Bem-vindo(a), " + user.getFullName() + "!",
                     "Acesso Liberado", JOptionPane.INFORMATION_MESSAGE);
 
-            // Sucesso! Esconde esta tela e abre a MainFrame
-            this.setVisible(false);
+            // Sucesso! Esconde esta tela e abre a MainPanel
             controller.detachSerial();
+
+            // Seta o state global
+            if (navManager instanceof ApplicationFrame) {
+                ((ApplicationFrame) navManager).setLoggedUser(user);
+            }
 
             // Instancia o repositorio e controller global do sistema
             com.cattlerfid.service.CattleApiService apiService = new com.cattlerfid.service.CattleApiService();
             com.cattlerfid.controller.CattleController cattleController = new com.cattlerfid.controller.CattleController(
                     apiService, controller.getSerialService());
 
-            MainFrame main = new MainFrame(user, cattleController);
-            main.setVisible(true);
+            MainPanel mainPanel = new MainPanel(user, cattleController, navManager);
+            navManager.showPanel("Main", mainPanel);
         });
     }
 

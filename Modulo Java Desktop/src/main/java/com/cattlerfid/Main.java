@@ -3,7 +3,8 @@ package com.cattlerfid;
 import com.cattlerfid.controller.ConnectionController;
 import com.cattlerfid.service.AuthenticationService;
 import com.cattlerfid.service.SerialService;
-import com.cattlerfid.view.ConnectionFrame;
+import com.cattlerfid.view.ApplicationFrame;
+import com.cattlerfid.view.ConnectionPanel;
 
 import javax.swing.*;
 
@@ -25,13 +26,15 @@ public class Main {
             // 2. Instanciar Controladores Raiz
             ConnectionController connectionController = new ConnectionController(serialService);
 
-            // 3. Inicializar a View Primária (Injetando Controller)
-            ConnectionFrame connectionFrame = new ConnectionFrame(connectionController, authService);
+            // 3. Inicializar a View Primária (ApplicationFrame e ConnectionPanel)
+            ApplicationFrame appFrame = new ApplicationFrame();
+            ConnectionPanel connectionPanel = new ConnectionPanel(connectionController, authService, appFrame);
 
             // 4. Mostrar Aplicação Java
-            connectionFrame.setVisible(true);
+            appFrame.setVisible(true);
+            appFrame.showPanel("Connection", connectionPanel);
 
-            System.out.println("Sistema Modulo Desktop iniciado.");
+            System.out.println("Sistema Modulo Desktop iniciado (Single-Window Mode).");
         });
     }
 }

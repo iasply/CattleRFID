@@ -11,42 +11,62 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
-public class VaccineFormFrame extends JFrame {
+public class VaccineFormPanel extends JPanel {
 
     private final Cattle cattle;
     private final CattleController controller;
     private final User loggedUser;
+    private final NavigationManager navManager;
+    private final MainPanel parentMainPanel;
 
     private JTextField dateField;
     private JTextField vaccineTypeField;
     private JTextField weightField;
+    private JTextField nameField;
     private JButton submitButton;
 
-    public VaccineFormFrame(Cattle cattle, CattleController controller, User loggedUser) {
+    public VaccineFormPanel(Cattle cattle, CattleController controller, User loggedUser, NavigationManager navManager,
+            MainPanel parentMainPanel) {
         this.cattle = cattle;
         this.controller = controller;
         this.loggedUser = loggedUser;
+        this.navManager = navManager;
+        this.parentMainPanel = parentMainPanel;
 
         setupUI();
-        pack();
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
 
     private void setupUI() {
-        setTitle("Registro de Vacinação - " + cattle.getRfidTag());
         setLayout(new BorderLayout(10, 10));
-        setPreferredSize(new Dimension(450, 400));
+
+        // Header
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        JLabel titleLabel = new JLabel("Registro de Vacinação - " + cattle.getRfidTag(), SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        headerPanel.add(titleLabel, BorderLayout.CENTER);
+
+        JButton backButton = new JButton("< Voltar");
+        backButton.addActionListener(e -> {
+            navManager.showPanel("Main", parentMainPanel);
+        });
+        headerPanel.add(backButton, BorderLayout.WEST);
+        add(headerPanel, BorderLayout.NORTH);
 
         // Form Pannel
-        JPanel formPanel = new JPanel(new GridLayout(6, 2, 5, 10));
+        JPanel formPanel = new JPanel(new GridLayout(7, 2, 5, 10));
         formPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
 
-        formPanel.add(new JLabel("Animal Alvo:"));
-        JTextField tagField = new JTextField(cattle.getName() + " (" + cattle.getRfidTag() + ")");
+        formPanel.add(new JLabel("Tag RFID:"));
+        JTextField tagField = new JTextField(cattle.getRfidTag());
         tagField.setEditable(false);
         tagField.setBackground(Color.LIGHT_GRAY);
         formPanel.add(tagField);
+
+        formPanel.add(new JLabel("Nome do Animal:"));
+        nameField = new JTextField(cattle.getName() != null ? cattle.getName() : "");
+        nameField.setEditable(false);
+        nameField.setBackground(Color.LIGHT_GRAY);
+        formPanel.add(nameField);
 
         formPanel.add(new JLabel("Veterinário Responsável:"));
         JTextField userField = new JTextField(loggedUser.getFullName());
@@ -104,9 +124,7 @@ public class VaccineFormFrame extends JFrame {
             v.setVaccinationDate(date);
 
             controller.saveVaccineData(v, cattle, weight);
-            JOptionPane.showMessageDialog(this, "Vacina registrada com sucesso!", "Sucesso",
-                    JOptionPane.INFORMATION_MESSAGE);
-            this.dispose();
+            navManager.showPanel("Main", parentMainPanel);
 
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Peso inválido. Use formato número decimal.", "Erro de Digitação",

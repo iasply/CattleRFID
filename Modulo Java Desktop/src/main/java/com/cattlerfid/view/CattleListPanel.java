@@ -7,39 +7,34 @@ import com.cattlerfid.model.User;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
-public class CattleListFrame extends JFrame {
+public class CattleListPanel extends JPanel {
 
     private final CattleApiService apiService;
     private final com.cattlerfid.controller.CattleController controller;
     private final User loggedUser;
-    private final MainFrame mainFrame;
+    private final NavigationManager navManager;
+    private final MainPanel parentMainPanel;
 
     private DefaultTableModel tableModel;
     private JTable table;
 
-    public CattleListFrame(CattleApiService apiService, com.cattlerfid.controller.CattleController controller,
-            User loggedUser, MainFrame mainFrame) {
+    public CattleListPanel(CattleApiService apiService, com.cattlerfid.controller.CattleController controller,
+            User loggedUser, NavigationManager navManager, MainPanel parentMainPanel) {
         this.apiService = apiService;
         this.controller = controller;
         this.loggedUser = loggedUser;
-        this.mainFrame = mainFrame;
+        this.navManager = navManager;
+        this.parentMainPanel = parentMainPanel;
 
         setupUI();
-        pack();
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
 
     private void setupUI() {
-        setTitle("Controle de Gado Cadastrado");
         setLayout(new BorderLayout(10, 10));
-        setPreferredSize(new Dimension(650, 400));
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topPanel.add(new JLabel("Abaixo estao listados os animais mockados pela API remota:"));
@@ -79,8 +74,10 @@ public class CattleListFrame extends JFrame {
         });
         bottomPanel.add(logButton);
 
-        JButton closeBtn = new JButton("Fechar");
-        closeBtn.addActionListener(e -> dispose());
+        JButton closeBtn = new JButton("< Voltar para Menu");
+        closeBtn.addActionListener(e -> {
+            navManager.showPanel("Main", parentMainPanel);
+        });
         bottomPanel.add(closeBtn);
         add(bottomPanel, BorderLayout.SOUTH);
     }
@@ -120,25 +117,20 @@ public class CattleListFrame extends JFrame {
             Cattle target = targetOpt.get();
             // Abre o formulario como isNew=false, isManual=true (permitir gravação RFID e
             // salvar no DB)
-            CattleFormFrame form = new CattleFormFrame(target, false, true, controller, loggedUser);
+            CattleFormPanel form = new CattleFormPanel(target, false, true, controller, loggedUser, navManager,
+                    parentMainPanel);
 
-            // Informa ao MainFrame (ouvinte master da porta serial) que esta é a tela
+            // Informa ao MainPanel (ouvinte master da porta serial) que esta é a tela
             // aguardando a gravação
-            if (mainFrame != null) {
-                mainFrame.setActiveCattleForm(form);
+            if (parentMainPanel != null) {
+                parentMainPanel.setActiveCattleForm(form);
             }
 
-            form.addWindowListener(new WindowAdapter() {
-                @Override
-                public void windowClosed(WindowEvent e) {
-                    // Limpa a referencia segura na main se ela tiver falhado/encerrado
-                    if (mainFrame != null) {
-                        mainFrame.setActiveCattleForm(null);
-                    }
-                    refreshTable(); // Atualiza a tabela quando o usuario fechar a tela de edição
-                }
-            });
-            form.setVisible(true);
+            // Transitamos para o form de edição. Quando voltar ele vai passar por um novo
+            // state,
+            // mas nós podemos forçar o refresh ao chamar a lista novamente caso seja
+            // necessário.
+            navManager.showPanel("EditCattle", form);
         } else {
             JOptionPane.showMessageDialog(this, "Erro: Animal não encontrado na base de dados.", "Erro",
                     JOptionPane.ERROR_MESSAGE);

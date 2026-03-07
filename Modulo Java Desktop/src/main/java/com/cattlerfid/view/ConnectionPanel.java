@@ -8,10 +8,11 @@ import com.cattlerfid.service.SerialService;
 import javax.swing.*;
 import java.awt.*;
 
-public class ConnectionFrame extends JFrame implements ConnectionController.ConnectionViewListener {
+public class ConnectionPanel extends JPanel implements ConnectionController.ConnectionViewListener {
 
     private final ConnectionController controller;
     private final AuthenticationService authService;
+    private final NavigationManager navManager;
 
     private JLabel statusLabel;
     private JComboBox<String> portSelector;
@@ -19,21 +20,19 @@ public class ConnectionFrame extends JFrame implements ConnectionController.Conn
     private JButton disconnectButton;
     private JButton testReadButton;
 
-    public ConnectionFrame(ConnectionController controller, AuthenticationService authService) {
+    public ConnectionPanel(ConnectionController controller, AuthenticationService authService,
+            NavigationManager navManager) {
         this.controller = controller;
         this.authService = authService;
+        this.navManager = navManager;
         this.controller.setViewListener(this);
 
         setupUI();
-        pack();
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
     private void setupUI() {
-        setTitle("Sistema de Vacinação - Conexão Arduino");
         setLayout(new BorderLayout(10, 10));
-        setPreferredSize(new Dimension(450, 250));
+        // Panels do not have setTitle, pack, etc.
 
         // Header
         JPanel headerPanel = new JPanel(new BorderLayout());
@@ -158,12 +157,12 @@ public class ConnectionFrame extends JFrame implements ConnectionController.Conn
                     "Teste concluído com sucesso!\nConteúdo Lido: " + tagContent + "\nAvançando para o Login.",
                     "Hardware Validado", JOptionPane.INFORMATION_MESSAGE);
 
-            this.setVisible(false);
             controller.detachSerial();
 
             LoginController loginController = new LoginController(authService, controller.getSerialService());
-            LoginFrame loginFrame = new LoginFrame(loginController);
-            loginFrame.setVisible(true);
+            LoginPanel loginPanel = new LoginPanel(loginController, navManager);
+
+            navManager.showPanel("Login", loginPanel);
 
             // Religa o canal Serial ouvindo direto pro LoginController
             loginController.attachToActiveSerial();
