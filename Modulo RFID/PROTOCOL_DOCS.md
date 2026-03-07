@@ -23,8 +23,10 @@ Pede ao Arduino para aguardar uma Tag (timeout de 2,5 segundos) e devolver a str
 
 ### 2. Comando de Gravação
 Pede ao Arduino para aguardar a aproximação de uma Tag e gravar até 16 caracteres de dados nela.
-- **Payload Literal:** `<WRITE:TextoQueQuerAte16Letras>\n`
-- *Nota: Se a string for menor que 16 caracteres, o Arduino preencherá o resto da memória do bloco automaticamente com espaços em branco.*
+- **Formato Exigido (16 Bytes):** O sistema Java exige formato estrito: `[Prefixo_1_Byte][7_Espacos][ID_8_Bytes]`.
+  - **Exemplo Veterinário:** `<WRITE:V       12345678>\n`
+  - **Exemplo Animal:** `<WRITE:C       87654321>\n`
+- *Nota: Se a string for menor que 16 caracteres, o Arduino preencherá o resto da memória do bloco automaticamente com espaços em branco, mas o Java rejeitará a leitura futuramente.*
 
 ---
 
@@ -33,7 +35,7 @@ Para facilitar o processamento em Java, o Arduino sempre responderá usando um p
 Todas as respostas incluem o sufixo `:FW:Versão_Do_Chip_RC522>` no final, permitindo que a aplicação Java saiba imediatamente qual é a versão de firmware da placa física e detecte cabos desconectados (quando o firmware for lido como algo do tipo 0x00).
 
 ### Respostas de Sucesso
-*   `<RES:OK:Texto Lido Da Tag :FW:92>` (Resposta à operação `READ`)
+*   `<RES:OK:C       12345678:FW:92>` (Resposta à operação `READ`)
 *   `<RES:OK:WROTE:FW:92>` (Resposta à operação `WRITE:...`)
 
 ### Respostas de Erro (Tratamento Essencial no Java)

@@ -5,11 +5,13 @@ import com.cattlerfid.service.SerialService;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class SerialLogFrame extends JFrame {
 
     private final SerialService serialService;
     private JTextArea logArea;
+    private final Consumer<String> logListener = this::onLogAppended;
 
     public SerialLogFrame(SerialService serialService) {
         this.serialService = serialService;
@@ -36,17 +38,38 @@ public class SerialLogFrame extends JFrame {
         JScrollPane scrollPane = new JScrollPane(logArea);
         add(scrollPane, BorderLayout.CENTER);
 
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel actionPanel = new JPanel(new BorderLayout(5, 5));
+
+        JPanel inputPanel = new JPanel(new BorderLayout(5, 0));
+        JTextField inputField = new JTextField();
+        JButton sendButton = new JButton("Enviar >");
+        inputPanel.add(new JLabel(" Comando Direto: "), BorderLayout.WEST);
+        inputPanel.add(inputField, BorderLayout.CENTER);
+        inputPanel.add(sendButton, BorderLayout.EAST);
+
+        sendButton.addActionListener(e -> {
+            String text = inputField.getText();
+            if (!text.isEmpty()) {
+                serialService.sendCommand(text + "\n");
+                inputField.setText("");
+            }
+        });
+        inputField.addActionListener(e -> sendButton.doClick());
+
+        JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton clearButton = new JButton("Limpar Tela");
         clearButton.addActionListener(e -> logArea.setText(""));
 
         JButton closeButton = new JButton("Fechar");
         closeButton.addActionListener(e -> dispose());
 
-        bottomPanel.add(clearButton);
-        bottomPanel.add(closeButton);
+        buttonsPanel.add(clearButton);
+        buttonsPanel.add(closeButton);
 
-        add(bottomPanel, BorderLayout.SOUTH);
+        actionPanel.add(inputPanel, BorderLayout.CENTER);
+        actionPanel.add(buttonsPanel, BorderLayout.SOUTH);
+
+        add(actionPanel, BorderLayout.SOUTH);
     }
 
     private void loadHistoryAndSubscribe() {
@@ -57,12 +80,14 @@ public class SerialLogFrame extends JFrame {
         }
 
         // Se inscreve para receber novos logs em tempo real
-        serialService.setOnLogAppended(newLine -> {
-            SwingUtilities.invokeLater(() -> {
-                logArea.append(newLine + "\n");
-                // Faz auto-scroll pra ultima linha
-                logArea.setCaretPosition(logArea.getDocument().getLength());
-            });
+        serialService.addLogListener(logListener);
+    }
+
+    private void onLogAppended(String newLine) {
+        SwingUtilities.invokeLater(() -> {
+            logArea.append(newLine + "\n");
+            // Faz auto-scroll pra ultima linha
+            logArea.setCaretPosition(logArea.getDocument().getLength());
         });
     }
 
@@ -70,7 +95,7 @@ public class SerialLogFrame extends JFrame {
     public void dispose() {
         // Remove listener de tela limpa ao fechar para evitar leaks de memoria,
         // caso o servico Serial sobreviva mais tempo do que a janela.
-        serialService.setOnLogAppended(null);
+        serialService.removeLogListener(logListener);
         super.dispose();
     }
 }

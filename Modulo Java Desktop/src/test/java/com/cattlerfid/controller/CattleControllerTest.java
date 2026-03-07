@@ -48,31 +48,40 @@ class CattleControllerTest {
 
     @Test
     void testHandleMessageReadSuccessExistingCattle() {
-        String simulatedSerialMsg = "RES:OK:TAG_VACA:FW:92";
-        Cattle existingCattle = new Cattle("TAG_VACA", "Mimosa", 400, LocalDate.now(), "vet");
+        String simulatedSerialMsg = "RES:OK:C       VACA_001:FW:92";
+        Cattle existingCattle = new Cattle("C       VACA_001", "Mimosa", 400, LocalDate.now(), "vet");
 
-        when(apiServiceMock.getCattleByTag("TAG_VACA")).thenReturn(Optional.of(existingCattle));
+        when(apiServiceMock.getCattleByTag("C       VACA_001")).thenReturn(Optional.of(existingCattle));
 
         controller.handleIncomingSerialMessage(simulatedSerialMsg);
 
-        verify(apiServiceMock).getCattleByTag("TAG_VACA");
+        verify(apiServiceMock).getCattleByTag("C       VACA_001");
         verify(viewListenerMock).onRfidReadSuccess(existingCattle, false);
     }
 
     @Test
     void testHandleMessageReadSuccessNewCattle() {
-        String simulatedSerialMsg = "RES:OK:TAG_DESCONHECIDA:FW:92";
+        String simulatedSerialMsg = "RES:OK:C       DESCONHE:FW:92";
 
-        when(apiServiceMock.getCattleByTag("TAG_DESCONHECIDA")).thenReturn(Optional.empty());
+        when(apiServiceMock.getCattleByTag("C       DESCONHE")).thenReturn(Optional.empty());
 
         controller.handleIncomingSerialMessage(simulatedSerialMsg);
 
-        verify(apiServiceMock).getCattleByTag("TAG_DESCONHECIDA");
+        verify(apiServiceMock).getCattleByTag("C       DESCONHE");
         verify(viewListenerMock).onRfidReadSuccess(any(Cattle.class), eq(true));
 
         Cattle c = controller.getCurrentEditingCattle();
         assertNotNull(c);
-        assertEquals("TAG_DESCONHECIDA", c.getRfidTag());
+        assertEquals("C       DESCONHE", c.getRfidTag());
+    }
+
+    @Test
+    void testHandleMessageReadUserTagWarning() {
+        String simulatedSerialMsg = "RES:OK:V       VET_0001:FW:92";
+
+        controller.handleIncomingSerialMessage(simulatedSerialMsg);
+
+        verify(viewListenerMock).onRfidReadError(contains("Tag de Usuário"));
     }
 
     @Test
@@ -102,5 +111,57 @@ class CattleControllerTest {
 
         verify(apiServiceMock).saveCattle(newCattle);
         verify(viewListenerMock).onApiSaveSuccess();
+    }
+
+    @Test
+    void testSaveCattleError() {
+        Cattle newCattle = new Cattle();
+        when(apiServiceMock.saveCattle(newCattle)).thenReturn(false);
+
+        controller.saveCattleData(newCattle);
+
+        verify(viewListenerMock).onApiSaveError("Falha ao salvar animal na base de dados (Mock API).");
+    }
+
+    @Test
+    void testHandleMessageReadInvalidTagFormat() {
+        String simulatedSerialMsg = "RES:OK:X       DESCONHE:FW:92";
+
+        controller.handleIncomingSerialMessage(simulatedSerialMsg);
+
+        verify(viewListenerMock).onRfidReadError(contains("Formato de Tag animal inválido"));
+    }
+
+    @Test
+    void testHandleMessageReadErrorNoTag() {
+        String simulatedSerialMsg = "RES:ERR:NO_TAG:FW:92";
+
+        controller.handleIncomingSerialMessage(simulatedSerialMsg);
+
+        verify(viewListenerMock).onRfidReadError("Nenhuma Tag detectada.");
+    }
+
+    @Test
+    void testHandleMessageReadErrorAuth() {
+        String simulatedSerialMsg = "RES:ERR:AUTH:FW:92";
+
+        controller.handleIncomingSerialMessage(simulatedSerialMsg);
+
+        verify(viewListenerMock).onRfidReadError("Erro de autenticação da Tag.");
+    }
+
+    @Test
+    void testHandleMessageReadErrorUnknown() {
+        String simulatedSerialMsg = "RES:ERR:UNKNOWN_FAULT:FW:92";
+
+        controller.handleIncomingSerialMessage(simulatedSerialMsg);
+
+        verify(viewListenerMock).onRfidReadError("Erro desconhecido: UNKNOWN_FAULT");
+    }
+
+    @Test
+    void testGetters() {
+        assertEquals(serialServiceMock, controller.getSerialService());
+        assertEquals(apiServiceMock, controller.getApiService());
     }
 }

@@ -5,6 +5,7 @@ import com.cattlerfid.service.AuthenticationService;
 import com.cattlerfid.service.SerialService;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class LoginController {
 
@@ -14,6 +15,7 @@ public class LoginController {
     // View Callbacks
     private LoginViewListener viewListener;
     private User loggedUser;
+    private final Consumer<String> serialListener = this::handleIncomingSerialMessage;
 
     public interface LoginViewListener {
         void onLoginSuccess(User user);
@@ -39,13 +41,25 @@ public class LoginController {
     public void startSerialConnection(String portName) {
         if (serialService.connect(portName)) {
             // Configura o parser de mensagens assincronas vindo do Arduino
-            serialService.setOnMessageReceived(this::handleIncomingSerialMessage);
+            serialService.addMessageListener(serialListener);
             if (viewListener != null)
                 viewListener.onSerialConnected();
         } else {
             if (viewListener != null)
                 viewListener.onSerialError("Não foi possível conectar na porta " + portName);
         }
+    }
+
+    public void attachToActiveSerial() {
+        if (serialService.isOpen()) {
+            serialService.addMessageListener(serialListener);
+            if (viewListener != null)
+                viewListener.onSerialConnected();
+        }
+    }
+
+    public void detachSerial() {
+        serialService.removeMessageListener(serialListener);
     }
 
     public void requestCardLogin() {
@@ -69,6 +83,13 @@ public class LoginController {
             if (parts[1].equals("OK")) {
                 // Sucesso de leitura
                 String tagContent = parts[2].trim();
+                if (tagContent.length() != 16 || !tagContent.startsWith("V")) {
+                    if (viewListener != null) {
+                        viewListener.onLoginError(
+                                "Tag inválida para Login. (Requer 16 chars e prefixo V). Lido: '" + tagContent + "'");
+                    }
+                    return;
+                }
                 attemptLogin(tagContent);
             } else if (parts[1].equals("ERR")) {
                 if (viewListener != null) {

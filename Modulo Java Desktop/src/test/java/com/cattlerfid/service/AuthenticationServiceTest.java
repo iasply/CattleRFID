@@ -19,7 +19,7 @@ class AuthenticationServiceTest {
 
     @Test
     void testAuthenticateWithValidTag() {
-        Optional<User> userOpt = authService.authenticateByTag("TAG_VET_01");
+        Optional<User> userOpt = authService.authenticateByTag("V       VET_0001");
         assertTrue(userOpt.isPresent());
         assertEquals("joao_vet", userOpt.get().getUsername());
         assertEquals("Joao Silva", userOpt.get().getFullName());

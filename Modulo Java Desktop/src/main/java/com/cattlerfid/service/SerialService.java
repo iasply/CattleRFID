@@ -15,19 +15,19 @@ public class SerialService {
 
     private SerialPort activePort;
     private OutputStream outputStream;
-    private Consumer<String> onMessageReceived; // Callback para quando a UI ou Controller precisar da string
+    private final List<Consumer<String>> messageListeners = new ArrayList<>();
     private final StringBuilder messageBuffer = new StringBuilder(); // Buffer para as mensagens seriais
 
     // Logs
     private final List<String> logHistory = new ArrayList<>();
-    private Consumer<String> onLogAppended;
+    private final List<Consumer<String>> logListeners = new ArrayList<>();
 
     private void appendLog(String origin, String message) {
         String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss.SSS"));
         String entry = String.format("[%s] %-5s %s", time, origin, message);
         logHistory.add(entry);
-        if (onLogAppended != null) {
-            onLogAppended.accept(entry);
+        for (Consumer<String> listener : logListeners) {
+            listener.accept(entry);
         }
     }
 
@@ -35,8 +35,14 @@ public class SerialService {
         return new ArrayList<>(logHistory);
     }
 
-    public void setOnLogAppended(Consumer<String> callback) {
-        this.onLogAppended = callback;
+    public void addLogListener(Consumer<String> listener) {
+        if (!logListeners.contains(listener)) {
+            logListeners.add(listener);
+        }
+    }
+
+    public void removeLogListener(Consumer<String> listener) {
+        logListeners.remove(listener);
     }
 
     // Inicia a porta Serial. Retorna true se conectou.
@@ -65,8 +71,14 @@ public class SerialService {
         return activePort != null && activePort.isOpen();
     }
 
-    public void setOnMessageReceived(Consumer<String> callback) {
-        this.onMessageReceived = callback;
+    public void addMessageListener(Consumer<String> listener) {
+        if (!messageListeners.contains(listener)) {
+            messageListeners.add(listener);
+        }
+    }
+
+    public void removeMessageListener(Consumer<String> listener) {
+        messageListeners.remove(listener);
     }
 
     // Envia o comando de leitura pro Arduino: <READ>\n
@@ -83,7 +95,7 @@ public class SerialService {
     }
 
     // Funcao generica para mandar Bytes pra porta OUt
-    protected void sendCommand(String command) {
+    public void sendCommand(String command) {
         if (isOpen()) {
             try {
                 appendLog("OUT", command.trim());
@@ -136,8 +148,8 @@ public class SerialService {
                                 // Valida se é o nosso pacote esperado
                                 if (message.startsWith("<") && message.endsWith(">")) {
                                     message = message.substring(1, message.length() - 1); // Remove os <>
-                                    if (onMessageReceived != null) {
-                                        onMessageReceived.accept(message);
+                                    for (Consumer<String> listener : messageListeners) {
+                                        listener.accept(message);
                                     }
                                 } else {
                                     appendLog("WARN", "Pacote incompleto ignorado: " + message);

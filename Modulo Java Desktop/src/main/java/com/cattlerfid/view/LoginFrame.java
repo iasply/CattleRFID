@@ -1,8 +1,9 @@
 package com.cattlerfid.view;
 
 import com.cattlerfid.controller.LoginController;
+import com.cattlerfid.controller.ConnectionController;
+import com.cattlerfid.service.AuthenticationService;
 import com.cattlerfid.model.User;
-import com.cattlerfid.service.SerialService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,8 +13,6 @@ public class LoginFrame extends JFrame implements LoginController.LoginViewListe
     private final LoginController controller;
 
     private JLabel statusLabel;
-    private JButton connectPortButton;
-    private JComboBox<String> portSelector;
     private JButton readCardButton;
 
     public LoginFrame(LoginController controller) {
@@ -37,6 +36,23 @@ public class LoginFrame extends JFrame implements LoginController.LoginViewListe
         titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
         headerPanel.add(titleLabel, BorderLayout.CENTER);
 
+        JButton backButton = new JButton("< Voltar");
+        backButton.setFont(new Font("Arial", Font.PLAIN, 10));
+        backButton.addActionListener(e -> {
+            setVisible(false);
+            dispose();
+            controller.detachSerial();
+
+            // Desliga a porta para liberá-la antes de voltar pro scanner raw de hardware
+            controller.getSerialService().disconnect();
+
+            AuthenticationService authService = new AuthenticationService();
+            ConnectionController connController = new ConnectionController(controller.getSerialService());
+            ConnectionFrame connFrame = new ConnectionFrame(connController, authService);
+            connFrame.setVisible(true);
+        });
+        headerPanel.add(backButton, BorderLayout.WEST);
+
         JButton logButton = new JButton("Ver Logs Serial");
         logButton.setFont(new Font("Arial", Font.PLAIN, 10));
         logButton.addActionListener(e -> {
@@ -46,20 +62,9 @@ public class LoginFrame extends JFrame implements LoginController.LoginViewListe
         headerPanel.add(logButton, BorderLayout.EAST);
         add(headerPanel, BorderLayout.NORTH);
 
-        // Center Panel (Config e Status)
-        JPanel centerPanel = new JPanel(new GridLayout(3, 1, 5, 5));
+        // Center Panel (Status e Leitura)
+        JPanel centerPanel = new JPanel(new GridLayout(2, 1, 5, 5));
         centerPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-
-        JPanel portPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        portPanel.add(new JLabel("Porta Serial (Arduino):"));
-        portSelector = new JComboBox<>(SerialService.getAvailablePorts());
-        portPanel.add(portSelector);
-
-        connectPortButton = new JButton("Conectar");
-        connectPortButton.addActionListener(e -> connectSerial());
-        portPanel.add(connectPortButton);
-
-        centerPanel.add(portPanel);
 
         statusLabel = new JLabel("Aguardando conexão...", SwingConstants.CENTER);
         statusLabel.setForeground(Color.DARK_GRAY);
@@ -74,14 +79,6 @@ public class LoginFrame extends JFrame implements LoginController.LoginViewListe
         add(centerPanel, BorderLayout.CENTER);
     }
 
-    private void connectSerial() {
-        if (portSelector.getSelectedItem() != null) {
-            String port = portSelector.getSelectedItem().toString();
-            statusLabel.setText("Conectando na " + port + "...");
-            controller.startSerialConnection(port);
-        }
-    }
-
     // Callbacks do Controller
     @Override
     public void onLoginSuccess(User user) {
@@ -92,6 +89,7 @@ public class LoginFrame extends JFrame implements LoginController.LoginViewListe
 
             // Sucesso! Esconde esta tela e abre a MainFrame
             this.setVisible(false);
+            controller.detachSerial();
 
             // Instancia o repositorio e controller global do sistema
             com.cattlerfid.service.CattleApiService apiService = new com.cattlerfid.service.CattleApiService();
@@ -119,8 +117,6 @@ public class LoginFrame extends JFrame implements LoginController.LoginViewListe
         SwingUtilities.invokeLater(() -> {
             statusLabel.setText("Arduino Conectado! Por favor, leia seu crachá.");
             statusLabel.setForeground(new Color(0, 150, 0)); // Verde escuro
-            connectPortButton.setEnabled(false);
-            portSelector.setEnabled(false);
             readCardButton.setEnabled(true);
         });
     }

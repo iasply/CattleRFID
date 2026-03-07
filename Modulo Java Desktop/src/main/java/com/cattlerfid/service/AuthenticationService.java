@@ -11,10 +11,11 @@ public class AuthenticationService {
             return Optional.empty();
         }
 
-        // Mock de usuarios
-        if (rfidTag.equals("TAG_VET_01")) {
+        // Mock de usuarios com prefixo V (Veterinario), 7 espacos e 8 chars ID totais
+        // 16
+        if (rfidTag.equals("V       VET_0001")) {
             return Optional.of(new User("joao_vet", "Joao Silva"));
-        } else if (rfidTag.equals("TAG_VET_02")) {
+        } else if (rfidTag.equals("V       VET_0002")) {
             return Optional.of(new User("maria_vet", "Maria Souza"));
         }
 

@@ -73,18 +73,8 @@ public class CattleFormFrame extends JFrame {
         // Botoes Pannel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-        JButton writeChipButton = new JButton("Gravar Nome No Chip");
-        writeChipButton.addActionListener(e -> {
-            if (nameField.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Preencha um nome primeiro para gravar no chip.", "Alerta",
-                        JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-            JOptionPane.showMessageDialog(this, "Aproxime A MESMA tag na antena agora. O nome será gravado nela.",
-                    "Info", JOptionPane.INFORMATION_MESSAGE);
-            controller.requestWriteTag(nameField.getText().trim());
-        });
-        buttonPanel.add(writeChipButton);
+        // Botao de gravar no chip foi removido. A definicao da tag agora eh feita
+        // manualmente no log.
 
         JButton logButton = new JButton("Logs");
         logButton.addActionListener(e -> {

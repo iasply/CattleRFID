@@ -29,7 +29,7 @@ class SerialServiceTest {
         }
 
         @Override
-        protected void sendCommand(String command) {
+        public void sendCommand(String command) {
             this.lastSentCommand = command; // Captura pra validacao
         }
 

@@ -5,6 +5,7 @@ import com.cattlerfid.service.CattleApiService;
 import com.cattlerfid.service.SerialService;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class CattleController {
 
@@ -14,6 +15,7 @@ public class CattleController {
     // View Callbacks
     private CattleViewListener viewListener;
     private Cattle currentEditingCattle;
+    private final Consumer<String> serialListener = this::handleIncomingSerialMessage;
 
     public interface CattleViewListener {
         void onRfidReadSuccess(Cattle cattle, boolean isNew);
@@ -38,8 +40,12 @@ public class CattleController {
         this.viewListener = listener;
         // Assegura que o parser de serial agora aponte pros listeners do Cattle
         if (serialService.isOpen()) {
-            serialService.setOnMessageReceived(this::handleIncomingSerialMessage);
+            serialService.addMessageListener(serialListener);
         }
+    }
+
+    public void detachSerial() {
+        serialService.removeMessageListener(serialListener);
     }
 
     // 1. Inicia um pedido para ler uma Tag
@@ -108,6 +114,20 @@ public class CattleController {
     }
 
     private void processTagRead(String rfidTag) {
+        if (!rfidTag.startsWith("C")) {
+            if (rfidTag.startsWith("V")) {
+                if (viewListener != null) {
+                    viewListener.onRfidReadError(
+                            "Atenção: Você leu uma Tag de Usuário (Veterinário) ao invés de um Animal.");
+                }
+            } else {
+                if (viewListener != null) {
+                    viewListener.onRfidReadError("Formato de Tag animal inválido (Requer prefixo C). Lido: " + rfidTag);
+                }
+            }
+            return;
+        }
+
         // Verifica se a Tag recemn-lida ja existe no banco principal
         Optional<Cattle> existing = apiService.getCattleByTag(rfidTag);
 

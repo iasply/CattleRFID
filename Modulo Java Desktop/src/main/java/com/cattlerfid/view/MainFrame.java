@@ -3,6 +3,8 @@ package com.cattlerfid.view;
 import com.cattlerfid.controller.CattleController;
 import com.cattlerfid.model.Cattle;
 import com.cattlerfid.model.User;
+import com.cattlerfid.controller.LoginController;
+import com.cattlerfid.service.AuthenticationService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -39,6 +41,27 @@ public class MainFrame extends JFrame implements CattleController.CattleViewList
         welcomeLabel.setForeground(Color.WHITE);
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 14));
         headerPanel.add(welcomeLabel, BorderLayout.WEST);
+
+        // Botão de Logout para Retornar ao LoginFrame
+        JButton logoutButton = new JButton("Sair (Logout)");
+        logoutButton.setFont(new Font("Arial", Font.BOLD, 12));
+        logoutButton.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(this, "Tem certeza que deseja deslogar do sistema?", "Logout",
+                    JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                this.setVisible(false);
+                this.dispose();
+                cattleController.detachSerial();
+
+                // Reconstroi serviço e abre a tela pura de Login pendurada na mesma serial viva
+                AuthenticationService authService = new AuthenticationService();
+                LoginController loginController = new LoginController(authService, cattleController.getSerialService());
+                LoginFrame loginFrame = new LoginFrame(loginController);
+                loginFrame.setVisible(true);
+                loginController.attachToActiveSerial();
+            }
+        });
+        headerPanel.add(logoutButton, BorderLayout.EAST);
 
         add(headerPanel, BorderLayout.NORTH);
 
