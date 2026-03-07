@@ -4,7 +4,6 @@ import com.cattlerfid.controller.CattleController;
 import com.cattlerfid.model.Cattle;
 import com.cattlerfid.model.User;
 import com.cattlerfid.model.Vaccine;
-
 import com.cattlerfid.view.utils.UIStyles;
 
 import javax.swing.*;
@@ -28,7 +27,7 @@ public class VaccineFormPanel extends JPanel {
     private JButton submitButton;
 
     public VaccineFormPanel(Cattle cattle, CattleController controller, User loggedUser, NavigationManager navManager,
-            MainPanel parentMainPanel) {
+                            MainPanel parentMainPanel) {
         this.cattle = cattle;
         this.controller = controller;
         this.loggedUser = loggedUser;

@@ -4,7 +4,6 @@ import com.cattlerfid.controller.ConnectionController;
 import com.cattlerfid.controller.LoginController;
 import com.cattlerfid.service.AuthenticationService;
 import com.cattlerfid.service.SerialService;
-
 import com.cattlerfid.view.utils.UIStyles;
 
 import javax.swing.*;
@@ -23,7 +22,7 @@ public class ConnectionPanel extends JPanel implements ConnectionController.Conn
     private JButton testReadButton;
 
     public ConnectionPanel(ConnectionController controller, AuthenticationService authService,
-            NavigationManager navManager) {
+                           NavigationManager navManager) {
         this.controller = controller;
         this.authService = authService;
         this.navManager = navManager;

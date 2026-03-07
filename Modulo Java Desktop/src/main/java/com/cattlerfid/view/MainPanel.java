@@ -1,11 +1,10 @@
 package com.cattlerfid.view;
 
 import com.cattlerfid.controller.CattleController;
+import com.cattlerfid.controller.LoginController;
 import com.cattlerfid.model.Cattle;
 import com.cattlerfid.model.User;
-import com.cattlerfid.controller.LoginController;
 import com.cattlerfid.service.AuthenticationService;
-
 import com.cattlerfid.view.utils.UIStyles;
 
 import javax.swing.*;

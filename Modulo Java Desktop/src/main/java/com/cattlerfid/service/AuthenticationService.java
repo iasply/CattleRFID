@@ -1,6 +1,7 @@
 package com.cattlerfid.service;
 
 import com.cattlerfid.model.User;
+
 import java.util.Optional;
 
 public class AuthenticationService {

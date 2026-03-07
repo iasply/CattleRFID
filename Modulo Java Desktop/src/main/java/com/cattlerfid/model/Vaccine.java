@@ -11,7 +11,7 @@ public class Vaccine {
     private double currentWeight; // Peso do animal no momento da vacinação
 
     public Vaccine(String id, String rfidTag, LocalDate vaccinationDate, String vaccinatorUser, String vaccineType,
-            double currentWeight) {
+                   double currentWeight) {
         this.id = id;
         this.rfidTag = rfidTag;
         this.vaccinationDate = vaccinationDate;

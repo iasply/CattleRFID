@@ -49,7 +49,7 @@ public class SerialService {
     public boolean connect(String portName) {
         activePort = SerialPort.getCommPort(portName);
         activePort.setComPortParameters(9600, 8, 1, 0); // 9600 baud rate, 8 bits de dados, 1 bit de parada, sem
-                                                        // paridade
+        // paridade
         activePort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 100, 0);
 
         if (activePort.openPort()) {

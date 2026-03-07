@@ -3,7 +3,6 @@ package com.cattlerfid.view;
 import com.cattlerfid.controller.CattleController;
 import com.cattlerfid.model.Cattle;
 import com.cattlerfid.model.User;
-
 import com.cattlerfid.view.utils.UIStyles;
 
 import javax.swing.*;
@@ -29,7 +28,7 @@ public class CattleFormPanel extends JPanel {
     private JButton saveDbButton;
 
     public CattleFormPanel(Cattle cattle, boolean isNew, boolean isManual, CattleController controller,
-            User loggedUser, NavigationManager navManager, MainPanel parentMainPanel) {
+                           User loggedUser, NavigationManager navManager, MainPanel parentMainPanel) {
         this.cattle = cattle;
         this.isNew = isNew;
         this.isManual = isManual;

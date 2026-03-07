@@ -1,6 +1,7 @@
 package com.cattlerfid.controller;
 
 import com.cattlerfid.service.SerialService;
+
 import java.util.function.Consumer;
 
 public class ConnectionController {

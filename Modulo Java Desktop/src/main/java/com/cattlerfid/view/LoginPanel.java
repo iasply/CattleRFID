@@ -1,10 +1,9 @@
 package com.cattlerfid.view;
 
-import com.cattlerfid.controller.LoginController;
 import com.cattlerfid.controller.ConnectionController;
-import com.cattlerfid.service.AuthenticationService;
+import com.cattlerfid.controller.LoginController;
 import com.cattlerfid.model.User;
-
+import com.cattlerfid.service.AuthenticationService;
 import com.cattlerfid.view.utils.UIStyles;
 
 import javax.swing.*;
