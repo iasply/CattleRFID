@@ -5,6 +5,8 @@ import com.cattlerfid.model.Cattle;
 import com.cattlerfid.model.User;
 import com.cattlerfid.model.Vaccine;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
@@ -75,9 +77,11 @@ public class CattleApiService {
         try {
             HttpResponse<String> response = sendAndLog(request);
             if (response.statusCode() == 200) {
+                JsonObject jsonObject = gson.fromJson(response.body(), JsonObject.class);
+                JsonArray dataArray = jsonObject.getAsJsonArray("data");
                 Type listType = new TypeToken<ArrayList<Cattle>>() {
                 }.getType();
-                return gson.fromJson(response.body(), listType);
+                return gson.fromJson(dataArray, listType);
             }
         } catch (IOException | InterruptedException e) {
             handleError("Error fetching all cattle", e);
@@ -96,9 +100,11 @@ public class CattleApiService {
         try {
             HttpResponse<String> response = sendAndLog(request);
             if (response.statusCode() == 200) {
+                JsonObject jsonObject = gson.fromJson(response.body(), JsonObject.class);
+                JsonArray dataArray = jsonObject.getAsJsonArray("data");
                 Type listType = new TypeToken<ArrayList<Cattle>>() {
                 }.getType();
-                return gson.fromJson(response.body(), listType);
+                return gson.fromJson(dataArray, listType);
             }
         } catch (IOException | InterruptedException e) {
             handleError("Error fetching all cattle with vaccines", e);
@@ -174,9 +180,11 @@ public class CattleApiService {
         try {
             HttpResponse<String> response = sendAndLog(request);
             if (response.statusCode() == 200) {
+                JsonObject jsonObject = gson.fromJson(response.body(), JsonObject.class);
+                JsonArray dataArray = jsonObject.getAsJsonArray("data");
                 Type listType = new TypeToken<ArrayList<Vaccine>>() {
                 }.getType();
-                return gson.fromJson(response.body(), listType);
+                return gson.fromJson(dataArray, listType);
             }
         } catch (IOException | InterruptedException e) {
             handleError("Error fetching vaccines for tag: " + rfidTag, e);

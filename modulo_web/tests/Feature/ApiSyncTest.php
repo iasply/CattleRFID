@@ -19,6 +19,8 @@ class ApiSyncTest extends TestCase
         ]);
 
         $cattle = Cattle::create([
+            'rfid_tag' => 'TAG-SYNC',
+            'registration_date' => now()->toDateString(),
             'name' => 'Mimosa API',
             'weight' => 300.0,
         ]);

@@ -61,6 +61,6 @@ class CattleApiTest extends TestCase
             ->getJson('/api/cattle');
 
         $response->assertStatus(200)
-            ->assertJsonCount(2);
+            ->assertJsonCount(2, 'data');
     }
 }

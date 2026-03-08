@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\DTOs\Request\Vaccine\StoreVaccineRequest;
-use App\DTOs\Response\VaccineResponse;
+use App\Http\Resources\VaccineResource;
 use App\Http\Controllers\Controller;
 use App\Models\Cattle;
 use App\Models\Vaccine;
@@ -36,7 +36,7 @@ class VaccineApiController extends Controller
 
         return response()->json([
             'message' => 'Vacinação registrada via API!',
-            'vaccine' => VaccineResponse::fromModel($vaccine)->toArray(),
+            'vaccine' => new VaccineResource($vaccine),
         ], 201);
     }
 
@@ -51,10 +51,8 @@ class VaccineApiController extends Controller
             $query->where('rfid_tag', $request->rfid_tag);
         }
 
-        $vaccines = $query->latest()->get();
+        $vaccines = $query->latest()->paginate(50);
 
-        $response = $vaccines->map(fn($v) => VaccineResponse::fromModel($v)->toArray());
-
-        return response()->json($response);
+        return response()->json(VaccineResource::collection($vaccines)->response()->getData(true));
     }
 }

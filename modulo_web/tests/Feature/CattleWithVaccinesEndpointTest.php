@@ -60,18 +60,20 @@ class CattleWithVaccinesEndpointTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
-            '*' => [
-                'id',
-                'rfid_tag',
-                'name',
-                'weight',
-                'registration_date',
-                'vaccines_count'
+            'data' => [
+                '*' => [
+                    'id',
+                    'rfid_tag',
+                    'name',
+                    'weight',
+                    'registration_date',
+                    'vaccines_count'
+                ]
             ]
         ]);
 
         // Assert data values are correct
-        $data = collect($response->json());
+        $data = collect($response->json('data'));
 
         $item1 = $data->firstWhere('rfid_tag', 'TAG001');
         $this->assertEquals(2, $item1['vaccines_count']);

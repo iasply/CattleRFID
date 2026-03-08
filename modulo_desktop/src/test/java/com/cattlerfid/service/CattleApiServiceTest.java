@@ -67,7 +67,7 @@ class CattleApiServiceTest {
     @Test
     void testGetAllCattle() throws IOException, InterruptedException {
         // Arrange
-        String jsonResponse = "[{\"rfid_tag\":\"TAG1\",\"name\":\"A\"},{\"rfid_tag\":\"TAG2\",\"name\":\"B\"}]";
+        String jsonResponse = "{ \"data\": [{\"rfid_tag\":\"TAG1\",\"name\":\"A\"},{\"rfid_tag\":\"TAG2\",\"name\":\"B\"}] }";
 
         when(config.url("/cattle")).thenReturn("http://localhost/api/cattle");
         when(httpResponse.statusCode()).thenReturn(200);
@@ -117,7 +117,7 @@ class CattleApiServiceTest {
     void testGetVaccinesByCattle() throws IOException, InterruptedException {
         // Arrange
         String rfidTag = "TAG_BOI_100";
-        String jsonResponse = "[{\"rfid_tag\":\"TAG_BOI_100\",\"vaccine_type\":\"Aftosa\"}]";
+        String jsonResponse = "{ \"data\": [{\"rfid_tag\":\"TAG_BOI_100\",\"vaccine_type\":\"Aftosa\"}] }";
 
         when(config.url("/vaccines?rfid_tag=" + rfidTag))
                 .thenReturn("http://localhost/api/vaccines?rfid_tag=" + rfidTag);
@@ -136,7 +136,7 @@ class CattleApiServiceTest {
     @Test
     void testGetAllCattleWithVaccines() throws IOException, InterruptedException {
         // Arrange
-        String jsonResponse = "[{\"rfid_tag\":\"TAG1\",\"name\":\"A\",\"vaccines_count\":2},{\"rfid_tag\":\"TAG2\",\"name\":\"B\",\"vaccines_count\":0}]";
+        String jsonResponse = "{ \"data\": [{\"rfid_tag\":\"TAG1\",\"name\":\"A\",\"vaccines_count\":2},{\"rfid_tag\":\"TAG2\",\"name\":\"B\",\"vaccines_count\":0}] }";
 
         when(config.url("/cattle-with-vaccines")).thenReturn("http://localhost/api/cattle-with-vaccines");
         when(httpResponse.statusCode()).thenReturn(200);

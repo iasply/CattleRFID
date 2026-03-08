@@ -121,9 +121,9 @@ class VaccineApiTest extends TestCase
             ->getJson('/api/vaccines?rfid_tag=TAG-A');
 
         $response->assertStatus(200)
-            ->assertJsonCount(2);
+            ->assertJsonCount(2, 'data');
 
-        foreach ($response->json() as $v) {
+        foreach ($response->json('data') as $v) {
             $this->assertEquals('TAG-A', $v['rfid_tag']);
         }
     }

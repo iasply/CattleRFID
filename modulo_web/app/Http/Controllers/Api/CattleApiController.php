@@ -4,41 +4,51 @@ namespace App\Http\Controllers\Api;
 
 use App\DTOs\Request\Cattle\StoreCattleRequest;
 use App\DTOs\Request\Cattle\UpdateCattleRequest;
-use App\DTOs\Response\CattleResponse;
+use App\Http\Resources\CattleResource;
 use App\Http\Controllers\Controller;
 use App\Models\Cattle;
 use Illuminate\Http\JsonResponse;
 
 class CattleApiController extends Controller
 {
+    public function __construct(
+        protected \App\Services\CattleService $cattleService
+    ) {
+    }
+
     public function index(): JsonResponse
     {
-        $items = Cattle::all()->map(fn(Cattle $c) => CattleResponse::fromModel($c)->toArray());
-
-        return response()->json($items);
+        $items = Cattle::paginate(50);
+        return response()->json(CattleResource::collection($items)->response()->getData(true));
     }
 
     public function indexWithVaccines(): JsonResponse
     {
-        $items = \App\Models\CattleWithVaccinesView::all()->map(function ($c) {
-            $data = CattleResponse::fromModel(Cattle::find($c->id))->toArray();
-            $data['vaccines_count'] = (int) $c->vaccines_count;
-            return $data;
-        });
+        $items = \App\Models\CattleWithVaccinesView::paginate(50);
+
+        // We iterate through the paginated view items and map them 
+        // using CattleResource, injecting vaccines_count 
+        $mappedItems = $items->getCollection()->map(function ($c) {
+            $cattleModel = Cattle::find($c->id);
+            if ($cattleModel) {
+                $cattleModel->setAttribute('vaccines_count', $c->vaccines_count);
+                return new CattleResource($cattleModel);
+            }
+            return null;
+        })->filter();
+
+        $items->setCollection($mappedItems);
 
         return response()->json($items);
     }
 
     public function store(StoreCattleRequest $request): JsonResponse
     {
-        $cattle = Cattle::create(array_merge(
-            $request->validated(),
-            ['user_id' => $request->user()?->id],
-        ));
+        $cattle = $this->cattleService->createCattle($request->validated(), $request->user()?->id);
 
         return response()->json([
             'message' => 'Animal cadastrado via API!',
-            'cattle' => CattleResponse::fromModel($cattle)->toArray(),
+            'cattle' => new CattleResource($cattle),
         ], 201);
     }
 
@@ -53,16 +63,16 @@ class CattleApiController extends Controller
             return response()->json(['message' => 'Animal não encontrado.'], 404);
         }
 
-        return response()->json(CattleResponse::fromModel($cattle)->toArray());
+        return response()->json(new CattleResource($cattle));
     }
 
     public function update(UpdateCattleRequest $request, Cattle $cattle): JsonResponse
     {
-        $cattle->update($request->validated());
+        $cattle = $this->cattleService->updateCattle($cattle, $request->validated());
 
         return response()->json([
             'message' => 'Animal atualizado via API!',
-            'cattle' => CattleResponse::fromModel($cattle)->toArray(),
+            'cattle' => new CattleResource($cattle),
         ]);
     }
 }

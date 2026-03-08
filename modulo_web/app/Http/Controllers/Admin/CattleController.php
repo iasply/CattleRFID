@@ -4,16 +4,19 @@ namespace App\Http\Controllers\Admin;
 
 use App\DTOs\Request\Cattle\StoreCattleRequest;
 use App\DTOs\Request\Cattle\UpdateCattleRequest;
-use App\DTOs\Response\CattleResponse;
-use App\DTOs\Response\VaccineResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Cattle;
 
 class CattleController extends Controller
 {
+    public function __construct(
+        protected \App\Services\CattleService $cattleService
+    ) {
+    }
+
     public function index()
     {
-        $gattos = Cattle::with('user')->get()->map(fn(Cattle $c) => CattleResponse::fromModel($c));
+        $gattos = Cattle::with('user')->get();
 
         return view('admin.cattle.index', compact('gattos'));
     }
@@ -25,10 +28,7 @@ class CattleController extends Controller
 
     public function store(StoreCattleRequest $request)
     {
-        Cattle::create(array_merge(
-            $request->validated(),
-            ['user_id' => auth()->id()],
-        ));
+        $this->cattleService->createCattle($request->validated(), auth()->id());
 
         return redirect()->route('admin.cattle.index')->with('success', 'Animal cadastrado!');
     }
@@ -36,22 +36,18 @@ class CattleController extends Controller
     public function show(Cattle $cattle)
     {
         $cattle->load('vaccines.user', 'vaccines.workstation');
-        $dto = CattleResponse::fromModel($cattle);
-        $vaccines = $cattle->vaccines->map(fn($v) => VaccineResponse::fromModel($v));
 
-        return view('admin.cattle.show', ['cattle' => $dto, 'vaccines' => $vaccines]);
+        return view('admin.cattle.show', ['cattle' => $cattle, 'vaccines' => $cattle->vaccines]);
     }
 
     public function edit(Cattle $cattle)
     {
-        $dto = CattleResponse::fromModel($cattle);
-
-        return view('admin.cattle.edit', ['cattle' => $dto]);
+        return view('admin.cattle.edit', ['cattle' => $cattle]);
     }
 
     public function update(UpdateCattleRequest $request, Cattle $cattle)
     {
-        $cattle->update($request->validated());
+        $this->cattleService->updateCattle($cattle, $request->validated());
 
         return redirect()->route('admin.cattle.index')->with('success', 'Dados do animal atualizados!');
     }
