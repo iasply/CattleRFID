@@ -2,18 +2,20 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\DTOs\Request\Vaccine\StoreVaccineRequest;
+use App\DTOs\Response\VaccineResponse;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-
-use App\Models\Vaccine;
 use App\Models\Cattle;
 use App\Models\User;
+use App\Models\Vaccine;
 
 class VaccineController extends Controller
 {
     public function index()
     {
-        $vaccines = Vaccine::latest()->get();
+        $vaccines = Vaccine::with('user', 'workstation')->latest()->get()
+            ->map(fn(Vaccine $v) => VaccineResponse::fromModel($v)->toArray());
+
         return view('admin.vaccines.index', compact('vaccines'));
     }
 
@@ -21,26 +23,19 @@ class VaccineController extends Controller
     {
         $gattos = Cattle::all();
         $vets = User::where('is_veterinarian', true)->get();
+
         return view('admin.vaccines.create', compact('gattos', 'vets'));
     }
 
-    public function store(Request $request)
+    public function store(StoreVaccineRequest $request)
     {
-        $data = $request->validate([
-            'rfid_tag' => 'required|exists:cattle,rfid_tag',
-            'vaccine_type' => 'required|string|max:255',
-            'current_weight' => 'required|numeric',
-            'vaccination_date' => 'required|date',
-        ]);
+        $vaccine = Vaccine::create(array_merge(
+            $request->validated(),
+            ['user_id' => auth()->id()],
+        ));
 
-        $data['user_id'] = auth()->id();
-        Vaccine::create($data);
-
-        // Atualiza o peso do animal
-        $cattle = Cattle::where('rfid_tag', $data['rfid_tag'])->first();
-        if ($cattle) {
-            $cattle->update(['weight' => $data['current_weight']]);
-        }
+        Cattle::where('rfid_tag', $request->rfid_tag)
+            ->update(['weight' => $request->current_weight]);
 
         return redirect()->route('admin.vaccines.index')->with('success', 'Vacinação registrada!');
     }

@@ -2,9 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\DTOs\Request\Auth\CredentialLoginRequest;
+use App\DTOs\Request\Auth\TagLoginRequest;
+use App\DTOs\Response\AuthResponse;
+use App\DTOs\Response\VeterinarianResponse;
+use App\DTOs\Response\WorkstationResponse;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Workstation;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -12,67 +18,51 @@ use Illuminate\Validation\ValidationException;
 class AuthController extends Controller
 {
     /**
-     * Handle an incoming authentication request for API.
+     * Handle workstation + tag login (IoT / Desktop flow).
      */
-    public function login(Request $request)
+    public function loginWithTag(TagLoginRequest $request): JsonResponse
     {
-        // Check for Workstation + Tag Hash login (Strictly for API/Desktop)
-        if ($request->has(['workstation', 'tag'])) {
-            $request->validate([
-                'workstation' => 'required|string',
-                'tag' => 'required|string',
-            ]);
+        $workstation = Workstation::where('hash', $request->workstation)->first();
 
-            // Validate Workstation
-            $workstation = \App\Models\Workstation::where('hash', $request->workstation)->first();
-            if (!$workstation) {
-                throw ValidationException::withMessages([
-                    'workstation' => ['Estação de trabalho não reconhecida.'],
-                ]);
-            }
-
-            // Hash the incoming raw tag using global salt
-            $hashedTag = hash('sha256', $request->tag . config('app.tag_salt'));
-
-            // Validate Veterinarian Tag Hash
-            $user = User::where('tag_hash', $hashedTag)
-                ->where('is_veterinarian', true)
-                ->first();
-
-            if (!$user) {
-                throw ValidationException::withMessages([
-                    'tag' => ['Veterinário não encontrado ou tag inválida.'],
-                ]);
-            }
-
-            // Create Token
-            $tokenResult = $user->createToken('auth_token');
-
-            // Associate workstation if provided
-            if ($request->has('workstation')) {
-                $workstation = Workstation::where('hash', $request->workstation)->first();
-                if ($workstation) {
-                    $tokenResult->accessToken->forceFill([
-                        'workstation_id' => $workstation->id
-                    ])->save();
-                }
-            }
-
-            return response()->json([
-                'access_token' => $tokenResult->plainTextToken,
-                'token_type' => 'Bearer',
-                'user' => $user,
-                'workstation' => $workstation ?? null
+        if (!$workstation) {
+            throw ValidationException::withMessages([
+                'workstation' => ['Estação de trabalho não reconhecida.'],
             ]);
         }
 
-        // Standard Identity/Password Login (Fallback for Admin/Mobile)
-        $request->validate([
-            'identity' => 'required', // Email or RFID Tag (username)
-            'password' => 'required',
-            'device_name' => 'required',
-        ]);
+        $hashedTag = hash('sha256', $request->tag . config('app.tag_salt'));
 
+        $user = User::where('tag_hash', $hashedTag)
+            ->where('is_veterinarian', true)
+            ->first();
+
+        if (!$user) {
+            throw ValidationException::withMessages([
+                'tag' => ['Veterinário não encontrado ou tag inválida.'],
+            ]);
+        }
+
+        $tokenResult = $user->createToken('auth_token');
+
+        $tokenResult->accessToken->forceFill([
+            'workstation_id' => $workstation->id,
+        ])->save();
+
+        $response = new AuthResponse(
+            access_token: $tokenResult->plainTextToken,
+            token_type: 'Bearer',
+            user: VeterinarianResponse::fromModel($user),
+            workstation: WorkstationResponse::fromModel($workstation),
+        );
+
+        return response()->json($response->toArray());
+    }
+
+    /**
+     * Handle standard email/RFID + password login (admin / mobile flow).
+     */
+    public function loginWithCredentials(CredentialLoginRequest $request): JsonResponse
+    {
         $user = User::where('email', $request->identity)
             ->orWhere('vet_rfid', $request->identity)
             ->first();
@@ -83,17 +73,31 @@ class AuthController extends Controller
             ]);
         }
 
-        return response()->json([
-            'access_token' => $user->createToken($request->device_name)->plainTextToken,
-            'token_type' => 'Bearer',
-            'user' => $user,
-        ]);
+        $response = new AuthResponse(
+            access_token: $user->createToken($request->device_name)->plainTextToken,
+            token_type: 'Bearer',
+            user: VeterinarianResponse::fromModel($user),
+        );
+
+        return response()->json($response->toArray());
+    }
+
+    /**
+     * Route dispatcher: choose login method by request shape.
+     */
+    public function login(Request $request): JsonResponse
+    {
+        if ($request->has(['workstation', 'tag'])) {
+            return $this->loginWithTag(TagLoginRequest::createFrom($request));
+        }
+
+        return $this->loginWithCredentials(CredentialLoginRequest::createFrom($request));
     }
 
     /**
      * Revoke the current token.
      */
-    public function logout(Request $request)
+    public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
 

@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\DTOs\Request\Cattle\StoreCattleRequest;
+use App\DTOs\Request\Cattle\UpdateCattleRequest;
+use App\DTOs\Response\CattleResponse;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-
 use App\Models\Cattle;
 
 class CattleController extends Controller
 {
     public function index()
     {
-        $gattos = Cattle::all();
+        $gattos = Cattle::all()->map(fn(Cattle $c) => CattleResponse::fromModel($c)->toArray());
+
         return view('admin.cattle.index', compact('gattos'));
     }
 
@@ -20,15 +22,12 @@ class CattleController extends Controller
         return view('admin.cattle.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreCattleRequest $request)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'weight' => 'required|numeric',
-        ]);
-
-        $data['user_id'] = auth()->id();
-        Cattle::create($data);
+        Cattle::create(array_merge(
+            $request->validated(),
+            ['user_id' => auth()->id()],
+        ));
 
         return redirect()->route('admin.cattle.index')->with('success', 'Animal cadastrado!');
     }
@@ -36,22 +35,21 @@ class CattleController extends Controller
     public function show(Cattle $cattle)
     {
         $cattle->load('vaccines');
-        return view('admin.cattle.show', compact('cattle'));
+        $dto = CattleResponse::fromModel($cattle)->toArray();
+
+        return view('admin.cattle.show', ['cattle' => $dto, 'vaccines' => $cattle->vaccines]);
     }
 
     public function edit(Cattle $cattle)
     {
-        return view('admin.cattle.edit', compact('cattle'));
+        $dto = CattleResponse::fromModel($cattle)->toArray();
+
+        return view('admin.cattle.edit', ['cattle' => $dto]);
     }
 
-    public function update(Request $request, Cattle $cattle)
+    public function update(UpdateCattleRequest $request, Cattle $cattle)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'weight' => 'required|numeric',
-        ]);
-
-        $cattle->update($data);
+        $cattle->update($request->validated());
 
         return redirect()->route('admin.cattle.index')->with('success', 'Dados do animal atualizados!');
     }
@@ -59,6 +57,7 @@ class CattleController extends Controller
     public function destroy(Cattle $cattle)
     {
         $cattle->delete();
+
         return redirect()->route('admin.cattle.index')->with('success', 'Registro removido.');
     }
 }

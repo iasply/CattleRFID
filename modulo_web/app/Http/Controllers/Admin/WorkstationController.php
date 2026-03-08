@@ -2,70 +2,52 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\DTOs\Request\Workstation\StoreWorkstationRequest;
+use App\DTOs\Request\Workstation\UpdateWorkstationRequest;
+use App\DTOs\Response\WorkstationResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Workstation;
-use Illuminate\Http\Request;
 
 class WorkstationController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $workstations = Workstation::all();
+        $workstations = Workstation::all()
+            ->map(fn(Workstation $w) => WorkstationResponse::fromModel($w)->toArray());
+
         return view('admin.workstations.index', compact('workstations'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return view('admin.workstations.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StoreWorkstationRequest $request)
     {
-        $request->validate([
-            'desc' => 'required|string',
-        ]);
-
-        Workstation::create($request->only('desc'));
+        Workstation::create($request->validated());
 
         return redirect()->route('admin.workstations.index')
             ->with('success', 'Estação de trabalho cadastrada com sucesso.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Workstation $workstation)
     {
-        return view('admin.workstations.show', compact('workstation'));
+        $dto = WorkstationResponse::fromModel($workstation)->toArray();
+
+        return view('admin.workstations.show', ['workstation' => $dto]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Workstation $workstation)
     {
-        return view('admin.workstations.edit', compact('workstation'));
+        $dto = WorkstationResponse::fromModel($workstation)->toArray();
+
+        return view('admin.workstations.edit', ['workstation' => $dto]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Workstation $workstation)
+    public function update(UpdateWorkstationRequest $request, Workstation $workstation)
     {
-        $request->validate([
-            'desc' => 'required|string',
-        ]);
-
-        $workstation->update($request->only('desc'));
+        $workstation->update($request->validated());
 
         return redirect()->route('admin.workstations.index')
             ->with('success', 'Estação de trabalho atualizada com sucesso.');

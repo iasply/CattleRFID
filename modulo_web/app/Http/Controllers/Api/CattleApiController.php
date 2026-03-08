@@ -2,30 +2,31 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\DTOs\Request\Cattle\StoreCattleRequest;
+use App\DTOs\Response\CattleResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Cattle;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class CattleApiController extends Controller
 {
-    public function index()
+    public function index(): JsonResponse
     {
-        return response()->json(Cattle::all());
+        $items = Cattle::all()->map(fn(Cattle $c) => CattleResponse::fromModel($c)->toArray());
+
+        return response()->json($items);
     }
 
-    public function store(Request $request)
+    public function store(StoreCattleRequest $request): JsonResponse
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'weight' => 'required|numeric',
-            'rfid_tag' => 'nullable|string|unique:cattle,rfid_tag',
-        ]);
-
-        $cattle = Cattle::create($data);
+        $cattle = Cattle::create(array_merge(
+            $request->validated(),
+            ['user_id' => $request->user()?->id],
+        ));
 
         return response()->json([
             'message' => 'Animal cadastrado via API!',
-            'cattle' => $cattle
-        ], 210);
+            'cattle' => CattleResponse::fromModel($cattle)->toArray(),
+        ], 201);
     }
 }
