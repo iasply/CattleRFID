@@ -14,7 +14,7 @@ class VaccineController extends Controller
     public function index()
     {
         $vaccines = Vaccine::with('user', 'workstation')->latest()->get()
-            ->map(fn(Vaccine $v) => VaccineResponse::fromModel($v)->toArray());
+            ->map(fn(Vaccine $v) => VaccineResponse::fromModel($v));
 
         return view('admin.vaccines.index', compact('vaccines'));
     }

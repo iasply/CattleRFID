@@ -29,4 +29,18 @@ class CattleApiController extends Controller
             'cattle' => CattleResponse::fromModel($cattle)->toArray(),
         ], 201);
     }
+
+    /**
+     * Display the specified cattle by its RFID tag.
+     */
+    public function show(string $rfid_tag): JsonResponse
+    {
+        $cattle = Cattle::where('rfid_tag', $rfid_tag)->first();
+
+        if (!$cattle) {
+            return response()->json(['message' => 'Animal não encontrado.'], 404);
+        }
+
+        return response()->json(CattleResponse::fromModel($cattle)->toArray());
+    }
 }

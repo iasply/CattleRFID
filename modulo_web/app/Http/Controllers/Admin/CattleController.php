@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\DTOs\Request\Cattle\StoreCattleRequest;
 use App\DTOs\Request\Cattle\UpdateCattleRequest;
 use App\DTOs\Response\CattleResponse;
+use App\DTOs\Response\VaccineResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Cattle;
 
@@ -12,7 +13,7 @@ class CattleController extends Controller
 {
     public function index()
     {
-        $gattos = Cattle::all()->map(fn(Cattle $c) => CattleResponse::fromModel($c)->toArray());
+        $gattos = Cattle::with('user')->get()->map(fn(Cattle $c) => CattleResponse::fromModel($c));
 
         return view('admin.cattle.index', compact('gattos'));
     }
@@ -34,15 +35,16 @@ class CattleController extends Controller
 
     public function show(Cattle $cattle)
     {
-        $cattle->load('vaccines');
-        $dto = CattleResponse::fromModel($cattle)->toArray();
+        $cattle->load('vaccines.user', 'vaccines.workstation');
+        $dto = CattleResponse::fromModel($cattle);
+        $vaccines = $cattle->vaccines->map(fn($v) => VaccineResponse::fromModel($v));
 
-        return view('admin.cattle.show', ['cattle' => $dto, 'vaccines' => $cattle->vaccines]);
+        return view('admin.cattle.show', ['cattle' => $dto, 'vaccines' => $vaccines]);
     }
 
     public function edit(Cattle $cattle)
     {
-        $dto = CattleResponse::fromModel($cattle)->toArray();
+        $dto = CattleResponse::fromModel($cattle);
 
         return view('admin.cattle.edit', ['cattle' => $dto]);
     }

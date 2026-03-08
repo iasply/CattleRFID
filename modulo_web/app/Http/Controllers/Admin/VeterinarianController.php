@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\DTOs\Request\Veterinarian\StoreVeterinarianRequest;
 use App\DTOs\Request\Veterinarian\UpdateVeterinarianRequest;
 use App\DTOs\Response\VeterinarianResponse;
+use App\DTOs\Response\VaccineResponse;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -14,7 +15,7 @@ class VeterinarianController extends Controller
     public function index()
     {
         $vets = User::where('is_veterinarian', true)->get()
-            ->map(fn(User $u) => VeterinarianResponse::fromModel($u)->toArray());
+            ->map(fn(User $u) => VeterinarianResponse::fromModel($u));
 
         return view('admin.veterinarians.index', compact('vets'));
     }
@@ -37,18 +38,19 @@ class VeterinarianController extends Controller
 
     public function show(User $veterinarian)
     {
-        $veterinarian->load('vaccinations');
-        $dto = VeterinarianResponse::fromModel($veterinarian)->toArray();
+        $veterinarian->load('vaccinations.workstation');
+        $dto = VeterinarianResponse::fromModel($veterinarian);
+        $vaccinations = $veterinarian->vaccinations->map(fn($v) => VaccineResponse::fromModel($v));
 
         return view('admin.veterinarians.show', [
             'veterinarian' => $dto,
-            'vaccinations' => $veterinarian->vaccinations,
+            'vaccinations' => $vaccinations,
         ]);
     }
 
     public function edit(User $veterinarian)
     {
-        $dto = VeterinarianResponse::fromModel($veterinarian)->toArray();
+        $dto = VeterinarianResponse::fromModel($veterinarian);
 
         return view('admin.veterinarians.edit', ['veterinarian' => $dto]);
     }

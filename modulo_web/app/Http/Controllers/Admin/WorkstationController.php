@@ -13,7 +13,7 @@ class WorkstationController extends Controller
     public function index()
     {
         $workstations = Workstation::all()
-            ->map(fn(Workstation $w) => WorkstationResponse::fromModel($w)->toArray());
+            ->map(fn(Workstation $w) => WorkstationResponse::fromModel($w));
 
         return view('admin.workstations.index', compact('workstations'));
     }
@@ -33,14 +33,14 @@ class WorkstationController extends Controller
 
     public function show(Workstation $workstation)
     {
-        $dto = WorkstationResponse::fromModel($workstation)->toArray();
+        $dto = WorkstationResponse::fromModel($workstation);
 
         return view('admin.workstations.show', ['workstation' => $dto]);
     }
 
     public function edit(Workstation $workstation)
     {
-        $dto = WorkstationResponse::fromModel($workstation)->toArray();
+        $dto = WorkstationResponse::fromModel($workstation);
 
         return view('admin.workstations.edit', ['workstation' => $dto]);
     }
