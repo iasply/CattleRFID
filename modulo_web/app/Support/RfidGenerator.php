@@ -15,4 +15,14 @@ class RfidGenerator
     {
         return 'C' . strtoupper(Str::random(10));
     }
+
+    /**
+     * Gera uma tag RFID padronizada para Veterinários.
+     * Inicia com 'V' e possui caracteres aleatórios (ex: V8F9A2B3D4).
+     * O tamanho total é 11 (< 16 obrigatórios pelo BD).
+     */
+    public static function generateVetTag(): string
+    {
+        return 'V' . strtoupper(Str::random(10));
+    }
 }

@@ -24,7 +24,7 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
     private CattleFormPanel activeCattleForm;
 
     public MainPanel(User loggedUser, CattleController cattleController, NavigationManager navManager,
-                     com.cattlerfid.config.ApiConfig apiConfig) {
+            com.cattlerfid.config.ApiConfig apiConfig) {
         this.loggedUser = loggedUser;
         this.cattleController = cattleController;
         this.navManager = navManager;
@@ -91,11 +91,8 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
         manualRegisterButton.addActionListener(e -> {
             statusLabel.setText("Preparando formulário manual...");
 
-            // Gera uma TAG automática garantindo até 16 bytes: "C" + Epoch timestamp
-            String generatedTag = "C" + System.currentTimeMillis();
-            if (generatedTag.length() > 16) {
-                generatedTag = generatedTag.substring(0, 16);
-            }
+            // Gera uma TAG automática garantindo até 16 bytes e unicidade padronizada
+            String generatedTag = com.cattlerfid.util.RfidGenerator.generateCattleTag();
 
             Cattle newCattle = new Cattle();
             newCattle.setRfidTag(generatedTag);

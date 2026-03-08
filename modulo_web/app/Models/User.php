@@ -33,7 +33,7 @@ class User extends Authenticatable
             // Logic for Veterinarians
             if ($user->is_veterinarian) {
                 if (!$user->vet_rfid || $user->vet_rfid === 'V') {
-                    $user->vet_rfid = 'V' . str_pad(static::where('is_veterinarian', true)->count() + 1, 6, '0', STR_PAD_LEFT);
+                    $user->vet_rfid = \App\Support\RfidGenerator::generateVetTag();
                 }
             } else {
                 // Logic for non-veterinarians (Admin/Others)

@@ -70,7 +70,7 @@ class ApiAuthTest extends TestCase
             'desc' => 'Main Lab',
         ]);
 
-        $rawTag = '123456789';
+        $rawTag = \App\Support\RfidGenerator::generateVetTag();
         $hashedTag = hash('sha256', $rawTag . config('app.tag_salt'));
 
         User::factory()->create([

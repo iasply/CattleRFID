@@ -26,12 +26,14 @@ class VaccineApiTest extends TestCase
             'is_veterinarian' => true,
         ]);
 
+        $vetTag = \App\Support\RfidGenerator::generateVetTag();
+
         // 2. Login via Workstation to get a token bound to that workstation
-        $user->update(['vet_rfid' => '999888777']);
+        $user->update(['vet_rfid' => $vetTag]);
 
         $loginResponse = $this->postJson('/api/login', [
             'workstation' => 'WS-API-TEST',
-            'tag' => '999888777',
+            'tag' => $vetTag,
         ]);
 
         $loginResponse->assertStatus(200);

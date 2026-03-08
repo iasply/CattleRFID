@@ -12,4 +12,13 @@ public class RfidGenerator {
     public static String generateCattleTag() {
         return "C" + UUID.randomUUID().toString().replace("-", "").substring(0, 10).toUpperCase();
     }
+
+    /**
+     * Gera uma tag RFID padronizada para Veterinários.
+     * Inicia com 'V' e possui caracteres aleatórios.
+     * O tamanho total é 11 (< 16 obrigatórios pelo BD).
+     */
+    public static String generateVetTag() {
+        return "V" + UUID.randomUUID().toString().replace("-", "").substring(0, 10).toUpperCase();
+    }
 }
