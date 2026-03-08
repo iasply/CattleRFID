@@ -13,7 +13,7 @@ class VaccineController extends Controller
 {
     public function index()
     {
-        $vaccines = Vaccine::with('user', 'workstation')->latest()->get()
+        $vaccines = Vaccine::with('user', 'workstation', 'cattle')->latest()->get()
             ->map(fn(Vaccine $v) => VaccineResponse::fromModel($v));
 
         return view('admin.vaccines.index', compact('vaccines'));

@@ -38,7 +38,7 @@ class VeterinarianController extends Controller
 
     public function show(User $veterinarian)
     {
-        $veterinarian->load('vaccinations.workstation');
+        $veterinarian->load('vaccinations.workstation', 'vaccinations.cattle');
         $dto = VeterinarianResponse::fromModel($veterinarian);
         $vaccinations = $veterinarian->vaccinations->map(fn($v) => VaccineResponse::fromModel($v));
 

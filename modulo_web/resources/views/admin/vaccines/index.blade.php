@@ -22,7 +22,7 @@
                 @foreach($vaccines as $v)
                     <tr>
                         <td>{{ \Carbon\Carbon::parse($v->vaccination_date)->format('d/m/Y') }}</td>
-                        <td><code>{{ $v->rfid_tag }}</code></td>
+                        <td>{{ $v->animal_name ?? 'Desconhecido' }} (<code>{{ $v->rfid_tag }}</code>)</td>
                         <td>{{ $v->vaccine_type }}</td>
                         <td>{{ number_format($v->current_weight, 2, ',', '.') }} kg</td>
                         <td>{{ $v->veterinarian_name ?? 'Sistema' }}</td>

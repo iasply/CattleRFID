@@ -37,7 +37,9 @@ class CattleController extends Controller
     {
         $cattle->load('vaccines.user', 'vaccines.workstation');
 
-        return view('admin.cattle.show', ['cattle' => $cattle, 'vaccines' => $cattle->vaccines]);
+        $vaccines = $cattle->vaccines->map(fn($v) => \App\DTOs\Response\VaccineResponse::fromModel($v));
+
+        return view('admin.cattle.show', ['cattle' => $cattle, 'vaccines' => $vaccines]);
     }
 
     public function edit(Cattle $cattle)
