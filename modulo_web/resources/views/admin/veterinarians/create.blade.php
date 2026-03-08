@@ -1,32 +1,21 @@
 @extends('layouts.app')
 
 @section('content')
-    <div style="margin-bottom: 2rem;">
-        <a href="{{ route('admin.veterinarians.index') }}" style="color: var(--secondary); text-decoration: none;">← Voltar
-            para Lista</a>
-        <h2 style="margin-top: 1rem;">Cadastrar Novo Veterinário</h2>
-    </div>
+    <x-page-header title="Novo Veterinário" :backLink="route('admin.veterinarians.index')" />
 
-    <div class="card" style="max-width: 600px;">
+    <x-card maxWidth="600px">
         <form action="{{ route('admin.veterinarians.store') }}" method="POST">
             @csrf
-            <div>
-                <label>Nome Completo</label>
-                <input type="text" name="name" value="{{ old('name') }}" required placeholder="Ex: Dr. João Silva">
-            </div>
 
-            <div>
-                <label>Email</label>
-                <input type="email" name="email" value="{{ old('email') }}" required placeholder="email@exemplo.com">
-                @error('email') <span class="error">{{ $message }}</span> @enderror
-            </div>
+            <x-input label="Nome Completo" name="name" required placeholder="Ex: Dr. João Silva" />
 
-            <div>
-                <label>Senha Provisória</label>
-                <input type="password" name="password" required>
-            </div>
+            <x-input label="E-mail" name="email" type="email" required placeholder="joao@exemplo.com" />
 
-            <button type="submit" class="btn btn-primary" style="margin-top: 1rem; width: 100%;">Finalizar Cadastro</button>
+            <x-input label="Senha de Acesso" name="password" type="password" required />
+
+            <x-button type="submit" fullWidth style="margin-top: 1rem;">
+                Cadastrar Veterinário
+            </x-button>
         </form>
-    </div>
+    </x-card>
 @endsection

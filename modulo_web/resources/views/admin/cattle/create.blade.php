@@ -1,26 +1,19 @@
 @extends('layouts.app')
 
 @section('content')
-    <div style="margin-bottom: 2rem;">
-        <a href="{{ route('admin.cattle.index') }}" style="color: var(--secondary); text-decoration: none;">← Voltar para
-            Lista</a>
-        <h2 style="margin-top: 1rem;">Cadastrar Novo Animal</h2>
-    </div>
+    <x-page-header title="Cadastrar Novo Animal" :backLink="route('admin.cattle.index')" backText="Voltar para Lista" />
 
-    <div class="card" style="max-width: 600px;">
+    <x-card maxWidth="600px">
         <form action="{{ route('admin.cattle.store') }}" method="POST">
             @csrf
-            <div>
-                <label>Nome / Apelido</label>
-                <input type="text" name="name" value="{{ old('name') }}" required placeholder="Ex: Mimosa">
-            </div>
 
-            <div>
-                <label>Peso Inicial (kg)</label>
-                <input type="number" step="0.01" name="weight" value="{{ old('weight') }}" required>
-            </div>
+            <x-input label="Nome / Apelido" name="name" required placeholder="Ex: Mimosa" />
 
-            <button type="submit" class="btn btn-success" style="margin-top: 1rem; width: 100%;">Finalizar Cadastro</button>
+            <x-input label="Peso Inicial (kg)" name="weight" type="number" step="0.01" required />
+
+            <x-button type="submit" variant="success" fullWidth style="margin-top: 1rem;">
+                Finalizar Cadastro
+            </x-button>
         </form>
-    </div>
+    </x-card>
 @endsection

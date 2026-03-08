@@ -1,32 +1,27 @@
 @extends('layouts.app')
 
 @section('content')
-    <div style="margin-bottom: 2rem;">
-        <a href="{{ route('admin.workstations.index') }}"
-            style="text-decoration: none; color: var(--primary); font-weight: 500;">&larr; Voltar para Lista</a>
-        <h2 style="margin-top: 1rem;">Nova Estação de Trabalho</h2>
-    </div>
+    <x-page-header title="Nova Estação de Trabalho" :backLink="route('admin.workstations.index')" />
 
-    <div class="card" style="max-width: 600px;">
+    <x-card maxWidth="600px">
+        <div style="margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--bg-main);">
+            <p style="color: var(--text-muted); font-size: 0.875rem;">
+                As estações de trabalho são identificadas automaticamente por um <strong>Hash Único</strong> gerado pelo
+                sistema no momento da criação.
+            </p>
+        </div>
+
         <form action="{{ route('admin.workstations.store') }}" method="POST">
             @csrf
-            <div style="margin-bottom: 1.5rem;">
-                <label for="desc" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Descrição /
-                    Localização</label>
-                <input type="text" name="desc" id="desc" value="{{ old('desc') }}" required
-                    style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 0.375rem;"
-                    placeholder="Ex: Computador da Recepção">
-                @error('desc')
-                    <span
-                        style="color: #dc2626; font-size: 0.875rem; margin-top: 0.25rem; display: block;">{{ $message }}</span>
-                @enderror
-            </div>
 
-            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-                <button type="submit" class="btn btn-primary">Cadastrar Estação</button>
-                <a href="{{ route('admin.workstations.index') }}" class="btn btn-secondary"
-                    style="text-decoration: none; display: flex; align-items: center;">Cancelar</a>
+            <x-input label="Descrição / Localização da Estação" name="desc" required
+                placeholder="Ex: Curral Principal, Laboratório A..." />
+
+            <div style="margin-top: 2rem;">
+                <x-button type="submit" fullWidth>
+                    Cadastrar Estação
+                </x-button>
             </div>
         </form>
-    </div>
+    </x-card>
 @endsection

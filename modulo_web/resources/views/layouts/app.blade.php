@@ -3,185 +3,240 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Cattle RFID - Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <title>Cattle RFID - Premium Admin</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
-        /* Modern UI Tweaks */
-        :root {
-            --primary: #2563eb;
-            --secondary: #64748b;
-            --success: #22c55e;
-            --danger: #ef4444;
-            --background: #f8fafc;
-            --surface: #ffffff;
-            --text: #1e293b;
-            --sidebar: #0f172a;
-        }
-
-        body {
-            background-color: var(--background);
-            color: var(--text);
-            font-family: 'Inter', sans-serif;
-            margin: 0;
+        /* Essential Layout Logic (Keeping here for immediate render) */
+        .app-container {
             display: flex;
             min-height: 100vh;
         }
 
         .sidebar {
-            width: 260px;
-            background-color: var(--sidebar);
+            width: 280px;
+            background-color: var(--bg-sidebar);
             color: white;
-            padding: 2rem 1rem;
+            padding: 2rem 1.25rem;
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .sidebar h1 {
+        .sidebar .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
             font-size: 1.5rem;
             font-weight: 800;
-            margin-bottom: 2rem;
-            text-align: center;
-            color: #3b82f6;
+            margin-bottom: 3rem;
+            color: var(--primary-light);
+            text-decoration: none;
         }
 
-        .sidebar a {
-            color: #cbd5e1;
+        .nav-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #94a3b8;
             text-decoration: none;
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
+            padding: 0.875rem 1rem;
+            border-radius: var(--radius-md);
             transition: all 0.2s;
             font-weight: 500;
         }
 
-        .sidebar a:hover {
-            background-color: #1e293b;
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.05);
             color: white;
         }
 
-        .sidebar a.active {
-            background-color: var(--primary);
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
         }
 
         .main-content {
             flex: 1;
-            padding: 2rem;
-            overflow-y: auto;
-        }
-
-        .card {
-            background: var(--surface);
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .btn {
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            transition: opacity 0.2s;
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .btn-success {
-            background-color: var(--success);
-            color: white;
-        }
-
-        .btn-danger {
-            background-color: var(--danger);
-            color: white;
-        }
-
-        table {
+            padding: 2.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
         }
 
-        th {
-            text-align: left;
-            padding: 1rem;
-            border-bottom: 2px solid #e2e8f0;
-            color: var(--secondary);
+        /* Mobile Adjustments */
+        .mobile-header {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 40;
+            padding: 0 1.25rem;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        td {
-            padding: 1rem;
-            border-bottom: 1px solid #e2e8f0;
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 72px;
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            border-top: 1px solid var(--glass-border);
+            z-index: 40;
+            padding: 0 1rem;
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
-        form div {
-            margin-bottom: 1rem;
+        .bottom-nav .nav-list {
+            flex-direction: row;
+            justify-content: space-around;
+            height: 100%;
+            align-items: center;
+            gap: 0;
         }
 
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        input {
-            width: 100%;
+        .bottom-nav .nav-link {
+            flex-direction: column;
+            gap: 0.25rem;
             padding: 0.5rem;
-            border: 1px solid #cbd5e1;
-            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            background: none !important;
+            box-shadow: none !important;
         }
 
-        .alert {
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
+        .bottom-nav .nav-link.active {
+            color: var(--primary);
         }
 
-        .alert-success {
-            background-color: #dcfce7;
-            color: #166534;
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .mobile-header {
+                display: flex;
+            }
+
+            .bottom-nav {
+                display: block;
+            }
+
+            .main-content {
+                padding: 1.25rem;
+                padding-top: 80px;
+                padding-bottom: 100px;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="sidebar">
-        <h1>🐂 Cattle RFID</h1>
-        <a href="{{ route('admin.dashboard') }}"
-            class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Dashboard</a>
-        <a href="{{ route('admin.veterinarians.index') }}"
-            class="{{ request()->routeIs('admin.veterinarians.*') ? 'active' : '' }}">Veterinários</a>
-        <a href="{{ route('admin.cattle.index') }}"
-            class="{{ request()->routeIs('admin.cattle.*') ? 'active' : '' }}">Animais</a>
-        <a href="{{ route('admin.vaccines.index') }}"
-            class="{{ request()->routeIs('admin.vaccines.*') ? 'active' : '' }}">Vacinas</a>
-        <a href="{{ route('admin.workstations.index') }}"
-            class="{{ request()->routeIs('admin.workstations.*') ? 'active' : '' }}">Estações</a>
+    <div class="app-container">
+        <!-- Desktop Sidebar -->
+        <aside class="sidebar">
+            <a href="{{ route('admin.dashboard') }}" class="brand">
+                <span>🐂</span> Cattle RFID
+            </a>
 
-        <div style="margin-top: auto;">
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
-                <button type="submit" class="btn btn-danger" style="width: 100%;">Sair</button>
-            </form>
-        </div>
-    </div>
+            <nav class="nav-list">
+                <a href="{{ route('admin.dashboard') }}"
+                    class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                    Dashboard
+                </a>
+                <a href="{{ route('admin.veterinarians.index') }}"
+                    class="nav-link {{ request()->routeIs('admin.veterinarians.*') ? 'active' : '' }}">
+                    Veterinários
+                </a>
+                <a href="{{ route('admin.cattle.index') }}"
+                    class="nav-link {{ request()->routeIs('admin.cattle.*') ? 'active' : '' }}">
+                    Animais
+                </a>
+                <a href="{{ route('admin.vaccines.index') }}"
+                    class="nav-link {{ request()->routeIs('admin.vaccines.*') ? 'active' : '' }}">
+                    Vacinas
+                </a>
+                <a href="{{ route('admin.workstations.index') }}"
+                    class="nav-link {{ request()->routeIs('admin.workstations.*') ? 'active' : '' }}">
+                    Estações
+                </a>
+            </nav>
 
-    <main class="main-content">
-        @if(session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
+            <div style="margin-top: auto; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05);">
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="btn btn-danger"
+                        style="width: 100%; background: none; border-color: rgba(239, 68, 68, 0.4); color: #ef4444;">
+                        Sair do Sistema
+                    </button>
+                </form>
             </div>
-        @endif
+        </aside>
 
-        @yield('content')
-    </main>
+        <!-- Mobile Header -->
+        <header class="mobile-header">
+            <span style="font-weight: 800; color: var(--primary-dark);">🐂 Cattle RFID</span>
+            <div style="display: flex; gap: 0.75rem;">
+                <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+                    @csrf
+                    <button type="submit"
+                        style="background: none; border: none; color: var(--danger); font-size: 1.25rem;">🚪</button>
+                </form>
+            </div>
+        </header>
+
+        <!-- Mobile Bottom Nav -->
+        <nav class="bottom-nav">
+            <div class="nav-list">
+                <a href="{{ route('admin.dashboard') }}"
+                    class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                    <span>🏠</span> Dashboard
+                </a>
+                <a href="{{ route('admin.cattle.index') }}"
+                    class="nav-link {{ request()->routeIs('admin.cattle.*') ? 'active' : '' }}">
+                    <span>🐄</span> Animais
+                </a>
+                <a href="{{ route('admin.vaccines.index') }}"
+                    class="nav-link {{ request()->routeIs('admin.vaccines.*') ? 'active' : '' }}">
+                    <span>💉</span> Vacinas
+                </a>
+                <a href="{{ route('admin.workstations.index') }}"
+                    class="nav-link {{ request()->routeIs('admin.workstations.*') ? 'active' : '' }}">
+                    <span>⚙️</span> Painel
+                </a>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            @if(session('success'))
+                <x-card
+                    style="background-color: #dcfce7; border-color: #10b981; color: #065f46; margin-bottom: 2rem; padding: 1rem;">
+                    {{ session('success') }}
+                </x-card>
+            @endif
+
+            @yield('content')
+        </main>
+    </div>
 </body>
 
 </html>

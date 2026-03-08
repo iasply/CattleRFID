@@ -1,45 +1,34 @@
 @extends('layouts.app')
 
 @section('content')
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <h2>Rebanho Cadastrado</h2>
-        <a href="{{ route('admin.cattle.create') }}" class="btn btn-success">+ Novo Animal</a>
-    </div>
+    <x-page-header title="Rebanho Cadastrado">
+        <x-slot name="actions">
+            <a href="{{ route('admin.cattle.create') }}" class="btn btn-success">+ Novo Animal</a>
+        </x-slot>
+    </x-page-header>
 
-    <div class="card">
-        <table>
-            <thead>
+    <x-card>
+        <x-table :headers="['Tag RFID', 'Nome/Apelido', 'Cadastrado por', 'Peso Atual', 'Data Registro', 'Ações']">
+            @foreach($gattos as $animal)
                 <tr>
-                    <th>Tag RFID</th>
-                    <th>Nome/Apelido</th>
-                    <th>Cadastrado por</th>
-                    <th>Peso Atual</th>
-                    <th>Data Registro</th>
-                    <th>Ações</th>
+                    <td><code>{{ $animal->rfid_tag }}</code></td>
+                    <td>{{ $animal->name }}</td>
+                    <td>{{ $animal->user->name ?? 'Sistema' }}</td>
+                    <td class="text-right">{{ number_format($animal->weight, 2, ',', '.') }} kg</td>
+                    <td>{{ \Carbon\Carbon::parse($animal->registration_date)->format('d/m/Y') }}</td>
+                    <td class="text-right" style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                        <a href="{{ route('admin.cattle.show', $animal->id) }}" class="btn btn-primary"
+                            style="font-size: 0.75rem; text-decoration: none; padding: 0.4rem 0.8rem;">Ver</a>
+                        <a href="{{ route('admin.cattle.edit', $animal->id) }}" class="btn btn-primary"
+                            style="font-size: 0.75rem; text-decoration: none; padding: 0.4rem 0.8rem;">Editar</a>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach($gattos as $animal)
-                    <tr>
-                        <td><code>{{ $animal->rfid_tag }}</code></td>
-                        <td>{{ $animal->name }}</td>
-                        <td>{{ $animal->user_name ?? 'Sistema' }}</td>
-                        <td>{{ number_format($animal->weight, 2, ',', '.') }} kg</td>
-                        <td>{{ \Carbon\Carbon::parse($animal->registration_date)->format('d/m/Y') }}</td>
-                        <td style="display: flex; gap: 0.5rem;">
-                            <a href="{{ route('admin.cattle.show', $animal->id) }}" class="btn btn-primary"
-                                style="font-size: 0.75rem; text-decoration: none; background-color: #6366f1; border-color: #6366f1;">Ver</a>
-                            <a href="{{ route('admin.cattle.edit', $animal->id) }}" class="btn btn-primary"
-                                style="font-size: 0.75rem; text-decoration: none;">Editar</a>
-                        </td>
-                    </tr>
-                @endforeach
-                @if($gattos->isEmpty())
-                    <tr>
-                        <td colspan="5" style="text-align: center; color: var(--secondary);">Nenhum animal cadastrado.</td>
-                    </tr>
-                @endif
-            </tbody>
-        </table>
-    </div>
+            @endforeach
+            @if($gattos->isEmpty())
+                <tr>
+                    <td colspan="6" style="text-align: center; color: var(--secondary);">Nenhum animal cadastrado.</td>
+                </tr>
+            @endif
+        </x-table>
+    </x-card>
 @endsection

@@ -1,95 +1,113 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Cattle RFID</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <title>Login - Cattle RFID Premium</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
-        body {
-            background-color: #f1f5f9;
-            font-family: sans-serif;
+        .auth-bg {
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
+            background: radial-gradient(circle at top left, #065f46 0%, #022c22 100%);
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
         }
 
-        .login-card {
-            background: white;
-            padding: 2.5rem;
-            border-radius: 1rem;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        /* Ambient light effects */
+        .auth-bg::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: var(--primary);
+            filter: blur(150px);
+            opacity: 0.15;
+            top: -250px;
+            left: -250px;
+            border-radius: 50%;
+        }
+
+        .login-box {
+            position: relative;
+            z-index: 10;
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
         }
 
-        h2 {
+        .brand-logo {
             text-align: center;
-            color: #1e293b;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
         }
 
-        .input-group {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
+        .brand-logo .icon {
+            font-size: 3.5rem;
             display: block;
             margin-bottom: 0.5rem;
-            color: #64748b;
-            font-weight: 600;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
         }
 
-        input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.5rem;
-            box-sizing: border-box;
-        }
-
-        .btn-login {
-            width: 100%;
-            padding: 0.75rem;
-            background-color: #2563eb;
+        .brand-logo h1 {
             color: white;
-            border: none;
-            border-radius: 0.5rem;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 1rem;
+            font-size: 1.75rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
         }
 
-        .error {
-            color: #ef4444;
+        .brand-logo p {
+            color: #34d399;
+            font-weight: 500;
             font-size: 0.875rem;
-            margin-top: 0.5rem;
+            margin-top: 0.25rem;
         }
     </style>
 </head>
 
 <body>
-    <div class="login-card">
-        <h2>🐂 Cattle RFID Admin</h2>
-        <form action="{{ route('login.post') }}" method="POST">
-            @csrf
-            <div class="input-group">
-                <label>Email</label>
-                <input type="email" name="email" required value="{{ old('email') }}">
-            </div>
-            <div class="input-group">
-                <label>Senha</label>
-                <input type="password" name="password" required>
+    <div class="auth-bg">
+        <div class="login-box">
+            <div class="brand-logo">
+                <span class="icon">🐂</span>
+                <h1>Cattle RFID</h1>
+                <p>Gestão Pecuária Inteligente</p>
             </div>
 
-            @if($errors->any())
-                <div class="error">{{ $errors->first() }}</div>
-            @endif
+            <x-card glass="true" style="padding: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
+                <form action="{{ route('login.post') }}" method="POST">
+                    @csrf
 
-            <button type="submit" class="btn-login">Acessar Painel</button>
-        </form>
+                    <h2
+                        style="font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 2rem; text-align: center;">
+                        Acesso ao Sistema
+                    </h2>
+
+                    <x-input label="E-mail Administrativo" name="email" type="email" required :value="old('email')"
+                        placeholder="seu@email.com" />
+
+                    <x-input label="Senha" name="password" type="password" required placeholder="••••••••" />
+
+                    @if($errors->any())
+                        <div
+                            style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--danger); padding: 1rem; margin-bottom: 1.5rem; border-radius: 4px;">
+                            <span style="color: var(--danger); font-size: 0.875rem; font-weight: 600;">
+                                {{ $errors->first() }}
+                            </span>
+                        </div>
+                    @endif
+
+                    <div style="margin-top: 2rem;">
+                        <x-button type="submit" fullWidth="true">
+                            Entrar no Painel
+                        </x-button>
+                    </div>
+
+                </form>
+            </x-card>
+        </div>
     </div>
 </body>
 

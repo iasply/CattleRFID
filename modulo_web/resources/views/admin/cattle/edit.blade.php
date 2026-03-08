@@ -1,32 +1,23 @@
 @extends('layouts.app')
 
 @section('content')
-    <div style="margin-bottom: 2rem;">
-        <a href="{{ route('admin.cattle.index') }}" style="color: var(--secondary); text-decoration: none;">← Voltar para
-            Lista</a>
-        <h2 style="margin-top: 1rem;">Editar Animal: {{ $cattle->rfid_tag }}</h2>
-    </div>
+    <x-page-header :title="'Editar Animal: ' . $cattle->rfid_tag" :backLink="route('admin.cattle.index')"
+        backText="Voltar para Lista" />
 
-    <div class="card" style="max-width: 600px;">
+    <x-card maxWidth="600px">
         <form action="{{ route('admin.cattle.update', $cattle->id) }}" method="POST">
             @csrf
             @method('PUT')
-            <div>
-                <label>Tag RFID</label>
-                <input type="text" value="{{ $cattle->rfid_tag }}" readonly style="background-color: #f1f5f9;">
-            </div>
 
-            <div>
-                <label>Nome / Apelido</label>
-                <input type="text" name="name" value="{{ old('name', $cattle->name) }}" required>
-            </div>
+            <x-input label="Tag RFID" name="rfid_tag" :value="$cattle->rfid_tag" readonly />
 
-            <div>
-                <label>Peso (kg)</label>
-                <input type="number" step="0.01" name="weight" value="{{ old('weight', $cattle->weight) }}" required>
-            </div>
+            <x-input label="Nome / Apelido" name="name" :value="$cattle->name" required />
 
-            <button type="submit" class="btn btn-primary" style="margin-top: 1rem; width: 100%;">Salvar Alterações</button>
+            <x-input label="Peso (kg)" name="weight" type="number" step="0.01" :value="$cattle->weight" required />
+
+            <x-button type="submit" fullWidth style="margin-top: 1rem;">
+                Salvar Alterações
+            </x-button>
         </form>
-    </div>
+    </x-card>
 @endsection
