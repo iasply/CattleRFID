@@ -11,7 +11,7 @@ class CattleUpdateApiTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_can_update_existing_cattle_without_rfid_collision()
     {
         $user = User::factory()->create();
@@ -46,7 +46,7 @@ class CattleUpdateApiTest extends TestCase
         $this->assertEquals(250.00, $cattle->fresh()->weight);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function updating_via_post_to_store_endpoint_fails_with_422_due_to_duplicate_rfid()
     {
         $user = User::factory()->create();

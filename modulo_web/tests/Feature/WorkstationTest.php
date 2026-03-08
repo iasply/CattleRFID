@@ -10,7 +10,7 @@ class WorkstationTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function workstation_can_be_created()
     {
         $workstation = Workstation::create([
@@ -24,7 +24,7 @@ class WorkstationTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function workstation_cannot_be_deleted()
     {
         $workstation = Workstation::create([

@@ -30,13 +30,13 @@ readonly class CattleResponse
 
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'id' => $this->id,
             'rfid_tag' => $this->rfid_tag,
             'name' => $this->name,
             'weight' => $this->weight,
             'registration_date' => $this->registration_date,
             'user_name' => $this->user_name,
-        ];
+        ], fn($v) => $v !== null);
     }
 }

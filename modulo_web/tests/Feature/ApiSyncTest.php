@@ -11,7 +11,7 @@ class ApiSyncTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function can_save_vaccine_via_api_with_valid_token()
     {
         $vet = User::factory()->create([

@@ -14,7 +14,7 @@ class ApiAuthTest extends TestCase
 
 
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_can_login_via_api_using_workstation_and_tag()
     {
         $workstation = \App\Models\Workstation::create([
@@ -44,7 +44,7 @@ class ApiAuthTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function login_fails_with_invalid_tag()
     {
         \App\Models\Workstation::create([
@@ -62,7 +62,7 @@ class ApiAuthTest extends TestCase
             ->assertJsonValidationErrors(['tag']);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function login_fails_if_user_is_not_a_veterinarian_even_with_valid_tag()
     {
         \App\Models\Workstation::create([
@@ -88,7 +88,7 @@ class ApiAuthTest extends TestCase
             ->assertJsonValidationErrors(['tag']);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function authenticated_user_can_access_protected_cattle_endpoint()
     {
         $user = User::factory()->create();
@@ -101,7 +101,7 @@ class ApiAuthTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function unauthenticated_user_cannot_access_protected_endpoints()
     {
         $response = $this->getJson('/api/cattle');

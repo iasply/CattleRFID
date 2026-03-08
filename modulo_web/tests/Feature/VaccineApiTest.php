@@ -13,7 +13,7 @@ class VaccineApiTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function vaccine_can_be_registered_via_api_and_associates_with_workstation()
     {
         // 1. Setup Workstation and User
@@ -72,7 +72,7 @@ class VaccineApiTest extends TestCase
         $this->assertEquals(510.50, $cattle->fresh()->weight);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function vaccine_registered_without_workstation_token_has_null_workstation_id()
     {
         $user = User::factory()->create(['is_veterinarian' => true]);
@@ -104,7 +104,7 @@ class VaccineApiTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_can_filter_vaccines_by_rfid_tag()
     {
         $user = User::factory()->create();

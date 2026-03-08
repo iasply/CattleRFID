@@ -18,7 +18,7 @@ class EntityTagTest extends TestCase
         $this->actingAs(User::factory()->create());
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function cattle_is_created_with_automatic_rfid_tag_and_registration_date()
     {
         $response = $this->post(route('admin.cattle.store'), [
@@ -36,7 +36,7 @@ class EntityTagTest extends TestCase
         $this->assertEquals(auth()->id(), $cattle->user_id);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function veterinarian_is_created_with_automatic_username_tag()
     {
         $response = $this->post(route('admin.veterinarians.store'), [

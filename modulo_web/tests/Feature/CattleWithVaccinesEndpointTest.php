@@ -66,7 +66,6 @@ class CattleWithVaccinesEndpointTest extends TestCase
                 'name',
                 'weight',
                 'registration_date',
-                'user_name',
                 'vaccines_count'
             ]
         ]);

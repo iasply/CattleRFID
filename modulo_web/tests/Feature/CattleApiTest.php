@@ -11,7 +11,7 @@ class CattleApiTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_can_lookup_cattle_by_rfid_tag()
     {
         $user = User::factory()->create();
@@ -35,7 +35,7 @@ class CattleApiTest extends TestCase
             ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function lookup_returns_404_for_non_existent_tag()
     {
         $user = User::factory()->create();
@@ -48,7 +48,7 @@ class CattleApiTest extends TestCase
             ->assertJson(['message' => 'Animal não encontrado.']);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_can_list_all_cattle()
     {
         $user = User::factory()->create();
