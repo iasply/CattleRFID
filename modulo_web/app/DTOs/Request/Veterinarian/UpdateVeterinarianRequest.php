@@ -18,6 +18,7 @@ class UpdateVeterinarianRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $veterinarianId,
+            'vet_rfid' => 'nullable|string|max:16|unique:users,vet_rfid,' . $veterinarianId,
             'password' => 'nullable|min:6',
         ];
     }
