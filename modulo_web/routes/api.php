@@ -14,11 +14,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // Cattle Endpoints
-    Route::get('/cattle', [CattleApiController::class, 'index']);
-    Route::post('/cattle', [CattleApiController::class, 'store']);
-
-    // Vaccine Endpoints
-    Route::post('/vaccines', [VaccineApiController::class, 'store']);
+    Route::apiResource('cattle', CattleApiController::class)->only(['index', 'store']);
+    Route::get('cattle/{rfid_tag}', [CattleApiController::class, 'show']);
+    Route::apiResource('vaccines', VaccineApiController::class)->only(['index', 'store']);
 });
 
 Route::get('/user', function (Request $request) {

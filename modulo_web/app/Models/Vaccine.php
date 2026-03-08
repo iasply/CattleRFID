@@ -30,4 +30,12 @@ class Vaccine extends Model
     {
         return $this->belongsTo(Workstation::class);
     }
+
+    /**
+     * Get the cattle (animal) associated with this vaccine record.
+     */
+    public function cattle()
+    {
+        return $this->belongsTo(Cattle::class, 'rfid_tag', 'rfid_tag');
+    }
 }

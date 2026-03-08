@@ -12,6 +12,7 @@ readonly class CattleResponse
         public string $name,
         public float $weight,
         public string $registration_date,
+        public ?string $user_name = null,
     ) {
     }
 
@@ -23,6 +24,7 @@ readonly class CattleResponse
             name: $cattle->name,
             weight: (float) $cattle->weight,
             registration_date: $cattle->registration_date,
+            user_name: $cattle->relationLoaded('user') ? $cattle->user?->name : null,
         );
     }
 
@@ -34,6 +36,7 @@ readonly class CattleResponse
             'name' => $this->name,
             'weight' => $this->weight,
             'registration_date' => $this->registration_date,
+            'user_name' => $this->user_name,
         ];
     }
 }
