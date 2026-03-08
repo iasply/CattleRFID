@@ -27,7 +27,7 @@ public class VaccineFormPanel extends JPanel {
     private JButton submitButton;
 
     public VaccineFormPanel(Cattle cattle, CattleController controller, User loggedUser, NavigationManager navManager,
-                            MainPanel parentMainPanel) {
+            MainPanel parentMainPanel) {
         this.cattle = cattle;
         this.controller = controller;
         this.loggedUser = loggedUser;
@@ -157,6 +157,7 @@ public class VaccineFormPanel extends JPanel {
 
         submitButton = UIStyles.createSuccessButton("Registrar Vacina");
         submitButton.setPreferredSize(new Dimension(250, 45));
+        submitButton.setBackground(UIStyles.PRIMARY);
         submitButton.addActionListener(e -> saveAction());
         buttonPanel.add(submitButton);
 

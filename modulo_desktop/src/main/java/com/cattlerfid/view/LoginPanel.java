@@ -19,7 +19,7 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
     private JButton readCardButton;
 
     public LoginPanel(LoginController controller, com.cattlerfid.config.ApiConfig apiConfig,
-                      NavigationManager navManager) {
+            NavigationManager navManager) {
         this.controller = controller;
         this.apiConfig = apiConfig;
         this.navManager = navManager;
@@ -34,10 +34,11 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
         // Background
         setBackground(UIStyles.BACKGROUND);
 
-        // Header
+        // Header - Dark Emerald
         JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(UIStyles.BACKGROUND);
+        headerPanel.setBackground(UIStyles.PRIMARY_DARK); // Darker top
         JLabel titleLabel = UIStyles.createTitleLabel("Acesso via Crachá RFID");
+        titleLabel.setForeground(Color.WHITE); // Contrast for Dark Emerald
         headerPanel.add(titleLabel, BorderLayout.CENTER);
 
         JButton backButton = UIStyles.createBackButton("< Voltar");
@@ -134,7 +135,7 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
     public void onSerialConnected() {
         SwingUtilities.invokeLater(() -> {
             statusLabel.setText("Arduino Conectado! Por favor, leia seu crachá.");
-            statusLabel.setForeground(new Color(0, 150, 0)); // Verde escuro
+            statusLabel.setForeground(UIStyles.PRIMARY); // Premium Emerald
             readCardButton.setEnabled(true);
         });
     }

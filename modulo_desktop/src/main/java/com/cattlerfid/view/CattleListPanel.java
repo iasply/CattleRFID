@@ -67,7 +67,7 @@ public class CattleListPanel extends JPanel {
         table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setFont(UIStyles.BODY_FONT);
         table.getTableHeader().setFont(UIStyles.SUBHEADER_FONT);
-        table.getTableHeader().setBackground(UIStyles.PRIMARY);
+        table.getTableHeader().setBackground(UIStyles.PRIMARY_DARK); // Dark Emerald Header
         table.getTableHeader().setForeground(Color.WHITE);
 
         // Alternating row colors

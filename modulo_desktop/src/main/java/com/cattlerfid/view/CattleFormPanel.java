@@ -26,7 +26,7 @@ public class CattleFormPanel extends JPanel {
     private JButton saveDbButton;
 
     public CattleFormPanel(Cattle cattle, boolean isNew, boolean isManual, CattleController controller,
-                           User loggedUser, NavigationManager navManager, MainPanel parentMainPanel) {
+            User loggedUser, NavigationManager navManager, MainPanel parentMainPanel) {
         this.cattle = cattle;
         this.isNew = isNew;
         this.isManual = isManual;
@@ -151,6 +151,8 @@ public class CattleFormPanel extends JPanel {
 
         writeTagButton = UIStyles.createPrimaryButton("1. Gravar Tag Física");
         writeTagButton.setPreferredSize(new Dimension(220, 40));
+        writeTagButton.setBackground(UIStyles.WARNING); // Gold for Tag writing
+        writeTagButton.setForeground(UIStyles.PRIMARY_DARK);
         writeTagButton.addActionListener(e -> writeTagAction());
         // Apenas habilita gravação física se for manual
         writeTagButton.setVisible(isManual);
@@ -158,6 +160,7 @@ public class CattleFormPanel extends JPanel {
 
         saveDbButton = UIStyles.createSuccessButton("2. Salvar no Banco");
         saveDbButton.setPreferredSize(new Dimension(220, 40));
+        saveDbButton.setBackground(UIStyles.PRIMARY); // Emerald for Saving
         saveDbButton.addActionListener(e -> saveDbAction());
         saveDbButton.setEnabled(!isManual || !isNew); // Habilita direto se for edição ou se não for manual
         buttonPanel.add(saveDbButton);

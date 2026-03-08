@@ -23,7 +23,7 @@ public class ConnectionPanel extends JPanel implements ConnectionController.Conn
     private JButton testReadButton;
 
     public ConnectionPanel(ConnectionController controller, AuthenticationService authService,
-                           com.cattlerfid.config.ApiConfig apiConfig, NavigationManager navManager) {
+            com.cattlerfid.config.ApiConfig apiConfig, NavigationManager navManager) {
         this.controller = controller;
         this.authService = authService;
         this.apiConfig = apiConfig;
@@ -40,10 +40,11 @@ public class ConnectionPanel extends JPanel implements ConnectionController.Conn
         // Background
         setBackground(UIStyles.BACKGROUND);
 
-        // Header
+        // Header - Dark Emerald
         JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(UIStyles.BACKGROUND);
+        headerPanel.setBackground(UIStyles.PRIMARY_DARK);
         JLabel titleLabel = UIStyles.createTitleLabel("Configuração de Hardware");
+        titleLabel.setForeground(Color.WHITE); // Contrast
         headerPanel.add(titleLabel, BorderLayout.CENTER);
 
         JButton logButton = new JButton("Ver Logs Serial");
@@ -126,7 +127,7 @@ public class ConnectionPanel extends JPanel implements ConnectionController.Conn
     public void onSerialConnected() {
         SwingUtilities.invokeLater(() -> {
             statusLabel.setText("Arduino Conectado! Faça um teste de leitura.");
-            statusLabel.setForeground(new Color(0, 150, 0)); // Verde escuro
+            statusLabel.setForeground(UIStyles.PRIMARY); // Premium Emerald
             connectPortButton.setEnabled(false);
             portSelector.setEnabled(false);
             disconnectButton.setEnabled(true);

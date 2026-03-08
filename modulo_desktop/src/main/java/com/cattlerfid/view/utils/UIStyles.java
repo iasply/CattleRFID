@@ -7,13 +7,17 @@ import java.awt.*;
 public class UIStyles {
 
     // Color Palette
-    public static final Color PRIMARY = new Color(43, 95, 159); // Deep Blue
-    public static final Color SECONDARY = new Color(220, 224, 229);
-    public static final Color SUCCESS = new Color(46, 125, 50); // Agriculture Green
-    public static final Color DANGER = new Color(211, 47, 47); // Red
-    public static final Color BACKGROUND = new Color(245, 247, 250); // Off-white
-    public static final Color TEXT_DARK = new Color(33, 33, 33);
+    // Color Palette - Premium Green
+    public static final Color PRIMARY = new Color(5, 150, 105); // Emerald 600
+    public static final Color PRIMARY_DARK = new Color(2, 44, 34); // Emerald 950 (Sidebar-like)
+    public static final Color SECONDARY = new Color(71, 85, 105); // Slate 600
+    public static final Color SUCCESS = new Color(5, 150, 105); // Using Emerald as Success too
+    public static final Color DANGER = new Color(220, 38, 38); // Red 600
+    public static final Color WARNING = new Color(251, 191, 36); // Amber 400
+    public static final Color BACKGROUND = new Color(248, 250, 252); // Slate 50
+    public static final Color TEXT_DARK = new Color(15, 23, 42); // Slate 900
     public static final Color TEXT_LIGHT = Color.WHITE;
+    public static final Color TEXT_MUTED = new Color(100, 116, 139); // Slate 500
 
     // Typography
     public static final Font HEADER_FONT = new Font("Segoe UI", Font.BOLD, 22);

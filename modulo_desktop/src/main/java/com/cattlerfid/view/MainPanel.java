@@ -40,10 +40,10 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
         // Background
         setBackground(UIStyles.BACKGROUND);
 
-        // Topo / Header
+        // Topo / Header - Premium Dark Emerald
         JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(UIStyles.PRIMARY);
-        headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        headerPanel.setBackground(UIStyles.PRIMARY_DARK);
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
 
         JLabel welcomeLabel = new JLabel("Usuário: " + loggedUser.getName() + " (Veterinário)");
         welcomeLabel.setForeground(UIStyles.TEXT_LIGHT);
@@ -70,14 +70,15 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
 
         add(headerPanel, BorderLayout.NORTH);
 
-        // Centro (Botoes Gigantes)
+        // Centro (Botoes Gigantes) - Emerald and Gold accents
         JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 80));
         centerPanel.setBackground(UIStyles.BACKGROUND);
 
         scanCattleButton = UIStyles.createPrimaryButton("<html><center>IDENTIFICAR<br>E VACINAR</center></html>");
         scanCattleButton.setPreferredSize(new Dimension(220, 120));
         scanCattleButton.setFont(UIStyles.HEADER_FONT);
-        scanCattleButton.setBackground(new Color(230, 81, 0)); // Resembles vibrant Orange
+        scanCattleButton.setBackground(UIStyles.WARNING); // Gold/Amber accent
+        scanCattleButton.setForeground(UIStyles.PRIMARY_DARK); // Better contrast
         scanCattleButton.addActionListener(e -> {
             statusLabel.setText("Aproxime a Tag do Animal...");
             cattleController.requestReadTag();
@@ -87,7 +88,7 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
                 .createPrimaryButton("<html><center>CADASTRAR<br>MANUAL</center></html>");
         manualRegisterButton.setPreferredSize(new Dimension(220, 120));
         manualRegisterButton.setFont(UIStyles.HEADER_FONT);
-        manualRegisterButton.setBackground(UIStyles.SUCCESS);
+        manualRegisterButton.setBackground(UIStyles.PRIMARY); // Emerald
         manualRegisterButton.addActionListener(e -> {
             statusLabel.setText("Preparando formulário manual...");
 
@@ -106,7 +107,7 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
         JButton listButton = UIStyles.createPrimaryButton("<html><center>LISTAR<br>REBANHO</center></html>");
         listButton.setPreferredSize(new Dimension(220, 120));
         listButton.setFont(UIStyles.HEADER_FONT);
-        listButton.setBackground(UIStyles.PRIMARY);
+        listButton.setBackground(UIStyles.SECONDARY); // Slate
         listButton.addActionListener(e -> {
             CattleListPanel listPanel = new CattleListPanel(cattleController.getApiService(), cattleController,
                     loggedUser, navManager, this);
