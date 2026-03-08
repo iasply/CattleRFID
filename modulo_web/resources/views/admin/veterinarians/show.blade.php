@@ -27,7 +27,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($veterinarian->vaccinations as $v)
+                @foreach($vaccinations as $v)
                     <tr>
                         <td>{{ \Carbon\Carbon::parse($v->vaccination_date)->format('d/m/Y') }}</td>
                         <td><code>{{ $v->rfid_tag }}</code></td>
@@ -35,7 +35,7 @@
                         <td>{{ number_format($v->current_weight, 2, ',', '.') }} kg</td>
                     </tr>
                 @endforeach
-                @if($veterinarian->vaccinations->isEmpty())
+                @if($vaccinations->isEmpty())
                     <tr>
                         <td colspan="4" style="text-align: center; color: var(--secondary);">Nenhuma vacina aplicada por este
                             profissional.</td>

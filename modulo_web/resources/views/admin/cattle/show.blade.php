@@ -28,15 +28,15 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($cattle->vaccines as $v)
+                @foreach($vaccines as $v)
                     <tr>
                         <td>{{ \Carbon\Carbon::parse($v->vaccination_date)->format('d/m/Y') }}</td>
                         <td>{{ $v->vaccine_type }}</td>
                         <td>{{ number_format($v->current_weight, 2, ',', '.') }} kg</td>
-                        <td>{{ $v->user->name ?? 'Sistema' }}</td>
+                        <td>{{ $v->veterinarian_name ?? 'Sistema' }}</td>
                     </tr>
                 @endforeach
-                @if($cattle->vaccines->isEmpty())
+                @if($vaccines->isEmpty())
                     <tr>
                         <td colspan="4" style="text-align: center; color: var(--secondary);">Nenhuma vacina registrada para este
                             animal.</td>

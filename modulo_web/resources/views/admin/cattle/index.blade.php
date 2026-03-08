@@ -23,13 +23,13 @@
                     <tr>
                         <td><code>{{ $animal->rfid_tag }}</code></td>
                         <td>{{ $animal->name }}</td>
-                        <td>{{ $animal->user->name ?? 'Sistema' }}</td>
+                        <td>{{ $animal->user_name ?? 'Sistema' }}</td>
                         <td>{{ number_format($animal->weight, 2, ',', '.') }} kg</td>
                         <td>{{ \Carbon\Carbon::parse($animal->registration_date)->format('d/m/Y') }}</td>
                         <td style="display: flex; gap: 0.5rem;">
-                            <a href="{{ route('admin.cattle.show', $animal) }}" class="btn btn-primary"
+                            <a href="{{ route('admin.cattle.show', $animal->id) }}" class="btn btn-primary"
                                 style="font-size: 0.75rem; text-decoration: none; background-color: #6366f1; border-color: #6366f1;">Ver</a>
-                            <a href="{{ route('admin.cattle.edit', $animal) }}" class="btn btn-primary"
+                            <a href="{{ route('admin.cattle.edit', $animal->id) }}" class="btn btn-primary"
                                 style="font-size: 0.75rem; text-decoration: none;">Editar</a>
                         </td>
                     </tr>

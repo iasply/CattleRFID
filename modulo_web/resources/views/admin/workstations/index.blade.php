@@ -28,7 +28,7 @@
                         <td><code>{{ $ws->hash }}</code></td>
                         <td>{{ $ws->desc }}</td>
                         <td style="display: flex; gap: 0.5rem;">
-                            <a href="{{ route('admin.workstations.edit', $ws) }}" class="btn btn-primary"
+                            <a href="{{ route('admin.workstations.edit', $ws->id) }}" class="btn btn-primary"
                                 style="font-size: 0.75rem; text-decoration: none;">Editar</a>
                         </td>
                     </tr>

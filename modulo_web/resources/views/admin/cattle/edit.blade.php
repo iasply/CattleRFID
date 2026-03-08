@@ -8,7 +8,7 @@
     </div>
 
     <div class="card" style="max-width: 600px;">
-        <form action="{{ route('admin.cattle.update', $cattle) }}" method="POST">
+        <form action="{{ route('admin.cattle.update', $cattle->id) }}" method="POST">
             @csrf
             @method('PUT')
             <div>

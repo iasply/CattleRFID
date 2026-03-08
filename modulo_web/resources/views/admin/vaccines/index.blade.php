@@ -25,7 +25,7 @@
                         <td><code>{{ $v->rfid_tag }}</code></td>
                         <td>{{ $v->vaccine_type }}</td>
                         <td>{{ number_format($v->current_weight, 2, ',', '.') }} kg</td>
-                        <td>{{ $v->user->name ?? 'Sistema' }}</td>
+                        <td>{{ $v->veterinarian_name ?? 'Sistema' }}</td>
                     </tr>
                 @endforeach
                 @if($vaccines->isEmpty())

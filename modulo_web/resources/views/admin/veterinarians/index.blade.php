@@ -23,9 +23,9 @@
                         <td><code>{{ $vet->vet_rfid }}</code></td>
                         <td>{{ $vet->email }}</td>
                         <td style="display: flex; gap: 0.5rem;">
-                            <a href="{{ route('admin.veterinarians.show', $vet) }}" class="btn btn-primary"
+                            <a href="{{ route('admin.veterinarians.show', $vet->id) }}" class="btn btn-primary"
                                 style="font-size: 0.75rem; text-decoration: none; background-color: #6366f1; border-color: #6366f1;">Ver</a>
-                            <a href="{{ route('admin.veterinarians.edit', $vet) }}" class="btn btn-primary"
+                            <a href="{{ route('admin.veterinarians.edit', $vet->id) }}" class="btn btn-primary"
                                 style="font-size: 0.75rem; text-decoration: none;">Editar</a>
                         </td>
                     </tr>
