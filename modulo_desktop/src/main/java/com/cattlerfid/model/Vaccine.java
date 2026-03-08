@@ -1,27 +1,46 @@
 package com.cattlerfid.model;
 
+import com.google.gson.annotations.SerializedName;
 import java.time.LocalDate;
 
+/**
+ * Represents a Vaccine record.
+ * Matches VaccineResponse DTO and StoreVaccineRequest fields.
+ */
 public class Vaccine {
     private String id;
-    private String rfidTag; // Tag do Gado associado
-    private LocalDate vaccinationDate;
-    private String vaccinatorUser; // Usuário que aplicou a vacina
-    private String vaccineType; // Tipo ou nome da Vacina (ex: Febre Aftosa)
-    private double currentWeight; // Peso do animal no momento da vacinação
 
-    public Vaccine(String id, String rfidTag, LocalDate vaccinationDate, String vaccinatorUser, String vaccineType,
-                   double currentWeight) {
+    @SerializedName("rfid_tag")
+    private String rfidTag;
+
+    @SerializedName("vaccination_date")
+    private String vaccinationDate; // Using String to simplify API parsing (YYYY-MM-DD)
+
+    @SerializedName("vaccine_type")
+    private String vaccineType;
+
+    @SerializedName("current_weight")
+    private double currentWeight;
+
+    // Response-only fields
+    @SerializedName("veterinarian_name")
+    private String veterinarianName;
+
+    @SerializedName("workstation_desc")
+    private String workstationDesc;
+
+    public Vaccine() {
+    }
+
+    public Vaccine(String id, String rfidTag, String vaccinationDate, String vaccineType, double currentWeight) {
         this.id = id;
         this.rfidTag = rfidTag;
         this.vaccinationDate = vaccinationDate;
-        this.vaccinatorUser = vaccinatorUser;
         this.vaccineType = vaccineType;
         this.currentWeight = currentWeight;
     }
 
-    public Vaccine() {
-    }
+    // Getters and Setters
 
     public String getId() {
         return id;
@@ -39,20 +58,12 @@ public class Vaccine {
         this.rfidTag = rfidTag;
     }
 
-    public LocalDate getVaccinationDate() {
+    public String getVaccinationDate() {
         return vaccinationDate;
     }
 
-    public void setVaccinationDate(LocalDate vaccinationDate) {
+    public void setVaccinationDate(String vaccinationDate) {
         this.vaccinationDate = vaccinationDate;
-    }
-
-    public String getVaccinatorUser() {
-        return vaccinatorUser;
-    }
-
-    public void setVaccinatorUser(String vaccinatorUser) {
-        this.vaccinatorUser = vaccinatorUser;
     }
 
     public String getVaccineType() {
@@ -69,5 +80,21 @@ public class Vaccine {
 
     public void setCurrentWeight(double currentWeight) {
         this.currentWeight = currentWeight;
+    }
+
+    public String getVeterinarianName() {
+        return veterinarianName;
+    }
+
+    public void setVeterinarianName(String veterinarianName) {
+        this.veterinarianName = veterinarianName;
+    }
+
+    public String getWorkstationDesc() {
+        return workstationDesc;
+    }
+
+    public void setWorkstationDesc(String workstationDesc) {
+        this.workstationDesc = workstationDesc;
     }
 }

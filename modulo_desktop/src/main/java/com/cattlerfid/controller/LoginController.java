@@ -82,7 +82,7 @@ public class LoginController {
         if (parts.length >= 2) {
             if (parts[1].equals("OK")) {
                 // Sucesso de leitura
-                String tagContent = parts[2].trim();
+                String tagContent = parts[2];
                 if (tagContent.length() != 16 || !tagContent.startsWith("V")) {
                     if (viewListener != null) {
                         viewListener.onLoginError(

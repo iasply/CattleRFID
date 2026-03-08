@@ -20,8 +20,9 @@ public class Main {
 
         SwingUtilities.invokeLater(() -> {
 
-            // 1. Instanciar Serviços Globais de Infraestrutura
-            AuthenticationService authService = new AuthenticationService();
+            // 1. Instanciar Serviços de Configuração e Infraestrutura
+            com.cattlerfid.config.ApiConfig apiConfig = new com.cattlerfid.config.ApiConfig();
+            AuthenticationService authService = new AuthenticationService(apiConfig);
             SerialService serialService = new SerialService();
 
             // 2. Instanciar Controladores Raiz
@@ -29,7 +30,8 @@ public class Main {
 
             // 3. Inicializar a View Primária (ApplicationFrame e ConnectionPanel)
             ApplicationFrame appFrame = new ApplicationFrame();
-            ConnectionPanel connectionPanel = new ConnectionPanel(connectionController, authService, appFrame);
+            ConnectionPanel connectionPanel = new ConnectionPanel(connectionController, authService, apiConfig,
+                    appFrame);
 
             // 4. Mostrar Aplicação Java
             appFrame.setVisible(true);

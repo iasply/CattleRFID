@@ -1,27 +1,102 @@
 package com.cattlerfid.model;
 
+/**
+ * Represents an authenticated user returned by the API.
+ * Fields match VeterinarianResponse DTO from the web module.
+ */
 public class User {
-    private String username;
-    private String fullName;
+    private int id;
+    private String name;
+    private String email;
+    private String vet_rfid;
+    private boolean is_veterinarian;
+
+    // Session-only: the Bearer token returned at login
+    private transient String accessToken;
+
+    public User() {
+    }
 
     public User(String username, String fullName) {
-        this.username = username;
-        this.fullName = fullName;
+        this.vet_rfid = username;
+        this.name = fullName;
     }
 
-    public String getUsername() {
-        return username;
+    // --- API fields ---
+
+    public int getId() {
+        return id;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setId(int id) {
+        this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getVetRfid() {
+        return vet_rfid;
+    }
+
+    public void setVetRfid(String v) {
+        if (v != null && v.length() > 16) {
+            this.vet_rfid = v.substring(0, 16);
+        } else {
+            this.vet_rfid = v;
+        }
+    }
+
+    public boolean isVeterinarian() {
+        return is_veterinarian;
+    }
+
+    public void setVeterinarian(boolean v) {
+        this.is_veterinarian = v;
+    }
+
+    // --- Session token (not serialized) ---
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String t) {
+        this.accessToken = t;
+    }
+
+    // --- Legacy compatibility ---
+
+    /** @deprecated Use getName() */
     public String getFullName() {
-        return fullName;
+        return name;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    /** @deprecated Use getVetRfid() */
+    public String getUsername() {
+        return vet_rfid;
+    }
+
+    /** @deprecated Use setName() */
+    public void setFullName(String n) {
+        this.name = n;
+    }
+
+    /** @deprecated Use setVetRfid() */
+    public void setUsername(String u) {
+        this.vet_rfid = u;
     }
 }

@@ -1,21 +1,29 @@
 package com.cattlerfid.model;
 
-import java.time.LocalDate;
+import com.google.gson.annotations.SerializedName;
 
+/**
+ * Represents a Cattle animal.
+ * Matches CattleResponse DTO fields.
+ */
 public class Cattle {
+    @SerializedName("rfid_tag")
     private String rfidTag;
+
     private String name;
     private double weight;
-    private LocalDate registrationDate;
 
-    public Cattle(String rfidTag, String name, double weight, LocalDate registrationDate) {
+    @SerializedName("registration_date")
+    private String registrationDate; // Using String YYYY-MM-DD
+
+    public Cattle() {
+    }
+
+    public Cattle(String rfidTag, String name, double weight, String registrationDate) {
         this.rfidTag = rfidTag;
         this.name = name;
         this.weight = weight;
         this.registrationDate = registrationDate;
-    }
-
-    public Cattle() {
     }
 
     public String getRfidTag() {
@@ -23,7 +31,11 @@ public class Cattle {
     }
 
     public void setRfidTag(String rfidTag) {
-        this.rfidTag = rfidTag;
+        if (rfidTag != null && rfidTag.length() > 16) {
+            this.rfidTag = rfidTag.substring(0, 16);
+        } else {
+            this.rfidTag = rfidTag;
+        }
     }
 
     public String getName() {
@@ -42,11 +54,11 @@ public class Cattle {
         this.weight = weight;
     }
 
-    public LocalDate getRegistrationDate() {
+    public String getRegistrationDate() {
         return registrationDate;
     }
 
-    public void setRegistrationDate(LocalDate registrationDate) {
+    public void setRegistrationDate(String registrationDate) {
         this.registrationDate = registrationDate;
     }
 }
