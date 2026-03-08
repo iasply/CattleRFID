@@ -16,9 +16,10 @@ class CattleUpdateApiTest extends TestCase
     {
         $user = User::factory()->create();
         $token = $user->createToken('test')->plainTextToken;
+        $tag = \App\Support\RfidGenerator::generateCattleTag();
 
         $cattle = Cattle::create([
-            'rfid_tag' => 'ANIMAL-UPDATE',
+            'rfid_tag' => $tag,
             'name' => 'Original Name',
             'weight' => 200.00,
             'registration_date' => '2024-01-01',
@@ -38,7 +39,7 @@ class CattleUpdateApiTest extends TestCase
                     'id' => $cattle->id,
                     'name' => 'Updated Name',
                     'weight' => 250.00,
-                    'rfid_tag' => 'ANIMAL-UPDATE', // RFID should remain same
+                    'rfid_tag' => $tag, // RFID should remain same
                 ]
             ]);
 
@@ -51,16 +52,17 @@ class CattleUpdateApiTest extends TestCase
     {
         $user = User::factory()->create();
         $token = $user->createToken('test')->plainTextToken;
+        $tag = \App\Support\RfidGenerator::generateCattleTag();
 
         Cattle::create([
-            'rfid_tag' => 'EXISTING-TAG',
+            'rfid_tag' => $tag,
             'name' => 'Boi 1',
             'weight' => 100,
             'registration_date' => now(),
         ]);
 
         $duplicateData = [
-            'rfid_tag' => 'EXISTING-TAG',
+            'rfid_tag' => $tag,
             'name' => 'Attempt Duplicate',
             'weight' => 200,
         ];

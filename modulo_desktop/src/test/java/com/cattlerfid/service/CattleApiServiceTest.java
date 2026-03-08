@@ -1,5 +1,7 @@
 package com.cattlerfid.service;
 
+import com.cattlerfid.util.RfidGenerator;
+
 import com.cattlerfid.config.ApiConfig;
 import com.cattlerfid.model.Cattle;
 import com.cattlerfid.model.User;
@@ -47,8 +49,9 @@ class CattleApiServiceTest {
     @Test
     void testGetCattleByTagSuccess() throws IOException, InterruptedException {
         // Arrange
-        String rfidTag = "TAG_BOI_100";
-        String jsonResponse = "{\"rfid_tag\":\"TAG_BOI_100\",\"name\":\"Mimosa\",\"weight\":450.0,\"registration_date\":\"2023-05-20\"}";
+        String rfidTag = RfidGenerator.generateCattleTag();
+        String jsonResponse = "{\"rfid_tag\":\"" + rfidTag
+                + "\",\"name\":\"Mimosa\",\"weight\":450.0,\"registration_date\":\"2023-05-20\"}";
 
         when(config.url("/cattle/" + rfidTag)).thenReturn("http://localhost/api/cattle/" + rfidTag);
         when(httpResponse.statusCode()).thenReturn(200);
@@ -67,7 +70,10 @@ class CattleApiServiceTest {
     @Test
     void testGetAllCattle() throws IOException, InterruptedException {
         // Arrange
-        String jsonResponse = "{ \"data\": [{\"rfid_tag\":\"TAG1\",\"name\":\"A\"},{\"rfid_tag\":\"TAG2\",\"name\":\"B\"}] }";
+        String tag1 = RfidGenerator.generateCattleTag();
+        String tag2 = RfidGenerator.generateCattleTag();
+        String jsonResponse = "{ \"data\": [{\"rfid_tag\":\"" + tag1 + "\",\"name\":\"A\"},{\"rfid_tag\":\"" + tag2
+                + "\",\"name\":\"B\"}] }";
 
         when(config.url("/cattle")).thenReturn("http://localhost/api/cattle");
         when(httpResponse.statusCode()).thenReturn(200);
@@ -79,14 +85,15 @@ class CattleApiServiceTest {
 
         // Assert
         assertEquals(2, result.size());
-        assertEquals("TAG1", result.get(0).getRfidTag());
-        assertEquals("TAG2", result.get(1).getRfidTag());
+        assertEquals(tag1, result.get(0).getRfidTag());
+        assertEquals(tag2, result.get(1).getRfidTag());
     }
 
     @Test
     void testSaveCattleSuccess() throws IOException, InterruptedException {
         // Arrange
-        Cattle cattle = new Cattle("NEW_TAG", "New Cow", 100.0, "2023-10-01");
+        String newTag = RfidGenerator.generateCattleTag();
+        Cattle cattle = new Cattle(newTag, "New Cow", 100.0, "2023-10-01");
         when(config.url("/cattle")).thenReturn("http://localhost/api/cattle");
         when(httpResponse.statusCode()).thenReturn(201);
         when(httpClient.send(any(), any())).thenAnswer(invocation -> httpResponse);
@@ -101,7 +108,8 @@ class CattleApiServiceTest {
     @Test
     void testSaveVaccineSuccess() throws IOException, InterruptedException {
         // Arrange
-        Vaccine vaccine = new Vaccine("1", "TAG_BOI_100", "2023-11-01", "Aftosa", 460.0);
+        String vaccineTag = RfidGenerator.generateCattleTag();
+        Vaccine vaccine = new Vaccine("1", vaccineTag, "2023-11-01", "Aftosa", 460.0);
         when(config.url("/vaccines")).thenReturn("http://localhost/api/vaccines");
         when(httpResponse.statusCode()).thenReturn(201);
         when(httpClient.send(any(), any())).thenAnswer(invocation -> httpResponse);
@@ -116,8 +124,8 @@ class CattleApiServiceTest {
     @Test
     void testGetVaccinesByCattle() throws IOException, InterruptedException {
         // Arrange
-        String rfidTag = "TAG_BOI_100";
-        String jsonResponse = "{ \"data\": [{\"rfid_tag\":\"TAG_BOI_100\",\"vaccine_type\":\"Aftosa\"}] }";
+        String rfidTag = RfidGenerator.generateCattleTag();
+        String jsonResponse = "{ \"data\": [{\"rfid_tag\":\"" + rfidTag + "\",\"vaccine_type\":\"Aftosa\"}] }";
 
         when(config.url("/vaccines?rfid_tag=" + rfidTag))
                 .thenReturn("http://localhost/api/vaccines?rfid_tag=" + rfidTag);
@@ -136,7 +144,11 @@ class CattleApiServiceTest {
     @Test
     void testGetAllCattleWithVaccines() throws IOException, InterruptedException {
         // Arrange
-        String jsonResponse = "{ \"data\": [{\"rfid_tag\":\"TAG1\",\"name\":\"A\",\"vaccines_count\":2},{\"rfid_tag\":\"TAG2\",\"name\":\"B\",\"vaccines_count\":0}] }";
+        String tag1 = RfidGenerator.generateCattleTag();
+        String tag2 = RfidGenerator.generateCattleTag();
+        String jsonResponse = "{ \"data\": [{\"rfid_tag\":\"" + tag1
+                + "\",\"name\":\"A\",\"vaccines_count\":2},{\"rfid_tag\":\"" + tag2
+                + "\",\"name\":\"B\",\"vaccines_count\":0}] }";
 
         when(config.url("/cattle-with-vaccines")).thenReturn("http://localhost/api/cattle-with-vaccines");
         when(httpResponse.statusCode()).thenReturn(200);
@@ -148,9 +160,9 @@ class CattleApiServiceTest {
 
         // Assert
         assertEquals(2, result.size());
-        assertEquals("TAG1", result.get(0).getRfidTag());
+        assertEquals(tag1, result.get(0).getRfidTag());
         assertEquals(2, result.get(0).getVaccinesCount());
-        assertEquals("TAG2", result.get(1).getRfidTag());
+        assertEquals(tag2, result.get(1).getRfidTag());
         assertEquals(0, result.get(1).getVaccinesCount());
     }
 }

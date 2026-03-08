@@ -6,6 +6,7 @@ import com.cattlerfid.model.User;
 import com.cattlerfid.model.Vaccine;
 import com.cattlerfid.service.AuthenticationService;
 import com.cattlerfid.service.CattleApiService;
+import com.cattlerfid.util.RfidGenerator;
 import org.junit.jupiter.api.*;
 
 import java.net.http.HttpClient;
@@ -27,12 +28,14 @@ public class ApiIntegrationTest {
     private AuthenticationService authService;
     private CattleApiService cattleService;
     private User currentUser;
+    private String sharedTestTag;
 
     @BeforeAll
     void setup() {
         apiConfig = new ApiConfig();
         httpClient = HttpClient.newBuilder().build();
         authService = new AuthenticationService(apiConfig, httpClient);
+        sharedTestTag = RfidGenerator.generateCattleTag();
     }
 
     @Test
@@ -67,12 +70,24 @@ public class ApiIntegrationTest {
 
     @Test
     @Order(3)
+    @DisplayName("Should create a test cattle")
+    void testCreateCattle() {
+        assertNotNull(cattleService, "Cattle service must be initialized");
+
+        Cattle c = new Cattle(sharedTestTag, "Integration Test Cow", 500.0, "2024-03-08");
+        boolean success = cattleService.saveCattle(c);
+
+        assertTrue(success, "Cattle creation should succeed");
+    }
+
+    @Test
+    @Order(4)
     @DisplayName("Should register a vaccine for a test cattle")
     void testRegisterVaccine() {
         assertNotNull(cattleService, "Cattle service must be initialized");
 
-        // Use the tag seeded in IntegrationTestDataSeeder
-        String testTag = "C000002";
+        // Use a dynamically generated tag
+        String testTag = sharedTestTag;
 
         Vaccine v = new Vaccine();
         v.setRfidTag(testTag);
@@ -89,13 +104,13 @@ public class ApiIntegrationTest {
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     @DisplayName("Should update an existing cattle's name and weight")
     void testUpdateCattle() {
         assertNotNull(cattleService, "Cattle service must be initialized");
 
-        // We know C000002 exists from previous tests
-        Cattle c = cattleService.getCattleByTag("C000002").orElseThrow();
+        // We know the cattle exists from previous vaccine registration test
+        Cattle c = cattleService.getCattleByTag(sharedTestTag).orElseThrow();
         String originalName = c.getName();
         double originalWeight = c.getWeight();
 
@@ -107,7 +122,7 @@ public class ApiIntegrationTest {
         assertTrue(success, "Cattle update should succeed");
 
         // Verify changes
-        Cattle updated = cattleService.getCattleByTag("C000002").orElseThrow();
+        Cattle updated = cattleService.getCattleByTag(sharedTestTag).orElseThrow();
         assertEquals("Updated Mimosa Name", updated.getName());
         assertEquals(originalWeight + 10.0, updated.getWeight());
     }

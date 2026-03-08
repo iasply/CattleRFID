@@ -16,10 +16,12 @@ class CattleWithVaccinesViewTest extends TestCase
     public function test_view_returns_correct_vaccines_count()
     {
         $user = User::factory()->create();
+        $tag1 = \App\Support\RfidGenerator::generateCattleTag();
+        $tag2 = \App\Support\RfidGenerator::generateCattleTag();
 
         // Create cattle
         $cattle1 = Cattle::create([
-            'rfid_tag' => 'TAG001',
+            'rfid_tag' => $tag1,
             'name' => 'Boi 1',
             'weight' => 500,
             'registration_date' => '2023-10-01',
@@ -27,7 +29,7 @@ class CattleWithVaccinesViewTest extends TestCase
         ]);
 
         $cattle2 = Cattle::create([
-            'rfid_tag' => 'TAG002',
+            'rfid_tag' => $tag2,
             'name' => 'Boi 2',
             'weight' => 600,
             'registration_date' => '2023-10-02',
@@ -36,14 +38,14 @@ class CattleWithVaccinesViewTest extends TestCase
 
         // Add 2 vaccines to cattle 1
         Vaccine::create([
-            'rfid_tag' => 'TAG001',
+            'rfid_tag' => $tag1,
             'vaccine_type' => 'Aftosa',
             'current_weight' => 500,
             'vaccination_date' => '2023-10-10',
             'user_id' => $user->id,
         ]);
         Vaccine::create([
-            'rfid_tag' => 'TAG001',
+            'rfid_tag' => $tag1,
             'vaccine_type' => 'Brucelose',
             'current_weight' => 510,
             'vaccination_date' => '2023-11-10',
@@ -52,7 +54,7 @@ class CattleWithVaccinesViewTest extends TestCase
 
         // Add 1 vaccine to cattle 2
         Vaccine::create([
-            'rfid_tag' => 'TAG002',
+            'rfid_tag' => $tag2,
             'vaccine_type' => 'Aftosa',
             'current_weight' => 600,
             'vaccination_date' => '2023-10-15',
@@ -60,8 +62,8 @@ class CattleWithVaccinesViewTest extends TestCase
         ]);
 
         // Query the view directly
-        $viewResult1 = CattleWithVaccinesView::where('rfid_tag', 'TAG001')->first();
-        $viewResult2 = CattleWithVaccinesView::where('rfid_tag', 'TAG002')->first();
+        $viewResult1 = CattleWithVaccinesView::where('rfid_tag', $tag1)->first();
+        $viewResult2 = CattleWithVaccinesView::where('rfid_tag', $tag2)->first();
 
         // Assert counts are correct
         $this->assertEquals(2, $viewResult1->vaccines_count);

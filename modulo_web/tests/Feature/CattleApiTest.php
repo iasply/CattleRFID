@@ -16,20 +16,21 @@ class CattleApiTest extends TestCase
     {
         $user = User::factory()->create();
         $token = $user->createToken('test')->plainTextToken;
+        $tag = \App\Support\RfidGenerator::generateCattleTag();
 
         Cattle::create([
-            'rfid_tag' => 'TEST-TAG-123',
+            'rfid_tag' => $tag,
             'name' => 'Boi Teste',
             'weight' => 450.50,
             'registration_date' => '2023-01-01',
         ]);
 
         $response = $this->withHeaders(['Authorization' => 'Bearer ' . $token])
-            ->getJson('/api/cattle/TEST-TAG-123');
+            ->getJson("/api/cattle/{$tag}");
 
         $response->assertStatus(200)
             ->assertJson([
-                'rfid_tag' => 'TEST-TAG-123',
+                'rfid_tag' => $tag,
                 'name' => 'Boi Teste',
                 'weight' => 450.50,
             ]);
@@ -54,8 +55,8 @@ class CattleApiTest extends TestCase
         $user = User::factory()->create();
         $token = $user->createToken('test')->plainTextToken;
 
-        Cattle::create(['rfid_tag' => 'TAG-1', 'name' => 'A', 'weight' => 100, 'registration_date' => now()]);
-        Cattle::create(['rfid_tag' => 'TAG-2', 'name' => 'B', 'weight' => 200, 'registration_date' => now()]);
+        Cattle::create(['rfid_tag' => \App\Support\RfidGenerator::generateCattleTag(), 'name' => 'A', 'weight' => 100, 'registration_date' => now()]);
+        Cattle::create(['rfid_tag' => \App\Support\RfidGenerator::generateCattleTag(), 'name' => 'B', 'weight' => 200, 'registration_date' => now()]);
 
         $response = $this->withHeaders(['Authorization' => 'Bearer ' . $token])
             ->getJson('/api/cattle');

@@ -18,8 +18,7 @@ class CattleService
             $data['user_id'] = $userId;
 
             if (empty($data['rfid_tag']) || $data['rfid_tag'] === 'C') {
-                $latestId = Cattle::max('id') ?? 0;
-                $data['rfid_tag'] = 'C' . str_pad($latestId + 1, 6, '0', STR_PAD_LEFT);
+                $data['rfid_tag'] = \App\Support\RfidGenerator::generateCattleTag();
             }
 
             if (empty($data['registration_date'])) {
