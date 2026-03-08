@@ -96,7 +96,7 @@ class CattleControllerTest {
     @Test
     void testHandleMessageReadSuccessExistingCattle() {
         String simulatedSerialMsg = "RES:OK:C       VACA_001:FW:92";
-        Cattle existingCattle = new Cattle("C       VACA_001", "Mimosa", 400, LocalDate.now());
+        Cattle existingCattle = new Cattle("C       VACA_001", "Mimosa", 400, "2023-01-01");
 
         when(apiServiceMock.getCattleByTag("C       VACA_001")).thenReturn(Optional.of(existingCattle));
 
@@ -174,7 +174,7 @@ class CattleControllerTest {
     @Test
     void testSaveVaccineDataSuccess() {
         com.cattlerfid.model.Vaccine vaccine = new com.cattlerfid.model.Vaccine();
-        Cattle cattle = new Cattle("C123", "Boi", 100.0, LocalDate.now());
+        Cattle cattle = new Cattle("C123", "Boi", 100.0, "2023-01-01");
 
         when(apiServiceMock.saveVaccine(vaccine)).thenReturn(true);
         when(apiServiceMock.saveCattle(cattle)).thenReturn(true);
@@ -190,7 +190,7 @@ class CattleControllerTest {
     @Test
     void testSaveVaccineDataError() {
         com.cattlerfid.model.Vaccine vaccine = new com.cattlerfid.model.Vaccine();
-        Cattle cattle = new Cattle("C123", "Boi", 100.0, LocalDate.now());
+        Cattle cattle = new Cattle("C123", "Boi", 100.0, "2023-01-01");
 
         when(apiServiceMock.saveVaccine(vaccine)).thenReturn(false);
         when(apiServiceMock.saveCattle(cattle)).thenReturn(true);
