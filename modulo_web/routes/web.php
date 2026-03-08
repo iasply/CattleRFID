@@ -1,0 +1,27 @@
+<?php
+
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\VeterinarianController;
+use App\Http\Controllers\Admin\CattleController;
+use App\Http\Controllers\Admin\VaccineController;
+use App\Http\Controllers\Admin\WorkstationController;
+
+// Auth Routes
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+// Admin Protected Routes
+Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::resource('veterinarians', VeterinarianController::class)->except(['destroy']);
+    Route::resource('cattle', CattleController::class)->except(['destroy']);
+    Route::resource('vaccines', VaccineController::class)->except(['destroy']);
+    Route::resource('workstations', WorkstationController::class)->except(['destroy']);
+});
+
+Route::get('/', function () {
+    return redirect()->route('admin.dashboard');
+});
