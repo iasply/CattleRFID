@@ -103,4 +103,28 @@ class VaccineApiTest extends TestCase
             'workstation_id' => null,
         ]);
     }
+
+    /** @test */
+    public function user_can_filter_vaccines_by_rfid_tag()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('test')->plainTextToken;
+
+        Cattle::create(['rfid_tag' => 'TAG-A', 'name' => 'Cow A', 'weight' => 100, 'registration_date' => now()]);
+        Cattle::create(['rfid_tag' => 'TAG-B', 'name' => 'Cow B', 'weight' => 100, 'registration_date' => now()]);
+
+        Vaccine::create(['rfid_tag' => 'TAG-A', 'vaccine_type' => 'Vax1', 'current_weight' => 105, 'vaccination_date' => now()]);
+        Vaccine::create(['rfid_tag' => 'TAG-A', 'vaccine_type' => 'Vax2', 'current_weight' => 110, 'vaccination_date' => now()]);
+        Vaccine::create(['rfid_tag' => 'TAG-B', 'vaccine_type' => 'Vax3', 'current_weight' => 105, 'vaccination_date' => now()]);
+
+        $response = $this->withHeaders(['Authorization' => 'Bearer ' . $token])
+            ->getJson('/api/vaccines?rfid_tag=TAG-A');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(2);
+
+        foreach ($response->json() as $v) {
+            $this->assertEquals('TAG-A', $v['rfid_tag']);
+        }
+    }
 }
