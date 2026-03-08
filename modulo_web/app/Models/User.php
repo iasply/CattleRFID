@@ -1,0 +1,91 @@
+<?php
+
+namespace App\Models;
+
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+
+class User extends Authenticatable
+{
+    /** @use HasFactory<\Database\Factories\UserFactory> */
+    use HasApiTokens, HasFactory, Notifiable;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'vet_rfid',
+        'is_veterinarian',
+        'tag_hash',
+    ];
+
+    protected static function booted()
+    {
+        static::creating(function ($user) {
+            // Logic for Veterinarians
+            if ($user->is_veterinarian) {
+                if (!$user->vet_rfid || $user->vet_rfid === 'V') {
+                    $user->vet_rfid = 'V' . str_pad(static::where('is_veterinarian', true)->count() + 1, 6, '0', STR_PAD_LEFT);
+                }
+            } else {
+                // Logic for non-veterinarians (Admin/Others)
+                if (!$user->vet_rfid) {
+                    $user->vet_rfid = 'USER-' . (static::max('id') + 1);
+                }
+            }
+
+            // Generate initial tag_hash for everyone
+            if ($user->vet_rfid) {
+                $user->tag_hash = hash('sha256', $user->vet_rfid . config('app.tag_salt'));
+            }
+        });
+
+        static::updating(function ($user) {
+            // Sync tag_hash if vet_rfid changes
+            if ($user->isDirty('vet_rfid') && $user->vet_rfid) {
+                $user->tag_hash = hash('sha256', $user->vet_rfid . config('app.tag_salt'));
+            }
+        });
+    }
+
+    public function cattle()
+    {
+        return $this->hasMany(Cattle::class);
+    }
+
+    public function vaccinations()
+    {
+        return $this->hasMany(Vaccine::class);
+    }
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+}
