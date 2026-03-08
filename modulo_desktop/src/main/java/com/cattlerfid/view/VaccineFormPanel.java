@@ -27,7 +27,7 @@ public class VaccineFormPanel extends JPanel {
     private JButton submitButton;
 
     public VaccineFormPanel(Cattle cattle, CattleController controller, User loggedUser, NavigationManager navManager,
-                            MainPanel parentMainPanel) {
+            MainPanel parentMainPanel) {
         this.cattle = cattle;
         this.controller = controller;
         this.loggedUser = loggedUser;
@@ -183,10 +183,14 @@ public class VaccineFormPanel extends JPanel {
 
             Vaccine v = new Vaccine();
             v.setRfidTag(cattle.getRfidTag());
-            v.setVaccinatorUser(loggedUser.getUsername());
             v.setVaccineType(vType);
             v.setCurrentWeight(weight);
-            v.setVaccinationDate(date);
+
+            // Convert DD/MM/YYYY (UI) to YYYY-MM-DD (API)
+            String[] parts = dateField.getText().trim().split("/");
+            if (parts.length == 3) {
+                v.setVaccinationDate(parts[2] + "-" + parts[1] + "-" + parts[0]);
+            }
 
             controller.saveVaccineData(v, cattle, weight);
             navManager.showPanel("Main", parentMainPanel);

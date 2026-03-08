@@ -28,7 +28,7 @@ public class CattleFormPanel extends JPanel {
     private JButton saveDbButton;
 
     public CattleFormPanel(Cattle cattle, boolean isNew, boolean isManual, CattleController controller,
-                           User loggedUser, NavigationManager navManager, MainPanel parentMainPanel) {
+            User loggedUser, NavigationManager navManager, MainPanel parentMainPanel) {
         this.cattle = cattle;
         this.isNew = isNew;
         this.isManual = isManual;
@@ -168,18 +168,23 @@ public class CattleFormPanel extends JPanel {
     }
 
     private void populateFields() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         if (!isNew) {
             nameField.setText(cattle.getName() != null ? cattle.getName() : "");
             weightField.setText(cattle.getWeight() > 0 ? String.valueOf(cattle.getWeight()) : "");
-            if (cattle.getRegistrationDate() != null) {
-                dateField.setText(cattle.getRegistrationDate().format(formatter));
+
+            String dateStr = cattle.getRegistrationDate();
+            if (dateStr != null && dateStr.length() == 10 && dateStr.contains("-")) {
+                // YYYY-MM-DD to DD/MM/YYYY
+                String[] parts = dateStr.split("-");
+                dateField.setText(parts[2] + "/" + parts[1] + "/" + parts[0]);
             } else {
-                dateField.setText(LocalDate.now().format(formatter));
+                dateField.setText(dateStr != null ? dateStr : "");
             }
         } else {
-            dateField.setText(LocalDate.now().format(formatter));
-            cattle.setRegistrationDate(LocalDate.now());
+            String today = java.time.LocalDate.now().toString(); // YYYY-MM-DD
+            String[] parts = today.split("-");
+            dateField.setText(parts[2] + "/" + parts[1] + "/" + parts[0]);
+            cattle.setRegistrationDate(today);
         }
     }
 
@@ -214,6 +219,11 @@ public class CattleFormPanel extends JPanel {
 
             cattle.setName(nameField.getText().trim());
             cattle.setWeight(weight);
+
+            // The dateField is not editable, so its value is already set during
+            // populateFields
+            // or initialization for new cattle. No need to re-read and format here for
+            // cattle.setRegistrationDate.
 
             controller.saveCattleData(cattle);
 

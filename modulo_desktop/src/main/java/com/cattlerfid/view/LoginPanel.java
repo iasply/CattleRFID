@@ -12,13 +12,16 @@ import java.awt.*;
 public class LoginPanel extends JPanel implements LoginController.LoginViewListener {
 
     private final LoginController controller;
+    private final com.cattlerfid.config.ApiConfig apiConfig;
     private final NavigationManager navManager;
 
     private JLabel statusLabel;
     private JButton readCardButton;
 
-    public LoginPanel(LoginController controller, NavigationManager navManager) {
+    public LoginPanel(LoginController controller, com.cattlerfid.config.ApiConfig apiConfig,
+            NavigationManager navManager) {
         this.controller = controller;
+        this.apiConfig = apiConfig;
         this.navManager = navManager;
         this.controller.setViewListener(this);
 
@@ -45,9 +48,9 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
             // Desliga a porta para liberá-la antes de voltar pro scanner raw de hardware
             controller.getSerialService().disconnect();
 
-            AuthenticationService authService = new AuthenticationService();
+            AuthenticationService authService = new AuthenticationService(apiConfig);
             ConnectionController connController = new ConnectionController(controller.getSerialService());
-            ConnectionPanel connPanel = new ConnectionPanel(connController, authService, navManager);
+            ConnectionPanel connPanel = new ConnectionPanel(connController, authService, apiConfig, navManager);
             navManager.showPanel("Connection", connPanel);
         });
         headerPanel.add(backButton, BorderLayout.WEST);
@@ -106,11 +109,12 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
             }
 
             // Instancia o repositorio e controller global do sistema
-            com.cattlerfid.service.CattleApiService apiService = new com.cattlerfid.service.CattleApiService();
+            com.cattlerfid.service.CattleApiService apiService = new com.cattlerfid.service.CattleApiService(apiConfig,
+                    user);
             com.cattlerfid.controller.CattleController cattleController = new com.cattlerfid.controller.CattleController(
                     apiService, controller.getSerialService());
 
-            MainPanel mainPanel = new MainPanel(user, cattleController, navManager);
+            MainPanel mainPanel = new MainPanel(user, cattleController, navManager, apiConfig);
             navManager.showPanel("Main", mainPanel);
         });
     }

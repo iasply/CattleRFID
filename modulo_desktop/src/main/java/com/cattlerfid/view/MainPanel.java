@@ -15,6 +15,7 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
     private final User loggedUser;
     private final CattleController cattleController;
     private final NavigationManager navManager;
+    private final com.cattlerfid.config.ApiConfig apiConfig;
 
     private JLabel statusLabel;
     private JButton scanCattleButton;
@@ -22,10 +23,12 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
     // Referencia da ultima tela ativa para callbacks
     private CattleFormPanel activeCattleForm;
 
-    public MainPanel(User loggedUser, CattleController cattleController, NavigationManager navManager) {
+    public MainPanel(User loggedUser, CattleController cattleController, NavigationManager navManager,
+            com.cattlerfid.config.ApiConfig apiConfig) {
         this.loggedUser = loggedUser;
         this.cattleController = cattleController;
         this.navManager = navManager;
+        this.apiConfig = apiConfig;
         this.cattleController.setViewListener(this); // Assume controle dos callbacks
 
         setupUI();
@@ -56,9 +59,9 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
                 cattleController.detachSerial();
 
                 // Reconstroi serviço e abre a tela pura de Login pendurada na mesma serial viva
-                AuthenticationService authService = new AuthenticationService();
+                AuthenticationService authService = new AuthenticationService(apiConfig);
                 LoginController loginController = new LoginController(authService, cattleController.getSerialService());
-                LoginPanel loginPanel = new LoginPanel(loginController, navManager);
+                LoginPanel loginPanel = new LoginPanel(loginController, apiConfig, navManager);
                 navManager.showPanel("Login", loginPanel);
                 loginController.attachToActiveSerial();
             }
@@ -184,8 +187,8 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
     @Override
     public void onApiSaveSuccess() {
         SwingUtilities.invokeLater(() -> {
-            statusLabel.setText("Dados salvos no mock db com sucesso.");
-            JOptionPane.showMessageDialog(this, "Registro concluído e salvo no banco de dados!", "Sucesso",
+            statusLabel.setText("Dados salvos com sucesso.");
+            JOptionPane.showMessageDialog(this, "Registro concluído e salvo no servidor!", "Sucesso",
                     JOptionPane.INFORMATION_MESSAGE);
             if (activeCattleForm != null) {
                 activeCattleForm = null;

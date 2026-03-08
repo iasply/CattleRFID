@@ -25,7 +25,7 @@ public class CattleListPanel extends JPanel {
     private JTable table;
 
     public CattleListPanel(CattleApiService apiService, com.cattlerfid.controller.CattleController controller,
-                           User loggedUser, NavigationManager navManager, MainPanel parentMainPanel) {
+            User loggedUser, NavigationManager navManager, MainPanel parentMainPanel) {
         this.apiService = apiService;
         this.controller = controller;
         this.loggedUser = loggedUser;
@@ -53,7 +53,7 @@ public class CattleListPanel extends JPanel {
         add(topPanel, BorderLayout.NORTH);
 
         // Configuração da Tabela
-        String[] columnNames = {"Tag RFID", "Nome/Apelido", "Peso (kg)", "Data Registro", "Vacinas Aplicadas"};
+        String[] columnNames = { "Tag RFID", "Nome/Apelido", "Peso (kg)", "Data Registro", "Vacinas Aplicadas" };
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -74,7 +74,7 @@ public class CattleListPanel extends JPanel {
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                           boolean hasFocus, int row, int column) {
+                    boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 if (!isSelected) {
                     c.setBackground(row % 2 == 0 ? Color.WHITE : UIStyles.BACKGROUND);
@@ -127,7 +127,14 @@ public class CattleListPanel extends JPanel {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         for (Cattle c : allCattle) {
-            String dateStr = c.getRegistrationDate() != null ? c.getRegistrationDate().format(formatter) : "N/A";
+            String dateStr = c.getRegistrationDate() != null ? c.getRegistrationDate() : "N/A";
+
+            // Re-format YYYY-MM-DD to DD/MM/YYYY for UI
+            if (dateStr.length() == 10 && dateStr.contains("-")) {
+                String[] parts = dateStr.split("-");
+                dateStr = parts[2] + "/" + parts[1] + "/" + parts[0];
+            }
+
             int countVaccines = apiService.getVaccinesByCattle(c.getRfidTag()).size();
 
             Object[] row = {
