@@ -1,0 +1,47 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\User;
+use App\Models\Cattle;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class ApiSyncTest extends TestCase
+{
+    use RefreshDatabase;
+
+    /** @test */
+    public function can_save_vaccine_via_api_with_valid_token()
+    {
+        $vet = User::factory()->create([
+            'is_veterinarian' => true,
+        ]);
+
+        $cattle = Cattle::create([
+            'name' => 'Mimosa API',
+            'weight' => 300.0,
+        ]);
+
+        $token = $vet->createToken('Desktop')->plainTextToken;
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->postJson('/api/vaccines', [
+                    'rfid_tag' => $cattle->rfid_tag,
+                    'vaccine_type' => 'Anti-Rábica',
+                    'current_weight' => 310.5,
+                    'vaccination_date' => now()->toDateString(),
+                    'vaccinator_username' => $vet->username,
+                ]);
+
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('vaccines', [
+            'rfid_tag' => $cattle->rfid_tag,
+            'vaccine_type' => 'Anti-Rábica',
+        ]);
+
+        // Verify cattle weight was updated
+        $this->assertEquals(310.5, $cattle->fresh()->weight);
+    }
+}
