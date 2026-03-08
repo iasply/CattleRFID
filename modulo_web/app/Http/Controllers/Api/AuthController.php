@@ -58,40 +58,13 @@ class AuthController extends Controller
         return response()->json($response->toArray());
     }
 
-    /**
-     * Handle standard email/RFID + password login (admin / mobile flow).
-     */
-    public function loginWithCredentials(CredentialLoginRequest $request): JsonResponse
-    {
-        $user = User::where('email', $request->identity)
-            ->orWhere('vet_rfid', $request->identity)
-            ->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'identity' => ['As credenciais fornecidas estão incorretas.'],
-            ]);
-        }
-
-        $response = new AuthResponse(
-            access_token: $user->createToken($request->device_name)->plainTextToken,
-            token_type: 'Bearer',
-            user: VeterinarianResponse::fromModel($user),
-        );
-
-        return response()->json($response->toArray());
-    }
 
     /**
-     * Route dispatcher: choose login method by request shape.
+     * Route dispatcher: choose login .
      */
     public function login(Request $request): JsonResponse
     {
-        if ($request->has(['workstation', 'tag'])) {
-            return $this->loginWithTag(TagLoginRequest::createFrom($request));
-        }
-
-        return $this->loginWithCredentials(CredentialLoginRequest::createFrom($request));
+        return $this->loginWithTag(TagLoginRequest::createFrom($request));
     }
 
     /**

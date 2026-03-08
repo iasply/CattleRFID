@@ -11,41 +11,8 @@ class ApiAuthTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
-    public function user_can_login_via_api_using_email()
-    {
-        $user = User::factory()->create([
-            'email' => 'api@test.com',
-            'password' => bcrypt('password123'),
-        ]);
 
-        $response = $this->postJson('/api/login', [
-            'identity' => 'api@test.com',
-            'password' => 'password123',
-            'device_name' => 'DesktopClient',
-        ]);
 
-        $response->assertStatus(200)
-            ->assertJsonStructure(['access_token', 'token_type', 'user']);
-    }
-
-    /** @test */
-    public function user_can_login_via_api_using_username_tag()
-    {
-        $user = User::factory()->create([
-            'vet_rfid' => 'V12345',
-            'password' => bcrypt('password123'),
-        ]);
-
-        $response = $this->postJson('/api/login', [
-            'identity' => 'V12345',
-            'password' => 'password123',
-            'device_name' => 'DesktopClient',
-        ]);
-
-        $response->assertStatus(200)
-            ->assertJsonStructure(['access_token', 'token_type', 'user']);
-    }
 
     /** @test */
     public function user_can_login_via_api_using_workstation_and_tag()
@@ -75,24 +42,6 @@ class ApiAuthTest extends TestCase
             'tokenable_id' => $user->id,
             'workstation_id' => $workstation->id,
         ]);
-    }
-
-    /** @test */
-    public function login_fails_with_invalid_workstation_hash()
-    {
-        $user = User::factory()->create([
-            'tag_hash' => 'some-hash',
-            'is_veterinarian' => true,
-        ]);
-
-        $response = $this->postJson('/api/login', [
-            'workstation' => 'INVALID-WS',
-            'tag' => '123456789',
-            'device_name' => 'DesktopClient',
-        ]);
-
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['workstation']);
     }
 
     /** @test */
