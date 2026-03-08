@@ -19,7 +19,7 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
     private JButton readCardButton;
 
     public LoginPanel(LoginController controller, com.cattlerfid.config.ApiConfig apiConfig,
-            NavigationManager navManager) {
+                      NavigationManager navManager) {
         this.controller = controller;
         this.apiConfig = apiConfig;
         this.navManager = navManager;
@@ -97,7 +97,7 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
     public void onLoginSuccess(User user) {
         SwingUtilities.invokeLater(() -> {
             JOptionPane.showMessageDialog(this,
-                    "Bem-vindo(a), " + user.getFullName() + "!",
+                    "Bem-vindo(a), " + user.getName() + "!",
                     "Acesso Liberado", JOptionPane.INFORMATION_MESSAGE);
 
             // Sucesso! Esconde esta tela e abre a MainPanel

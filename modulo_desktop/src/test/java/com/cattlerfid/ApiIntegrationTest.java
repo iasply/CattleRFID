@@ -45,7 +45,7 @@ public class ApiIntegrationTest {
         assertTrue(userOpt.isPresent(), "Authentication should return a User object");
         currentUser = userOpt.get();
 
-        assertEquals("Vet Integration Test", currentUser.getFullName());
+        assertEquals("Vet Integration Test", currentUser.getName());
         assertNotNull(currentUser.getAccessToken(), "User should have an access token");
         assertTrue(currentUser.isVeterinarian());
 
@@ -86,5 +86,29 @@ public class ApiIntegrationTest {
         // return true
         assertTrue(success, "Vaccine registration should succeed");
         System.out.println("Integration Test - Vaccine Registration Result: " + success);
+    }
+
+    @Test
+    @Order(4)
+    @DisplayName("Should update an existing cattle's name and weight")
+    void testUpdateCattle() {
+        assertNotNull(cattleService, "Cattle service must be initialized");
+
+        // We know C000002 exists from previous tests
+        Cattle c = cattleService.getCattleByTag("C000002").orElseThrow();
+        String originalName = c.getName();
+        double originalWeight = c.getWeight();
+
+        c.setName("Updated Mimosa Name");
+        c.setWeight(originalWeight + 10.0);
+
+        boolean success = cattleService.updateCattle(c);
+
+        assertTrue(success, "Cattle update should succeed");
+
+        // Verify changes
+        Cattle updated = cattleService.getCattleByTag("C000002").orElseThrow();
+        assertEquals("Updated Mimosa Name", updated.getName());
+        assertEquals(originalWeight + 10.0, updated.getWeight());
     }
 }

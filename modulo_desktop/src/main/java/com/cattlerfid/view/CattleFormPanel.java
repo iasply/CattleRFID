@@ -7,8 +7,6 @@ import com.cattlerfid.view.utils.UIStyles;
 
 import javax.swing.*;
 import java.awt.*;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 public class CattleFormPanel extends JPanel {
 
@@ -28,7 +26,7 @@ public class CattleFormPanel extends JPanel {
     private JButton saveDbButton;
 
     public CattleFormPanel(Cattle cattle, boolean isNew, boolean isManual, CattleController controller,
-            User loggedUser, NavigationManager navManager, MainPanel parentMainPanel) {
+                           User loggedUser, NavigationManager navManager, MainPanel parentMainPanel) {
         this.cattle = cattle;
         this.isNew = isNew;
         this.isManual = isManual;
@@ -96,7 +94,7 @@ public class CattleFormPanel extends JPanel {
         cardPanel.add(respLabel, gbc);
 
         gbc.gridx = 1;
-        JTextField userField = new JTextField(loggedUser.getFullName());
+        JTextField userField = new JTextField(loggedUser.getName());
         userField.setFont(UIStyles.BODY_FONT);
         userField.setEditable(false);
         userField.setBackground(UIStyles.SECONDARY);

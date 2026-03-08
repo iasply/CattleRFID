@@ -1,7 +1,8 @@
 package com.cattlerfid.model;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class UserTest {
 
@@ -9,17 +10,17 @@ class UserTest {
     void testUserCreationAndGetters() {
         User user = new User("marcelo_vet", "Marcelo Veterinario");
 
-        assertEquals("marcelo_vet", user.getUsername());
-        assertEquals("Marcelo Veterinario", user.getFullName());
+        assertEquals("marcelo_vet", user.getVetRfid());
+        assertEquals("Marcelo Veterinario", user.getName());
     }
 
     @Test
     void testUserSetters() {
         User user = new User("temp", "Temp");
-        user.setUsername("joao_vet");
-        user.setFullName("Joao Silva");
+        user.setVetRfid("joao_vet");
+        user.setName("Joao Silva");
 
-        assertEquals("joao_vet", user.getUsername());
-        assertEquals("Joao Silva", user.getFullName());
+        assertEquals("joao_vet", user.getVetRfid());
+        assertEquals("Joao Silva", user.getName());
     }
 }

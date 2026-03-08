@@ -55,8 +55,8 @@ class AuthenticationServiceTest {
         // Assert
         assertTrue(result.isPresent());
         User user = result.get();
-        assertEquals("joao_vet", user.getUsername());
-        assertEquals("Joao Silva", user.getFullName());
+        assertEquals("joao_vet", user.getVetRfid());
+        assertEquals("Joao Silva", user.getName());
         assertEquals("secret_token", user.getAccessToken());
     }
 

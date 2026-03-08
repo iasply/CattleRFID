@@ -78,25 +78,4 @@ public class User {
         this.accessToken = t;
     }
 
-    // --- Legacy compatibility ---
-
-    /** @deprecated Use getName() */
-    public String getFullName() {
-        return name;
-    }
-
-    /** @deprecated Use getVetRfid() */
-    public String getUsername() {
-        return vet_rfid;
-    }
-
-    /** @deprecated Use setName() */
-    public void setFullName(String n) {
-        this.name = n;
-    }
-
-    /** @deprecated Use setVetRfid() */
-    public void setUsername(String u) {
-        this.vet_rfid = u;
-    }
 }

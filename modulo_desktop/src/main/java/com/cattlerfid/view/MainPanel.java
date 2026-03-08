@@ -24,7 +24,7 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
     private CattleFormPanel activeCattleForm;
 
     public MainPanel(User loggedUser, CattleController cattleController, NavigationManager navManager,
-            com.cattlerfid.config.ApiConfig apiConfig) {
+                     com.cattlerfid.config.ApiConfig apiConfig) {
         this.loggedUser = loggedUser;
         this.cattleController = cattleController;
         this.navManager = navManager;
@@ -45,7 +45,7 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
         headerPanel.setBackground(UIStyles.PRIMARY);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        JLabel welcomeLabel = new JLabel("Usuário: " + loggedUser.getFullName() + " (Veterinário)");
+        JLabel welcomeLabel = new JLabel("Usuário: " + loggedUser.getName() + " (Veterinário)");
         welcomeLabel.setForeground(UIStyles.TEXT_LIGHT);
         welcomeLabel.setFont(UIStyles.SUBHEADER_FONT);
         headerPanel.add(welcomeLabel, BorderLayout.WEST);
