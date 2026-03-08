@@ -23,7 +23,7 @@ public class ConnectionPanel extends JPanel implements ConnectionController.Conn
     private JButton testReadButton;
 
     public ConnectionPanel(ConnectionController controller, AuthenticationService authService,
-            com.cattlerfid.config.ApiConfig apiConfig, NavigationManager navManager) {
+                           com.cattlerfid.config.ApiConfig apiConfig, NavigationManager navManager) {
         this.controller = controller;
         this.authService = authService;
         this.apiConfig = apiConfig;

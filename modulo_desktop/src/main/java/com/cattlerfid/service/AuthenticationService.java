@@ -16,7 +16,7 @@ import java.util.Optional;
 /**
  * Authenticates a veterinarian by sending the raw RFID tag + workstation hash
  * to the Laravel API (POST /api/login).
- *
+ * <p>
  * Replaces the previous hardcoded mock.
  */
 public class AuthenticationService {
@@ -64,7 +64,9 @@ public class AuthenticationService {
                 .build();
 
         try {
+            System.out.println("[API Request] POST " + config.url("/login"));
             HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println("[API Response] Status: " + response.statusCode() + " Body: " + response.body());
 
             if (response.statusCode() == 200) {
                 JsonObject json = gson.fromJson(response.body(), JsonObject.class);

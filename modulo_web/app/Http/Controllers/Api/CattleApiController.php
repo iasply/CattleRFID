@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\DTOs\Request\Cattle\StoreCattleRequest;
+use App\DTOs\Request\Cattle\UpdateCattleRequest;
 use App\DTOs\Response\CattleResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Cattle;
@@ -42,5 +43,15 @@ class CattleApiController extends Controller
         }
 
         return response()->json(CattleResponse::fromModel($cattle)->toArray());
+    }
+
+    public function update(UpdateCattleRequest $request, Cattle $cattle): JsonResponse
+    {
+        $cattle->update($request->validated());
+
+        return response()->json([
+            'message' => 'Animal atualizado via API!',
+            'cattle' => CattleResponse::fromModel($cattle)->toArray(),
+        ]);
     }
 }

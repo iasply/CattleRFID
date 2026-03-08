@@ -1,7 +1,6 @@
 package com.cattlerfid.model;
 
 import com.google.gson.annotations.SerializedName;
-import java.time.LocalDate;
 
 /**
  * Represents a Vaccine record.

@@ -72,24 +72,28 @@ public class CattleController {
 
     // 3. Salva os dados completos do formulario (Mocked Database/API)
     public void saveCattleData(Cattle cattle) {
-        boolean success = apiService.saveCattle(cattle);
+        boolean success;
+        if (cattle.getId() > 0) {
+            success = apiService.updateCattle(cattle);
+        } else {
+            success = apiService.saveCattle(cattle);
+        }
+
         if (success) {
             if (viewListener != null)
                 viewListener.onApiSaveSuccess();
         } else {
             if (viewListener != null)
-                viewListener.onApiSaveError("Falha ao salvar animal na base de dados (Mock API).");
+                viewListener.onApiSaveError("Falha ao salvar animal na base de dados (API).");
         }
     }
 
     // 4. Salva a vacina aplicada e atualiza o peso do animal
     public void saveVaccineData(com.cattlerfid.model.Vaccine vaccine, Cattle cattle, double currentWeight) {
+        // O peso ja eh atualizado pelo VaccineApiController no servidor
         boolean vaccineSuccess = apiService.saveVaccine(vaccine);
 
-        cattle.setWeight(currentWeight);
-        boolean cattleSuccess = apiService.saveCattle(cattle);
-
-        if (vaccineSuccess && cattleSuccess) {
+        if (vaccineSuccess) {
             if (viewListener != null)
                 viewListener.onApiSaveSuccess();
         } else {

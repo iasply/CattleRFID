@@ -52,7 +52,9 @@ public class ApiConfig {
         return workstationHash;
     }
 
-    /** Convenience: full URL for a given path (e.g. "/login") */
+    /**
+     * Convenience: full URL for a given path (e.g. "/login")
+     */
     public String url(String path) {
         return baseUrl + path;
     }

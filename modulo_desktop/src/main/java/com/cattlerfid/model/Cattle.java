@@ -7,6 +7,8 @@ import com.google.gson.annotations.SerializedName;
  * Matches CattleResponse DTO fields.
  */
 public class Cattle {
+    private int id;
+
     @SerializedName("rfid_tag")
     private String rfidTag;
 
@@ -24,6 +26,14 @@ public class Cattle {
         this.name = name;
         this.weight = weight;
         this.registrationDate = registrationDate;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getRfidTag() {

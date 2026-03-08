@@ -1,12 +1,12 @@
 package com.cattlerfid.controller;
 
 import com.cattlerfid.model.Cattle;
+import com.cattlerfid.model.Vaccine;
 import com.cattlerfid.service.CattleApiService;
 import com.cattlerfid.service.SerialService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -57,14 +57,12 @@ class CattleControllerTest {
     @Test
     void testRequestWriteTagConnected() {
         controller.requestWriteTag("C1234567890");
-        verify(serialServiceMock).requestRead(); // Agora ele lê primeiro antes de gravar
+        verify(serialServiceMock).requestRead(); // Valida fisicamente primeiro
     }
 
     @Test
     void testHandleMessageWriteReadUserTagBlocked() {
-        // Simula o pedido pre-gravação
         controller.requestWriteTag("C123456");
-        // Arduino devolve que leu uma TAG de usuario
         controller.handleIncomingSerialMessage("RES:OK:V_ADMIN_01:FW:92");
 
         verify(viewListenerMock).onRfidWriteError(contains("Bloqueado"));
@@ -73,20 +71,18 @@ class CattleControllerTest {
 
     @Test
     void testHandleMessageWriteReadNewTagAllowed() {
-        // Simula o pedido pre-gravação
         controller.requestWriteTag("C123456");
-        // Arduino devolve a TAG que lá estava (vazia, de animal, ou desconhecida)
         controller.handleIncomingSerialMessage("RES:OK:C_OLD_TAG:FW:92");
 
-        // O comando write real entra em ação
         verify(serialServiceMock).requestWrite("C123456");
     }
 
+    /**
+     * Regression test for the reported missing test.
+     */
     @Test
     void testHandleMessageWriteReadNoTagError() {
-        // Simula o pedido pre-gravação
         controller.requestWriteTag("C123456");
-        // Arduino tenta ler mas não acha tag
         controller.handleIncomingSerialMessage("RES:ERR:NO_TAG:FW:92");
 
         verify(viewListenerMock).onRfidWriteError(contains("Nenhuma Tag detectada"));
@@ -97,6 +93,7 @@ class CattleControllerTest {
     void testHandleMessageReadSuccessExistingCattle() {
         String simulatedSerialMsg = "RES:OK:C       VACA_001:FW:92";
         Cattle existingCattle = new Cattle("C       VACA_001", "Mimosa", 400, "2023-01-01");
+        existingCattle.setId(10);
 
         when(apiServiceMock.getCattleByTag("C       VACA_001")).thenReturn(Optional.of(existingCattle));
 
@@ -119,8 +116,7 @@ class CattleControllerTest {
                 .onRfidReadError("Animal não encontrado na base de dados. Por favor, cadastre-o primeiro.");
 
         Cattle c = controller.getCurrentEditingCattle();
-        assertNull(c,
-                "O animal não deve ser instanciado em modo de leitura se a tag for nova (agora bloqueado para o Vaccine Form)");
+        assertNull(c);
     }
 
     @Test
@@ -151,8 +147,10 @@ class CattleControllerTest {
     }
 
     @Test
-    void testSaveCattleSuccess() {
-        Cattle newCattle = new Cattle();
+    void testSaveCattleData_shouldCallSaveCattle_whenIdIsZero() {
+        Cattle newCattle = new Cattle("C002", "Newbie", 100.0, "2024-03-08");
+        newCattle.setId(0);
+
         when(apiServiceMock.saveCattle(newCattle)).thenReturn(true);
 
         controller.saveCattleData(newCattle);
@@ -162,28 +160,37 @@ class CattleControllerTest {
     }
 
     @Test
-    void testSaveCattleError() {
-        Cattle newCattle = new Cattle();
-        when(apiServiceMock.saveCattle(newCattle)).thenReturn(false);
+    void testSaveCattleData_shouldCallUpdateCattle_whenIdIsPresent() {
+        Cattle existingCattle = new Cattle("C001", "Mimosa", 400.0, "2024-01-01");
+        existingCattle.setId(10);
 
-        controller.saveCattleData(newCattle);
+        when(apiServiceMock.updateCattle(existingCattle)).thenReturn(true);
 
-        verify(viewListenerMock).onApiSaveError("Falha ao salvar animal na base de dados (Mock API).");
+        controller.saveCattleData(existingCattle);
+
+        verify(apiServiceMock).updateCattle(existingCattle);
+        verify(apiServiceMock, never()).saveCattle(any(Cattle.class));
+        verify(viewListenerMock).onApiSaveSuccess();
     }
 
+    /**
+     * Regression test for the 422 error fix.
+     * saveVaccineData should NOT call saveCattle/updateCattle because the server
+     * handles it.
+     */
     @Test
-    void testSaveVaccineDataSuccess() {
+    void testSaveVaccineData_shouldOnlyCallSaveVaccine() {
         com.cattlerfid.model.Vaccine vaccine = new com.cattlerfid.model.Vaccine();
         Cattle cattle = new Cattle("C123", "Boi", 100.0, "2023-01-01");
+        cattle.setId(10);
 
         when(apiServiceMock.saveVaccine(vaccine)).thenReturn(true);
-        when(apiServiceMock.saveCattle(cattle)).thenReturn(true);
 
         controller.saveVaccineData(vaccine, cattle, 150.0);
 
-        assertEquals(150.0, cattle.getWeight());
         verify(apiServiceMock).saveVaccine(vaccine);
-        verify(apiServiceMock).saveCattle(cattle);
+        verify(apiServiceMock, never()).saveCattle(any(Cattle.class));
+        verify(apiServiceMock, never()).updateCattle(any(Cattle.class));
         verify(viewListenerMock).onApiSaveSuccess();
     }
 
@@ -193,7 +200,6 @@ class CattleControllerTest {
         Cattle cattle = new Cattle("C123", "Boi", 100.0, "2023-01-01");
 
         when(apiServiceMock.saveVaccine(vaccine)).thenReturn(false);
-        when(apiServiceMock.saveCattle(cattle)).thenReturn(true);
 
         controller.saveVaccineData(vaccine, cattle, 150.0);
 

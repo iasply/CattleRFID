@@ -54,7 +54,7 @@ public class CattleApiService {
                 .build();
 
         try {
-            HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = sendAndLog(request);
             if (response.statusCode() == 200) {
                 return Optional.of(gson.fromJson(response.body(), Cattle.class));
             }
@@ -73,7 +73,7 @@ public class CattleApiService {
                 .build();
 
         try {
-            HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = sendAndLog(request);
             if (response.statusCode() == 200) {
                 Type listType = new TypeToken<ArrayList<Cattle>>() {
                 }.getType();
@@ -95,10 +95,28 @@ public class CattleApiService {
                 .build();
 
         try {
-            HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = sendAndLog(request);
             return response.statusCode() == 200 || response.statusCode() == 201;
         } catch (IOException | InterruptedException e) {
             handleError("Error saving cattle", e);
+            return false;
+        }
+    }
+
+    /**
+     * Updates existing cattle data on the cloud.
+     */
+    public boolean updateCattle(Cattle cattle) {
+        String body = gson.toJson(cattle);
+        HttpRequest request = authenticatedRequest("/cattle/" + cattle.getId())
+                .PUT(HttpRequest.BodyPublishers.ofString(body))
+                .build();
+
+        try {
+            HttpResponse<String> response = sendAndLog(request);
+            return response.statusCode() == 200;
+        } catch (IOException | InterruptedException e) {
+            handleError("Error updating cattle", e);
             return false;
         }
     }
@@ -113,7 +131,7 @@ public class CattleApiService {
                 .build();
 
         try {
-            HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = sendAndLog(request);
             return response.statusCode() == 200 || response.statusCode() == 201;
         } catch (IOException | InterruptedException e) {
             handleError("Error saving vaccine", e);
@@ -133,7 +151,7 @@ public class CattleApiService {
                 .build();
 
         try {
-            HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = sendAndLog(request);
             if (response.statusCode() == 200) {
                 Type listType = new TypeToken<ArrayList<Vaccine>>() {
                 }.getType();
@@ -146,6 +164,13 @@ public class CattleApiService {
     }
 
     // --- Helper Methods ---
+
+    private HttpResponse<String> sendAndLog(HttpRequest request) throws IOException, InterruptedException {
+        System.out.println("[API Request] " + request.method() + " " + request.uri());
+        HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println("[API Response] Status: " + response.statusCode() + " Body: " + response.body());
+        return response;
+    }
 
     private HttpRequest.Builder authenticatedRequest(String path) {
         return HttpRequest.newBuilder()
