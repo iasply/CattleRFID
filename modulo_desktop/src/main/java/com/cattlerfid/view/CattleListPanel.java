@@ -25,7 +25,7 @@ public class CattleListPanel extends JPanel {
     private JTable table;
 
     public CattleListPanel(CattleApiService apiService, com.cattlerfid.controller.CattleController controller,
-                           User loggedUser, NavigationManager navManager, MainPanel parentMainPanel) {
+            User loggedUser, NavigationManager navManager, MainPanel parentMainPanel) {
         this.apiService = apiService;
         this.controller = controller;
         this.loggedUser = loggedUser;
@@ -53,7 +53,7 @@ public class CattleListPanel extends JPanel {
         add(topPanel, BorderLayout.NORTH);
 
         // Configuração da Tabela
-        String[] columnNames = {"Tag RFID", "Nome/Apelido", "Peso (kg)", "Data Registro", "Vacinas Aplicadas"};
+        String[] columnNames = { "Tag RFID", "Nome/Apelido", "Peso (kg)", "Data Registro", "Vacinas Aplicadas" };
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -74,7 +74,7 @@ public class CattleListPanel extends JPanel {
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                           boolean hasFocus, int row, int column) {
+                    boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 if (!isSelected) {
                     c.setBackground(row % 2 == 0 ? Color.WHITE : UIStyles.BACKGROUND);
@@ -123,7 +123,7 @@ public class CattleListPanel extends JPanel {
 
     private void refreshTable() {
         tableModel.setRowCount(0); // Limpa tabela
-        List<Cattle> allCattle = apiService.getAllCattle();
+        List<Cattle> allCattle = apiService.getAllCattleWithVaccines();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         for (Cattle c : allCattle) {
@@ -135,7 +135,7 @@ public class CattleListPanel extends JPanel {
                 dateStr = parts[2] + "/" + parts[1] + "/" + parts[0];
             }
 
-            int countVaccines = apiService.getVaccinesByCattle(c.getRfidTag()).size();
+            int countVaccines = c.getVaccinesCount();
 
             Object[] row = {
                     c.getRfidTag(),

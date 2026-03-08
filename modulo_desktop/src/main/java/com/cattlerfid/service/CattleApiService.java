@@ -86,6 +86,27 @@ public class CattleApiService {
     }
 
     /**
+     * Lists all cattle registered in the system along with their vaccine count.
+     */
+    public List<Cattle> getAllCattleWithVaccines() {
+        HttpRequest request = authenticatedRequest("/cattle-with-vaccines")
+                .GET()
+                .build();
+
+        try {
+            HttpResponse<String> response = sendAndLog(request);
+            if (response.statusCode() == 200) {
+                Type listType = new TypeToken<ArrayList<Cattle>>() {
+                }.getType();
+                return gson.fromJson(response.body(), listType);
+            }
+        } catch (IOException | InterruptedException e) {
+            handleError("Error fetching all cattle with vaccines", e);
+        }
+        return new ArrayList<>();
+    }
+
+    /**
      * Persists new cattle data to the cloud.
      */
     public boolean saveCattle(Cattle cattle) {

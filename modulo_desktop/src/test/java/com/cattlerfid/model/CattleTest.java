@@ -32,4 +32,14 @@ class CattleTest {
         assertEquals(300.0, cattle.getWeight());
         assertEquals(newDate, cattle.getRegistrationDate());
     }
+
+    @Test
+    void testCattleDeserializationWithVaccinesCount() {
+        String json = "{\"rfid_tag\":\"TAG123\",\"name\":\"Boi Bandido\",\"weight\":450.5,\"registration_date\":\"2026-03-07\",\"vaccines_count\":5}";
+        com.google.gson.Gson gson = new com.google.gson.Gson();
+        Cattle cattle = gson.fromJson(json, Cattle.class);
+
+        assertEquals("TAG123", cattle.getRfidTag());
+        assertEquals(5, cattle.getVaccinesCount());
+    }
 }

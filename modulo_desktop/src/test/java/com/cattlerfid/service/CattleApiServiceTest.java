@@ -132,4 +132,25 @@ class CattleApiServiceTest {
         assertEquals(1, result.size());
         assertEquals("Aftosa", result.get(0).getVaccineType());
     }
+
+    @Test
+    void testGetAllCattleWithVaccines() throws IOException, InterruptedException {
+        // Arrange
+        String jsonResponse = "[{\"rfid_tag\":\"TAG1\",\"name\":\"A\",\"vaccines_count\":2},{\"rfid_tag\":\"TAG2\",\"name\":\"B\",\"vaccines_count\":0}]";
+
+        when(config.url("/cattle-with-vaccines")).thenReturn("http://localhost/api/cattle-with-vaccines");
+        when(httpResponse.statusCode()).thenReturn(200);
+        when(httpResponse.body()).thenReturn(jsonResponse);
+        when(httpClient.send(any(), any())).thenAnswer(invocation -> httpResponse);
+
+        // Act
+        List<Cattle> result = apiService.getAllCattleWithVaccines();
+
+        // Assert
+        assertEquals(2, result.size());
+        assertEquals("TAG1", result.get(0).getRfidTag());
+        assertEquals(2, result.get(0).getVaccinesCount());
+        assertEquals("TAG2", result.get(1).getRfidTag());
+        assertEquals(0, result.get(1).getVaccinesCount());
+    }
 }

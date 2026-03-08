@@ -18,6 +18,9 @@ public class Cattle {
     @SerializedName("registration_date")
     private String registrationDate; // Using String YYYY-MM-DD
 
+    @SerializedName("vaccines_count")
+    private int vaccinesCount;
+
     public Cattle() {
     }
 
@@ -70,5 +73,13 @@ public class Cattle {
 
     public void setRegistrationDate(String registrationDate) {
         this.registrationDate = registrationDate;
+    }
+
+    public int getVaccinesCount() {
+        return vaccinesCount;
+    }
+
+    public void setVaccinesCount(int vaccinesCount) {
+        this.vaccinesCount = vaccinesCount;
     }
 }

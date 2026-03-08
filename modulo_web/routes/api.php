@@ -14,6 +14,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // Cattle Endpoints
+    Route::get('cattle-with-vaccines', [CattleApiController::class, 'indexWithVaccines']);
     Route::apiResource('cattle', CattleApiController::class)->only(['index', 'store', 'update']);
     Route::get('cattle/{rfid_tag}', [CattleApiController::class, 'show']);
     Route::apiResource('vaccines', VaccineApiController::class)->only(['index', 'store']);

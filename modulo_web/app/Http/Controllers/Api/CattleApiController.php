@@ -18,6 +18,17 @@ class CattleApiController extends Controller
         return response()->json($items);
     }
 
+    public function indexWithVaccines(): JsonResponse
+    {
+        $items = \App\Models\CattleWithVaccinesView::all()->map(function ($c) {
+            $data = CattleResponse::fromModel(Cattle::find($c->id))->toArray();
+            $data['vaccines_count'] = (int) $c->vaccines_count;
+            return $data;
+        });
+
+        return response()->json($items);
+    }
+
     public function store(StoreCattleRequest $request): JsonResponse
     {
         $cattle = Cattle::create(array_merge(
