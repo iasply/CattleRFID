@@ -1,0 +1,49 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\User;
+use App\Models\Cattle;
+use App\Models\Vaccine;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+
+class DatabaseSeeder extends Seeder
+{
+    /**
+     * Seed the application's database.
+     */
+    public function run(): void
+    {
+        // Admin principal (não é veterinário)
+        User::create([
+            'name' => 'Sistema Admin',
+            'email' => 'admin@cattlerfid.com',
+            'password' => Hash::make('admin123'),
+            'is_veterinarian' => false,
+        ]);
+
+        // Veterinário padrão
+        $vet = User::create([
+            'name' => 'Dr. Ricardo Vet',
+            'email' => 'ricardo@vet.com',
+            'password' => Hash::make('vet123'),
+            'is_veterinarian' => true,
+        ]);
+
+        // Animal padrão
+        $animal = Cattle::create([
+            'name' => 'Mimosa',
+            'weight' => 450.00,
+        ]);
+
+        // Vacina padrão
+        Vaccine::create([
+            'rfid_tag' => $animal->rfid_tag,
+            'vaccine_type' => 'Febre Aftosa',
+            'current_weight' => 450.00,
+            'vaccination_date' => now()->toDateString(),
+            'user_id' => $vet->id,
+        ]);
+    }
+}
