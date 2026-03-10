@@ -35,6 +35,8 @@ class DatabaseSeeder extends Seeder
         $animal = Cattle::create([
             'name' => 'Mimosa',
             'weight' => 450.00,
+            'rfid_tag' => 'C1234567894',
+            'registration_date' => now()->toDateString(),
         ]);
 
         // Vacina padrão
