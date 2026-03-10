@@ -70,9 +70,15 @@ php artisan serve
 Requisitos: JDK 21+ instalado.
 ```bash
 cd modulo_desktop
-mvn clean install
-# Iniciar a aplicação
+
+# Compilar o código fonte
+mvn clean compile
+
+# Iniciar a aplicação no Windows / macOS (executável java padrão configurado no path)
 mvn exec:java
+
+# Iniciar a aplicação no Linux / Ubuntu (Usa um profile customizado injetando o caminho absoluto e prevenindo ambiente headless)
+mvn exec:exec
 ```
 
 ### Módulo Arduino
