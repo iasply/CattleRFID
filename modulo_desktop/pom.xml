@@ -112,4 +112,34 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>ubuntu-workaround</id>
+            <activation>
+                <os>
+                    <name>linux</name>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <configuration>
+                            <executable>${user.home}/.jdks/openjdk-24.0.1/bin/java</executable>
+                            <arguments>
+                                <argument>--enable-native-access=ALL-UNNAMED</argument>
+                                <argument>-Djava.awt.headless=false</argument>
+                                <argument>-classpath</argument>
+                                <classpath/>
+                                <argument>com.cattlerfid.Main</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 </project>
