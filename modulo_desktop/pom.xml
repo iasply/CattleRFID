@@ -12,6 +12,8 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Exclui testes de integração por padrão; override: mvn test -DexcludedGroups="" -->
+        <excludedGroups>integration</excludedGroups>
     </properties>
 
     <dependencies>
@@ -80,6 +82,15 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
+                <configuration>
+                    <!--
+                      Por padrão exclui testes de integração (@Tag("integration"))
+                      que requerem o servidor Laravel rodando.
+                      Para rodar SOMENTE integração: mvn test -Dgroups="integration"
+                      Para rodar TUDO:               mvn test -DexcludedGroups=""
+                    -->
+                    <excludedGroups>${excludedGroups}</excludedGroups>
+                </configuration>
             </plugin>
             <!-- Jacoco Plugin for Test Coverage -->
             <plugin>

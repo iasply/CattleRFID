@@ -1,0 +1,45 @@
+services:
+
+  laravel:
+    build: .
+    container_name: cattlerfid_app
+    restart: unless-stopped
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+    volumes:
+      # Volume compartilhado com nginx: assets do public/
+      - laravel_public:/var/www/public_volume
+      # Volume compartilhado com nginx: certs SSL gerados no entrypoint
+      - ssl_certs:/etc/nginx/certs
+      # Volume persistente do banco SQLite
+      - sqlite_data:/var/www/html/database
+    networks:
+      - cattlerfid
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: cattlerfid_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # Assets PHP (readonly no nginx)
+      - laravel_public:/var/www/public_volume:ro
+      # Certs gerados pelo entrypoint do laravel (readonly no nginx)
+      - ssl_certs:/etc/nginx/certs:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - laravel
+    networks:
+      - cattlerfid
+
+networks:
+  cattlerfid:
+    driver: bridge
+
+volumes:
+  laravel_public:
+  ssl_certs:
+  sqlite_data:

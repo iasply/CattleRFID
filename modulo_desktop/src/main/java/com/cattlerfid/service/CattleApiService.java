@@ -1,6 +1,7 @@
 package com.cattlerfid.service;
 
 import com.cattlerfid.config.ApiConfig;
+import com.cattlerfid.config.HttpClientFactory;
 import com.cattlerfid.model.Cattle;
 import com.cattlerfid.model.User;
 import com.cattlerfid.model.Vaccine;
@@ -32,9 +33,7 @@ public class CattleApiService {
     private final Gson gson = new Gson();
 
     public CattleApiService(ApiConfig config, User user) {
-        this(config, user, HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(5))
-                .build());
+        this(config, user, HttpClientFactory.create(config));
     }
 
     public CattleApiService(ApiConfig config, User user, HttpClient http) {

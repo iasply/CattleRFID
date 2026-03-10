@@ -1,0 +1,8 @@
+# Ignora certs SSL gerados automaticamente (não versionar chaves privadas!)
+certs/*.pem
+certs/*.key
+certs/*.crt
+certs/*.p12
+
+# Mantém a pasta no git
+!certs/.gitkeep

@@ -18,6 +18,7 @@ class IntegrationTestDataSeeder extends Seeder
                 'email' => 'vet2@cattlerfid.com',
                 'password' => Hash::make('password123'),
                 'is_veterinarian' => true,
+                'tag_hash' => hash('sha256', 'V000002' . config('app.tag_salt')),
             ]
         );
 

@@ -47,5 +47,8 @@ class DatabaseSeeder extends Seeder
             'vaccination_date' => now()->toDateString(),
             'user_id' => $vet->id,
         ]);
+
+        // Dados para testes de integração do desktop Java
+        $this->call(IntegrationTestDataSeeder::class);
     }
 }

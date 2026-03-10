@@ -1,6 +1,7 @@
 package com.cattlerfid.service;
 
 import com.cattlerfid.config.ApiConfig;
+import com.cattlerfid.config.HttpClientFactory;
 import com.cattlerfid.model.User;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -26,9 +27,7 @@ public class AuthenticationService {
     private final Gson gson = new Gson();
 
     public AuthenticationService(ApiConfig config) {
-        this(config, HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(5))
-                .build());
+        this(config, HttpClientFactory.create(config));
     }
 
     public AuthenticationService(ApiConfig config, HttpClient http) {

@@ -8,6 +8,7 @@ import com.cattlerfid.service.AuthenticationService;
 import com.cattlerfid.service.CattleApiService;
 import com.cattlerfid.util.RfidGenerator;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Tag;
 
 import java.net.http.HttpClient;
 import java.util.List;
@@ -18,7 +19,11 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Real integration test hitting the PHP API.
  * Requires the Laravel server to be running at http://127.0.0.1:8000
+ *
+ * Run only with: mvn test -Dgroups="integration"
+ * Skip with:    mvn test -DexcludedGroups="integration"
  */
+@Tag("integration")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ApiIntegrationTest {
@@ -32,7 +37,8 @@ public class ApiIntegrationTest {
 
     @BeforeAll
     void setup() {
-        apiConfig = new ApiConfig();
+        // Carrega explicitamente o .env do modulo_desktop
+        apiConfig = new ApiConfig(".env");
         httpClient = HttpClient.newBuilder().build();
         authService = new AuthenticationService(apiConfig, httpClient);
         sharedTestTag = RfidGenerator.generateCattleTag();

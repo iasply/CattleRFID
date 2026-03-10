@@ -16,16 +16,24 @@ public class ApiConfig {
 
     private final String baseUrl;
     private final String workstationHash;
+    private final boolean trustAllCerts;
 
+    /** Construtor de produção: lê .env no diretório de trabalho. */
     public ApiConfig() {
-        Map<String, String> env = loadEnv();
-        this.baseUrl = env.getOrDefault("API_BASE_URL", "http://127.0.0.1:8000/api");
-        this.workstationHash = env.getOrDefault("API_WORKSTATION_HASH", "");
+        this(ENV_FILE);
     }
 
-    private Map<String, String> loadEnv() {
+    /** Construtor para testes: lê .env do path informado. */
+    public ApiConfig(String envFilePath) {
+        Map<String, String> env = loadEnv(envFilePath);
+        this.baseUrl = env.getOrDefault("API_BASE_URL", "http://127.0.0.1:8000/api");
+        this.workstationHash = env.getOrDefault("API_WORKSTATION_HASH", "");
+        this.trustAllCerts = "true".equalsIgnoreCase(env.getOrDefault("SSL_TRUST_ALL", "false"));
+    }
+
+    private Map<String, String> loadEnv(String filePath) {
         Map<String, String> map = new HashMap<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(ENV_FILE))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
@@ -50,6 +58,11 @@ public class ApiConfig {
 
     public String getWorkstationHash() {
         return workstationHash;
+    }
+
+    /** Retorna true se SSL_TRUST_ALL=true no .env (aceita self-signed). */
+    public boolean isTrustAllCerts() {
+        return trustAllCerts;
     }
 
     /**
