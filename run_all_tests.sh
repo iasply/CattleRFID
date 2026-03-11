@@ -2,17 +2,29 @@
 
 # Default mode is local if not specified
 MODE="local"
+KEEP_DOCKER=false
 
-if [ "$1" == "--docker" ]; then
-    MODE="docker"
-elif [ "$1" == "--local" ]; then
-    MODE="local"
-elif [ -n "$1" ]; then
-    echo "Uso: ./run_all_tests.sh [--local | --docker]"
-    echo "  --local : Roda usando 'php artisan serve' (HTTP, porta 8555)"
-    echo "  --docker: Roda usando 'docker compose' (HTTPS, porta 443 / porta mapeada)"
-    exit 1
-fi
+# Simple argument parsing
+for arg in "$@"; do
+    case $arg in
+        --docker)
+            MODE="docker"
+            ;;
+        --local)
+            MODE="local"
+            ;;
+        --keep-docker)
+            KEEP_DOCKER=true
+            ;;
+        *)
+            echo "Uso: ./run_all_tests.sh [--local | --docker] [--keep-docker]"
+            echo "  --local       : Roda usando 'php artisan serve' (HTTP, porta 8555)"
+            echo "  --docker      : Roda usando 'docker compose' (HTTPS, porta 443 / porta mapeada)"
+            echo "  --keep-docker : Mantém o docker rodando após os testes (apenas modo --docker)"
+            exit 1
+            ;;
+    esac
+done
 
 echo "Starting test suite in $MODE mode..."
 echo "=================================================="
@@ -29,21 +41,31 @@ echo ""
 echo "=================================================="
 echo "2. Preparing database for integration tests..."
 echo "=================================================="
+# Garantir que o diretório e o arquivo sqlite existam
+mkdir -p database
+touch database/database.sqlite
+
 if [ "$MODE" == "docker" ]; then
-    # Para o docker, precisamos subir os containers primeiro para rodar as migrations dentro deles
     docker compose up -d
     echo "Aguardando serviços do Docker subirem..."
     sleep 5
+    # Usamos o banco persistente mapeado no volume
     docker compose exec -T laravel php artisan migrate:fresh --seed --force
 else
     php artisan migrate:fresh --seed --force
 fi
 echo "✅ Database seeded with integration test data."
 
+
 echo ""
 echo "=================================================="
 echo "3. Starting services and configuring desktop .env..."
 echo "=================================================="
+
+# Generate certificates if running with Docker
+if [ "$MODE" == "docker" ]; then
+    ../generate_dev_ssl.sh
+fi
 
 # Configurar o enviroment do desktop (Java) dinamicamente
 DESKTOP_ENV_FILE="../modulo_desktop/.env"
@@ -53,6 +75,10 @@ if [ "$MODE" == "docker" ]; then
     echo "API_BASE_URL=https://localhost/api" > $DESKTOP_ENV_FILE
     echo "API_WORKSTATION_HASH=WS-XTYBQRG6" >> $DESKTOP_ENV_FILE
     echo "SSL_TRUST_ALL=true" >> $DESKTOP_ENV_FILE
+    
+    # Path absoluto para o certificado dev gerado
+    CERT_PATH=$(readlink -f "../modulo_web/nginx/certs/dev.crt")
+    echo "SSL_DEV_CERT_PATH=$CERT_PATH" >> $DESKTOP_ENV_FILE
     
     echo "Ambiente Docker configurado (HTTPS: https://localhost/api)."
 else
@@ -84,16 +110,27 @@ JAVA_TEST_RESULT=$?
 
 echo ""
 echo "=================================================="
-echo "5. Tearing down services..."
+echo "5. Tearing down services and cleaning up..."
 echo "=================================================="
+
+# Remover o .env temporário do desktop
+rm -f "$DESKTOP_ENV_FILE"
+echo "✅ Arquivo $DESKTOP_ENV_FILE removido."
+
 if [ "$MODE" == "docker" ]; then
     cd ../modulo_web
-    # Mantém o docker rodando ou derruba? Geralmente derrubamos pos teste
-    # docker compose down
-    echo "Manteve o docker rodando para debug. Use 'docker compose down' manualmente se quiser desligar."
+    if [ "$KEEP_DOCKER" = true ]; then
+        echo "Manteve o docker rodando para debug (--keep-docker ativo)."
+    else
+        echo "Limpando ambiente docker (containers, volumes, orphans)..."
+        docker compose down -v --remove-orphans
+        echo "✅ Ambiente Docker removido."
+    fi
 else
-    kill $SERVER_PID 2>/dev/null
-    echo "Processo 'php artisan serve' encerrado."
+    if [ -n "$SERVER_PID" ]; then
+        kill $SERVER_PID 2>/dev/null
+        echo "✅ Processo 'php artisan serve' encerrado."
+    fi
 fi
 
 echo ""

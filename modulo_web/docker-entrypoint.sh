@@ -12,17 +12,17 @@ PUBLIC_VOLUME="/var/www/public_volume"
 CERTS_DIR="/etc/nginx/certs"
 
 # ── 1. Certificados SSL ────────────────────────
-# Se não houver fullchain.pem no volume de certs, gera um self-signed.
+# Se não houver dev.crt no volume de certs, gera um self-signed.
 # Em produção real, substitua por certs reais (Let's Encrypt, etc).
-if [ ! -f "${CERTS_DIR}/fullchain.pem" ] || [ ! -f "${CERTS_DIR}/privkey.pem" ]; then
+if [ ! -f "${CERTS_DIR}/dev.crt" ] || [ ! -f "${CERTS_DIR}/dev.key" ]; then
     echo "🔒 No SSL certs found — generating self-signed certificate..."
     mkdir -p "${CERTS_DIR}"
     openssl req -x509 \
         -nodes \
         -days 365 \
         -newkey rsa:2048 \
-        -keyout "${CERTS_DIR}/privkey.pem" \
-        -out    "${CERTS_DIR}/fullchain.pem" \
+        -keyout "${CERTS_DIR}/dev.key" \
+        -out    "${CERTS_DIR}/dev.crt" \
         -subj "/C=BR/ST=SP/L=SaoPaulo/O=CattleRFID/CN=localhost" \
         -extensions v3_ca \
         -addext "subjectAltName=DNS:localhost,IP:127.0.0.1" \

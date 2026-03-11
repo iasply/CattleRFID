@@ -10,10 +10,8 @@ services:
     volumes:
       # Volume compartilhado com nginx: assets do public/
       - laravel_public:/var/www/public_volume
-      # Volume compartilhado com nginx: certs SSL gerados no entrypoint
-      - ssl_certs:/etc/nginx/certs
-      # Volume persistente do banco SQLite
-      - sqlite_data:/var/www/html/database
+      # Persistência do banco SQLite
+      - ./database:/var/www/html/database
     networks:
       - cattlerfid
 
@@ -27,8 +25,8 @@ services:
     volumes:
       # Assets PHP (readonly no nginx)
       - laravel_public:/var/www/public_volume:ro
-      # Certs gerados pelo entrypoint do laravel (readonly no nginx)
-      - ssl_certs:/etc/nginx/certs:ro
+      # Certs: bind mount local
+      - ./nginx/certs:/etc/nginx/certs:ro
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - laravel
@@ -41,5 +39,3 @@ networks:
 
 volumes:
   laravel_public:
-  ssl_certs:
-  sqlite_data:

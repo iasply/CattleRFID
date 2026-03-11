@@ -34,14 +34,41 @@ public class HttpClientFactory {
 
         if (config.isTrustAllCerts()) {
             System.err.println("[HttpClientFactory] ⚠  SSL_TRUST_ALL=true — " +
-                    "certificate validation disabled. Use only for development!");
-            builder.sslContext(buildTrustAllContext());
+                    "Configurando SSL local dev certs!");
+            String certPath = config.getSslDevCertPath();
+            builder.sslContext(buildDevContext(certPath));
         }
 
         return builder.build();
     }
 
     // ── Trust-all SSLContext (apenas dev/self-signed) ─────────────────────
+    private static SSLContext buildDevContext(String certPath) {
+        try {
+            if (certPath == null || certPath.isBlank()) {
+               System.err.println("[HttpClientFactory] ⚠ SSL_DEV_CERT_PATH nao definido. Tentando Trust-all (pode falhar no hostname verification)...");
+               return buildTrustAllContext();
+            }
+
+            java.io.FileInputStream fis = new java.io.FileInputStream(certPath);
+            java.security.cert.CertificateFactory cf = java.security.cert.CertificateFactory.getInstance("X.509");
+            java.security.cert.X509Certificate caCert = (java.security.cert.X509Certificate) cf.generateCertificate(fis);
+
+            java.security.KeyStore ks = java.security.KeyStore.getInstance(java.security.KeyStore.getDefaultType());
+            ks.load(null, null);
+            ks.setCertificateEntry("dev-cert", caCert);
+
+            javax.net.ssl.TrustManagerFactory tmf = javax.net.ssl.TrustManagerFactory.getInstance(javax.net.ssl.TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(ks);
+
+            SSLContext ctx = SSLContext.getInstance("TLS");
+            ctx.init(null, tmf.getTrustManagers(), new java.security.SecureRandom());
+            return ctx;
+        } catch (Exception e) {
+            throw new RuntimeException("[HttpClientFactory] Failed to build dev SSLContext", e);
+        }
+    }
+
     private static SSLContext buildTrustAllContext() {
         try {
             TrustManager[] trustAll = new TrustManager[]{

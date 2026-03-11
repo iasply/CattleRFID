@@ -39,7 +39,7 @@ public class ApiIntegrationTest {
     void setup() {
         // Carrega explicitamente o .env do modulo_desktop
         apiConfig = new ApiConfig(".env");
-        httpClient = HttpClient.newBuilder().build();
+        httpClient = com.cattlerfid.config.HttpClientFactory.create(apiConfig);
         authService = new AuthenticationService(apiConfig, httpClient);
         sharedTestTag = RfidGenerator.generateCattleTag();
     }

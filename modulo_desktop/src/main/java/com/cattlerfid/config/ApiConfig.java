@@ -17,6 +17,7 @@ public class ApiConfig {
     private final String baseUrl;
     private final String workstationHash;
     private final boolean trustAllCerts;
+    private final String sslDevCertPath;
 
     /** Construtor de produção: lê .env no diretório de trabalho. */
     public ApiConfig() {
@@ -29,6 +30,7 @@ public class ApiConfig {
         this.baseUrl = env.getOrDefault("API_BASE_URL", "http://127.0.0.1:8000/api");
         this.workstationHash = env.getOrDefault("API_WORKSTATION_HASH", "");
         this.trustAllCerts = "true".equalsIgnoreCase(env.getOrDefault("SSL_TRUST_ALL", "false"));
+        this.sslDevCertPath = env.getOrDefault("SSL_DEV_CERT_PATH", "");
     }
 
     private Map<String, String> loadEnv(String filePath) {
@@ -63,6 +65,10 @@ public class ApiConfig {
     /** Retorna true se SSL_TRUST_ALL=true no .env (aceita self-signed). */
     public boolean isTrustAllCerts() {
         return trustAllCerts;
+    }
+
+    public String getSslDevCertPath() {
+        return sslDevCertPath;
     }
 
     /**
