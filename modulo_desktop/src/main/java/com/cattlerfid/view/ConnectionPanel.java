@@ -72,6 +72,12 @@ public class ConnectionPanel extends JPanel implements ConnectionController.Conn
         portSelector.setFont(UIStyles.BODY_FONT);
         portPanel.add(portSelector);
 
+        JCheckBox simCheckBox = new JCheckBox("Simular Hardware (Modo Terminal)");
+        simCheckBox.setBackground(Color.WHITE);
+        simCheckBox.setFont(UIStyles.BODY_FONT);
+        simCheckBox.addActionListener(e -> controller.setSimulationMode(simCheckBox.isSelected()));
+        portPanel.add(simCheckBox);
+
         connectPortButton = UIStyles.createPrimaryButton("Conectar");
         connectPortButton.setPreferredSize(new Dimension(130, 35));
         connectPortButton.addActionListener(e -> connectSerial());

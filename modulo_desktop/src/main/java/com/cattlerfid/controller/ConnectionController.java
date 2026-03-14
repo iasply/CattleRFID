@@ -79,6 +79,10 @@ public class ConnectionController {
         return serialService;
     }
 
+    public void setSimulationMode(boolean active) {
+        serialService.setSimulationMode(active);
+    }
+
     public interface ConnectionViewListener {
         void onSerialConnected();
 

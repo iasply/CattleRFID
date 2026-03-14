@@ -20,6 +20,7 @@ public class SerialService {
     private final List<Consumer<String>> logListeners = new ArrayList<>();
     private SerialPort activePort;
     private OutputStream outputStream;
+    private boolean simulationMode = false;
 
     // Usado pra testar localmente listando portas disponiveis
     public static String[] getAvailablePorts() {
@@ -29,6 +30,39 @@ public class SerialService {
             portNames[i] = ports[i].getSystemPortName();
         }
         return portNames;
+    }
+
+    public boolean isSimulationMode() {
+        return simulationMode;
+    }
+
+    public void setSimulationMode(boolean simulationMode) {
+        this.simulationMode = simulationMode;
+        if (simulationMode) {
+            appendLog("SYS", "Modo Simulação Ativado");
+        } else {
+            appendLog("SYS", "Modo Simulação Desativado");
+        }
+    }
+
+    public void injectMessage(String message) {
+        if (!simulationMode)
+            return;
+
+        // Garante que a mensagem injetada tenha o formato <CONTEUDO>
+        String formattedMessage = message;
+        if (!formattedMessage.startsWith("<"))
+            formattedMessage = "<" + formattedMessage;
+        if (!formattedMessage.endsWith(">"))
+            formattedMessage = formattedMessage + ">";
+
+        appendLog("IN", formattedMessage + " (Simulado)");
+
+        // Remove os <> para os ouvintes (como handled no setupListener)
+        String payload = formattedMessage.substring(1, formattedMessage.length() - 1);
+        for (Consumer<String> listener : messageListeners) {
+            listener.accept(payload);
+        }
     }
 
     private void appendLog(String origin, String message) {
@@ -56,6 +90,11 @@ public class SerialService {
 
     // Inicia a porta Serial. Retorna true se conectou.
     public boolean connect(String portName) {
+        if (simulationMode) {
+            appendLog("SYS", "Conexão Simulada iniciada.");
+            return true;
+        }
+
         activePort = SerialPort.getCommPort(portName);
         activePort.setComPortParameters(9600, 8, 1, 0); // 9600 baud rate, 8 bits de dados, 1 bit de parada, sem
         // paridade
@@ -70,6 +109,11 @@ public class SerialService {
     }
 
     public void disconnect() {
+        if (simulationMode) {
+            appendLog("SYS", "Conexão Simulada encerrada.");
+            return;
+        }
+
         if (activePort != null && activePort.isOpen()) {
             activePort.removeDataListener();
             activePort.closePort();
@@ -77,7 +121,7 @@ public class SerialService {
     }
 
     public boolean isOpen() {
-        return activePort != null && activePort.isOpen();
+        return simulationMode || (activePort != null && activePort.isOpen());
     }
 
     public void addMessageListener(Consumer<String> listener) {
@@ -106,8 +150,11 @@ public class SerialService {
     // Funcao generica para mandar Bytes pra porta OUt
     public void sendCommand(String command) {
         if (isOpen()) {
+            appendLog("OUT", command.trim() + (simulationMode ? " (Simulado)" : ""));
+            if (simulationMode) {
+                return;
+            }
             try {
-                appendLog("OUT", command.trim());
                 outputStream.write(command.getBytes());
                 outputStream.flush();
             } catch (Exception e) {

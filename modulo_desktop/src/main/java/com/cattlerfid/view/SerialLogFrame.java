@@ -67,6 +67,43 @@ public class SerialLogFrame extends JFrame {
         buttonsPanel.add(closeButton);
 
         actionPanel.add(inputPanel, BorderLayout.CENTER);
+
+        // Painel de Simulação (Apenas visivel se em modo simulação)
+        if (serialService.isSimulationMode()) {
+            JPanel simulationPanel = new JPanel(new GridLayout(2, 1, 5, 5));
+            simulationPanel.setBorder(BorderFactory.createTitledBorder("Simulação de Hardware"));
+
+            // Linha 1: Simular Leitura
+            JPanel readSimPanel = new JPanel(new BorderLayout(5, 0));
+            JTextField tagInputField = new JTextField("1234567890123456");
+            JButton simReadButton = new JButton("Simular Leitura (IN)");
+            readSimPanel.add(new JLabel(" Tag ID: "), BorderLayout.WEST);
+            readSimPanel.add(tagInputField, BorderLayout.CENTER);
+            readSimPanel.add(simReadButton, BorderLayout.EAST);
+
+            simReadButton.addActionListener(e -> {
+                String tag = tagInputField.getText().trim();
+                if (!tag.isEmpty()) {
+                    serialService.injectMessage("READ:OK:" + tag);
+                }
+            });
+
+            // Linha 2: Simular Escrita
+            JPanel writeSimPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            JButton simWriteOkButton = new JButton("Simular Sucesso Gravação");
+            JButton simWriteErrButton = new JButton("Simular Erro Gravação");
+
+            simWriteOkButton.addActionListener(e -> serialService.injectMessage("WRITE:OK"));
+            simWriteErrButton.addActionListener(e -> serialService.injectMessage("WRITE:ERR:GRAVACAO_FALHOU"));
+
+            writeSimPanel.add(simWriteOkButton);
+            writeSimPanel.add(simWriteErrButton);
+
+            simulationPanel.add(readSimPanel);
+            simulationPanel.add(writeSimPanel);
+            actionPanel.add(simulationPanel, BorderLayout.NORTH);
+        }
+
         actionPanel.add(buttonsPanel, BorderLayout.SOUTH);
 
         add(actionPanel, BorderLayout.SOUTH);

@@ -27,4 +27,6 @@ build/
 *.sym
 *.map
 ~*
+.agents/
+.agents/*
 modulo_desktop/.env.production
