@@ -27,7 +27,7 @@ public class VaccineFormPanel extends JPanel {
     private JButton submitButton;
 
     public VaccineFormPanel(Cattle cattle, CattleController controller, User loggedUser, NavigationManager navManager,
-            MainPanel parentMainPanel) {
+                            MainPanel parentMainPanel) {
         this.cattle = cattle;
         this.controller = controller;
         this.loggedUser = loggedUser;

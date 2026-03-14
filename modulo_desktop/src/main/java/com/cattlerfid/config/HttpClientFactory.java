@@ -10,16 +10,19 @@ import java.time.Duration;
 /**
  * Factory para criação do HttpClient com suporte a SSL.
  *
- * <p>Por padrão usa o SSLContext do sistema (confia em CAs conhecidas,
+ * <p>
+ * Por padrão usa o SSLContext do sistema (confia em CAs conhecidas,
  * incluindo Let's Encrypt). Quando {@code SSL_TRUST_ALL=true} estiver
  * definido no .env, aceita qualquer certificado — útil para self-signed
  * em ambiente de desenvolvimento/testes.
  *
- * <p><b>⚠ Nunca use SSL_TRUST_ALL=true em produção.</b>
+ * <p>
+ * <b>⚠ Nunca use SSL_TRUST_ALL=true em produção.</b>
  */
 public class HttpClientFactory {
 
-    private HttpClientFactory() {}
+    private HttpClientFactory() {
+    }
 
     /**
      * Cria um HttpClient configurado conforme as flags do {@link ApiConfig}.
@@ -46,19 +49,36 @@ public class HttpClientFactory {
     private static SSLContext buildDevContext(String certPath) {
         try {
             if (certPath == null || certPath.isBlank()) {
-               System.err.println("[HttpClientFactory] ⚠ SSL_DEV_CERT_PATH nao definido. Tentando Trust-all (pode falhar no hostname verification)...");
-               return buildTrustAllContext();
+                System.err.println(
+                        "[HttpClientFactory] ⚠ SSL_DEV_CERT_PATH nao definido. Tentando Trust-all (pode falhar no hostname verification)...");
+                return buildTrustAllContext();
             }
 
-            java.io.FileInputStream fis = new java.io.FileInputStream(certPath);
+            String path = certPath.trim();
+
+            if (path.matches("^/[a-zA-Z]/.*")) {
+                path = path.substring(1, 2).toUpperCase() + ":" + path.substring(2);
+            }
+
+            java.nio.file.Path p = java.nio.file.Paths.get(path);
+
+            if (!p.isAbsolute()) {
+                p = java.nio.file.Paths.get("").toAbsolutePath().resolve(p);
+            }
+
+            p = p.normalize();
+            System.out.println("Path: " + p.toAbsolutePath());
+            java.io.FileInputStream fis = new java.io.FileInputStream(p.toFile());
             java.security.cert.CertificateFactory cf = java.security.cert.CertificateFactory.getInstance("X.509");
-            java.security.cert.X509Certificate caCert = (java.security.cert.X509Certificate) cf.generateCertificate(fis);
+            java.security.cert.X509Certificate caCert = (java.security.cert.X509Certificate) cf
+                    .generateCertificate(fis);
 
             java.security.KeyStore ks = java.security.KeyStore.getInstance(java.security.KeyStore.getDefaultType());
             ks.load(null, null);
             ks.setCertificateEntry("dev-cert", caCert);
 
-            javax.net.ssl.TrustManagerFactory tmf = javax.net.ssl.TrustManagerFactory.getInstance(javax.net.ssl.TrustManagerFactory.getDefaultAlgorithm());
+            javax.net.ssl.TrustManagerFactory tmf = javax.net.ssl.TrustManagerFactory
+                    .getInstance(javax.net.ssl.TrustManagerFactory.getDefaultAlgorithm());
             tmf.init(ks);
 
             SSLContext ctx = SSLContext.getInstance("TLS");
@@ -72,11 +92,17 @@ public class HttpClientFactory {
     private static SSLContext buildTrustAllContext() {
         try {
             TrustManager[] trustAll = new TrustManager[]{
-                new X509TrustManager() {
-                    public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
-                    public void checkClientTrusted(X509Certificate[] c, String a) {}
-                    public void checkServerTrusted(X509Certificate[] c, String a) {}
-                }
+                    new X509TrustManager() {
+                        public X509Certificate[] getAcceptedIssuers() {
+                            return new X509Certificate[0];
+                        }
+
+                        public void checkClientTrusted(X509Certificate[] c, String a) {
+                        }
+
+                        public void checkServerTrusted(X509Certificate[] c, String a) {
+                        }
+                    }
             };
             SSLContext ctx = SSLContext.getInstance("TLS");
             ctx.init(null, trustAll, new java.security.SecureRandom());

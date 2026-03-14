@@ -18,20 +18,6 @@ public class CattleController {
     private String pendingWriteData = null;
     private final Consumer<String> serialListener = this::handleIncomingSerialMessage;
 
-    public interface CattleViewListener {
-        void onRfidReadSuccess(Cattle cattle, boolean isNew);
-
-        void onRfidReadError(String message);
-
-        void onRfidWriteSuccess();
-
-        void onRfidWriteError(String message);
-
-        void onApiSaveSuccess();
-
-        void onApiSaveError(String message);
-    }
-
     public CattleController(CattleApiService apiService, SerialService serialService) {
         this.apiService = apiService;
         this.serialService = serialService;
@@ -201,5 +187,19 @@ public class CattleController {
 
     public CattleApiService getApiService() {
         return apiService;
+    }
+
+    public interface CattleViewListener {
+        void onRfidReadSuccess(Cattle cattle, boolean isNew);
+
+        void onRfidReadError(String message);
+
+        void onRfidWriteSuccess();
+
+        void onRfidWriteError(String message);
+
+        void onApiSaveSuccess();
+
+        void onApiSaveError(String message);
     }
 }

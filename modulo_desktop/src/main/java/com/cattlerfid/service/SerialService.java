@@ -13,14 +13,23 @@ import java.util.function.Consumer;
 
 public class SerialService {
 
-    private SerialPort activePort;
-    private OutputStream outputStream;
     private final List<Consumer<String>> messageListeners = new ArrayList<>();
     private final StringBuilder messageBuffer = new StringBuilder(); // Buffer para as mensagens seriais
-
     // Logs
     private final List<String> logHistory = new ArrayList<>();
     private final List<Consumer<String>> logListeners = new ArrayList<>();
+    private SerialPort activePort;
+    private OutputStream outputStream;
+
+    // Usado pra testar localmente listando portas disponiveis
+    public static String[] getAvailablePorts() {
+        SerialPort[] ports = SerialPort.getCommPorts();
+        String[] portNames = new String[ports.length];
+        for (int i = 0; i < ports.length; i++) {
+            portNames[i] = ports[i].getSystemPortName();
+        }
+        return portNames;
+    }
 
     private void appendLog(String origin, String message) {
         String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss.SSS"));
@@ -162,15 +171,5 @@ public class SerialService {
                 }
             }
         });
-    }
-
-    // Usado pra testar localmente listando portas disponiveis
-    public static String[] getAvailablePorts() {
-        SerialPort[] ports = SerialPort.getCommPorts();
-        String[] portNames = new String[ports.length];
-        for (int i = 0; i < ports.length; i++) {
-            portNames[i] = ports[i].getSystemPortName();
-        }
-        return portNames;
     }
 }

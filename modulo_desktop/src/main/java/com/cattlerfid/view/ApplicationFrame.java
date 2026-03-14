@@ -41,11 +41,11 @@ public class ApplicationFrame extends JFrame implements NavigationManager {
         cardLayout.show(containerPanel, name);
     }
 
-    public void setLoggedUser(User user) {
-        this.loggedUser = user;
-    }
-
     public User getLoggedUser() {
         return loggedUser;
+    }
+
+    public void setLoggedUser(User user) {
+        this.loggedUser = user;
     }
 }

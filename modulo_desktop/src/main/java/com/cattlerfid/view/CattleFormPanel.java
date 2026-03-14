@@ -26,7 +26,7 @@ public class CattleFormPanel extends JPanel {
     private JButton saveDbButton;
 
     public CattleFormPanel(Cattle cattle, boolean isNew, boolean isManual, CattleController controller,
-            User loggedUser, NavigationManager navManager, MainPanel parentMainPanel) {
+                           User loggedUser, NavigationManager navManager, MainPanel parentMainPanel) {
         this.cattle = cattle;
         this.isNew = isNew;
         this.isManual = isManual;

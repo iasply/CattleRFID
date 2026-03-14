@@ -1,11 +1,10 @@
 package com.cattlerfid.service;
 
-import com.cattlerfid.util.RfidGenerator;
-
 import com.cattlerfid.config.ApiConfig;
 import com.cattlerfid.model.Cattle;
 import com.cattlerfid.model.User;
 import com.cattlerfid.model.Vaccine;
+import com.cattlerfid.util.RfidGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

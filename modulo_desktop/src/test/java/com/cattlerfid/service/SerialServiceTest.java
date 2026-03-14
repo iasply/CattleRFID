@@ -15,36 +15,6 @@ class SerialServiceTest {
     // Porem podemos testar os manipuladores criados dentro de uma subclasse mock em
     // memoria.
 
-    class MockSerialService extends SerialService {
-        private String lastSentCommand = "";
-
-        @Override
-        public boolean connect(String portName) {
-            return true; // Simula sucesso sempre
-        }
-
-        @Override
-        public boolean isOpen() {
-            return true;
-        }
-
-        @Override
-        public void sendCommand(String command) {
-            this.lastSentCommand = command; // Captura pra validacao
-        }
-
-        public String getLastSentCommand() {
-            return lastSentCommand;
-        }
-
-        // Metodo pra simular entrada fake vinda do Arduino, chamando o callback
-        public void simulateArduinoIncomingLine(String line, java.util.function.Consumer<String> callback) {
-            if (line.startsWith("<") && line.endsWith(">")) {
-                callback.accept(line.substring(1, line.length() - 1));
-            }
-        }
-    }
-
     @Test
     void testRequestReadCommandFormat() {
         MockSerialService mockService = new MockSerialService();
@@ -77,5 +47,35 @@ class SerialServiceTest {
 
         // O servico Serial tem que cortar os <> (brackets) que sao do protocolo
         assertEquals("RES:OK:João :FW:92", receivedParsedMessage.get());
+    }
+
+    class MockSerialService extends SerialService {
+        private String lastSentCommand = "";
+
+        @Override
+        public boolean connect(String portName) {
+            return true; // Simula sucesso sempre
+        }
+
+        @Override
+        public boolean isOpen() {
+            return true;
+        }
+
+        @Override
+        public void sendCommand(String command) {
+            this.lastSentCommand = command; // Captura pra validacao
+        }
+
+        public String getLastSentCommand() {
+            return lastSentCommand;
+        }
+
+        // Metodo pra simular entrada fake vinda do Arduino, chamando o callback
+        public void simulateArduinoIncomingLine(String line, java.util.function.Consumer<String> callback) {
+            if (line.startsWith("<") && line.endsWith(">")) {
+                callback.accept(line.substring(1, line.length() - 1));
+            }
+        }
     }
 }

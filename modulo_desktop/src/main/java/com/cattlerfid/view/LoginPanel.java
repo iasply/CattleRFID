@@ -19,7 +19,7 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
     private JButton readCardButton;
 
     public LoginPanel(LoginController controller, com.cattlerfid.config.ApiConfig apiConfig,
-            NavigationManager navManager) {
+                      NavigationManager navManager) {
         this.controller = controller;
         this.apiConfig = apiConfig;
         this.navManager = navManager;

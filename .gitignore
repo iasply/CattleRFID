@@ -27,3 +27,4 @@ build/
 *.sym
 *.map
 ~*
+modulo_desktop/.env.production

@@ -44,7 +44,7 @@ class HttpClientFactoryTest {
         Path envFile = tempDir.resolve(".env");
         Files.writeString(envFile,
                 "API_BASE_URL=https://localhost/api\n" +
-                "SSL_TRUST_ALL=true\n");
+                        "SSL_TRUST_ALL=true\n");
 
         ApiConfig config = new ApiConfig(envFile.toString());
 

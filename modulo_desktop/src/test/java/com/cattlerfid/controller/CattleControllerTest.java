@@ -1,7 +1,6 @@
 package com.cattlerfid.controller;
 
 import com.cattlerfid.model.Cattle;
-import com.cattlerfid.model.Vaccine;
 import com.cattlerfid.service.CattleApiService;
 import com.cattlerfid.service.SerialService;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,7 +8,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 
 class CattleControllerTest {

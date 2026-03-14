@@ -17,18 +17,6 @@ public class LoginController {
     private User loggedUser;
     private final Consumer<String> serialListener = this::handleIncomingSerialMessage;
 
-    public interface LoginViewListener {
-        void onLoginSuccess(User user);
-
-        void onLoginError(String message);
-
-        void onSerialConnected();
-
-        void onSerialError(String message);
-
-        void onWaitingForCard();
-    }
-
     public LoginController(AuthenticationService authService, SerialService serialService) {
         this.authService = authService;
         this.serialService = serialService;
@@ -123,5 +111,17 @@ public class LoginController {
 
     public SerialService getSerialService() {
         return serialService;
+    }
+
+    public interface LoginViewListener {
+        void onLoginSuccess(User user);
+
+        void onLoginError(String message);
+
+        void onSerialConnected();
+
+        void onSerialError(String message);
+
+        void onWaitingForCard();
     }
 }

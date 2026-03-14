@@ -100,9 +100,9 @@ class ApiConfigTest {
     void givenEnvWithComments_shouldIgnoreCommentLines(@TempDir Path tempDir) throws IOException {
         Path env = writeEnv(tempDir,
                 "# URL da API\n" +
-                "API_BASE_URL=https://cattle.io/api\n" +
-                "# SSL desabilitado\n" +
-                "SSL_TRUST_ALL=false\n");
+                        "API_BASE_URL=https://cattle.io/api\n" +
+                        "# SSL desabilitado\n" +
+                        "SSL_TRUST_ALL=false\n");
 
         ApiConfig config = new ApiConfig(env.toString());
 

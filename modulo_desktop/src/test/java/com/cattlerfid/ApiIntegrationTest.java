@@ -8,7 +8,6 @@ import com.cattlerfid.service.AuthenticationService;
 import com.cattlerfid.service.CattleApiService;
 import com.cattlerfid.util.RfidGenerator;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.Tag;
 
 import java.net.http.HttpClient;
 import java.util.List;
@@ -19,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Real integration test hitting the PHP API.
  * Requires the Laravel server to be running at http://127.0.0.1:8000
- *
+ * <p>
  * Run only with: mvn test -Dgroups="integration"
  * Skip with:    mvn test -DexcludedGroups="integration"
  */

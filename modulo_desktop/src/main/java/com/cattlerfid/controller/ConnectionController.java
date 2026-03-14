@@ -11,18 +11,6 @@ public class ConnectionController {
     private boolean testingConnection = false;
     private final Consumer<String> serialListener = this::handleIncomingSerialMessage;
 
-    public interface ConnectionViewListener {
-        void onSerialConnected();
-
-        void onSerialDisconnected();
-
-        void onSerialError(String message);
-
-        void onWaitingForTestTag();
-
-        void onTestTagReadSuccess(String tagContent);
-    }
-
     public ConnectionController(SerialService serialService) {
         this.serialService = serialService;
     }
@@ -89,5 +77,17 @@ public class ConnectionController {
 
     public SerialService getSerialService() {
         return serialService;
+    }
+
+    public interface ConnectionViewListener {
+        void onSerialConnected();
+
+        void onSerialDisconnected();
+
+        void onSerialError(String message);
+
+        void onWaitingForTestTag();
+
+        void onTestTagReadSuccess(String tagContent);
     }
 }
