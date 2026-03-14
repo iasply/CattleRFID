@@ -7,15 +7,16 @@ use App\Models\Vaccine;
 readonly class VaccineResponse
 {
     public function __construct(
-        public int $id,
-        public string $rfid_tag,
-        public string $vaccine_type,
-        public float $current_weight,
-        public string $vaccination_date,
+        public int     $id,
+        public string  $rfid_tag,
+        public string  $vaccine_type,
+        public float   $current_weight,
+        public string  $vaccination_date,
         public ?string $veterinarian_name,
         public ?string $workstation_desc,
         public ?string $animal_name = null,
-    ) {
+    )
+    {
     }
 
     public static function fromModel(Vaccine $vaccine): self
@@ -24,7 +25,7 @@ readonly class VaccineResponse
             id: $vaccine->id,
             rfid_tag: $vaccine->rfid_tag,
             vaccine_type: $vaccine->vaccine_type,
-            current_weight: (float) $vaccine->current_weight,
+            current_weight: (float)$vaccine->current_weight,
             vaccination_date: $vaccine->vaccination_date,
             veterinarian_name: $vaccine->relationLoaded('user') ? $vaccine->user?->name : null,
             workstation_desc: $vaccine->relationLoaded('workstation') ? $vaccine->workstation?->desc : null,

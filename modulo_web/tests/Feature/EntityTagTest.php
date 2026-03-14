@@ -11,13 +11,6 @@ class EntityTagTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        // Create an admin user for authenticated requests
-        $this->actingAs(User::factory()->create());
-    }
-
     #[\PHPUnit\Framework\Attributes\Test]
     public function cattle_is_created_with_automatic_rfid_tag_and_registration_date()
     {
@@ -50,5 +43,12 @@ class EntityTagTest extends TestCase
         $vet = User::where('is_veterinarian', true)->first();
         $this->assertNotNull($vet->vet_rfid);
         $this->assertStringStartsWith('V', $vet->vet_rfid);
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Create an admin user for authenticated requests
+        $this->actingAs(User::factory()->create());
     }
 }

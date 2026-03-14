@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-page-header title="Histórico de Vacinação" />
+    <x-page-header title="Histórico de Vacinação"/>
 
     <x-card>
         <x-table :headers="['Data', 'Animal (Tag)', 'Vacina', 'Peso na Aplicação', 'Veterinário']">
@@ -16,7 +16,8 @@
             @endforeach
             @if($vaccines->isEmpty())
                 <tr>
-                    <td colspan="5" style="text-align: center; color: var(--secondary);">Nenhum registro de vacinação.</td>
+                    <td colspan="5" style="text-align: center; color: var(--secondary);">Nenhum registro de vacinação.
+                    </td>
                 </tr>
             @endif
         </x-table>

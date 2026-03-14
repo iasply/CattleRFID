@@ -17,13 +17,14 @@
                     <td>{{ $ws->desc }}</td>
                     <td class="text-right" style="display: flex; gap: 0.5rem; justify-content: flex-end;">
                         <a href="{{ route('admin.workstations.edit', $ws->id) }}" class="btn btn-primary"
-                            style="font-size: 0.75rem; text-decoration: none; padding: 0.4rem 0.8rem;">Editar</a>
+                           style="font-size: 0.75rem; text-decoration: none; padding: 0.4rem 0.8rem;">Editar</a>
                     </td>
                 </tr>
             @endforeach
             @if($workstations->isEmpty())
                 <tr>
-                    <td colspan="3" style="text-align: center; color: var(--secondary);">Nenhuma estação cadastrada.</td>
+                    <td colspan="3" style="text-align: center; color: var(--secondary);">Nenhuma estação cadastrada.
+                    </td>
                 </tr>
             @endif
         </x-table>

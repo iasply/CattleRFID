@@ -68,47 +68,47 @@
 </head>
 
 <body>
-    <div class="auth-bg">
-        <div class="login-box">
-            <div class="brand-logo">
-                <span class="icon">🐂</span>
-                <h1>Cattle RFID</h1>
-                <p>Gestão Pecuária Inteligente</p>
-            </div>
+<div class="auth-bg">
+    <div class="login-box">
+        <div class="brand-logo">
+            <span class="icon">🐂</span>
+            <h1>Cattle RFID</h1>
+            <p>Gestão Pecuária Inteligente</p>
+        </div>
 
-            <x-card glass="true" style="padding: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
-                <form action="{{ route('login.post') }}" method="POST">
-                    @csrf
+        <x-card glass="true" style="padding: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
+            <form action="{{ route('login.post') }}" method="POST">
+                @csrf
 
-                    <h2
-                        style="font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 2rem; text-align: center;">
-                        Acesso ao Sistema
-                    </h2>
+                <h2
+                    style="font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 2rem; text-align: center;">
+                    Acesso ao Sistema
+                </h2>
 
-                    <x-input label="E-mail Administrativo" name="email" type="email" required :value="old('email')"
-                        placeholder="seu@email.com" />
+                <x-input label="E-mail Administrativo" name="email" type="email" required :value="old('email')"
+                         placeholder="seu@email.com"/>
 
-                    <x-input label="Senha" name="password" type="password" required placeholder="••••••••" />
+                <x-input label="Senha" name="password" type="password" required placeholder="••••••••"/>
 
-                    @if($errors->any())
-                        <div
-                            style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--danger); padding: 1rem; margin-bottom: 1.5rem; border-radius: 4px;">
+                @if($errors->any())
+                    <div
+                        style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--danger); padding: 1rem; margin-bottom: 1.5rem; border-radius: 4px;">
                             <span style="color: var(--danger); font-size: 0.875rem; font-weight: 600;">
                                 {{ $errors->first() }}
                             </span>
-                        </div>
-                    @endif
-
-                    <div style="margin-top: 2rem;">
-                        <x-button type="submit" fullWidth="true">
-                            Entrar no Painel
-                        </x-button>
                     </div>
+                @endif
 
-                </form>
-            </x-card>
-        </div>
+                <div style="margin-top: 2rem;">
+                    <x-button type="submit" fullWidth="true">
+                        Entrar no Painel
+                    </x-button>
+                </div>
+
+            </form>
+        </x-card>
     </div>
+</div>
 </body>
 
 </html>

@@ -5,9 +5,9 @@ namespace Tests\Feature;
 use App\Models\Cattle;
 use App\Models\User;
 use App\Models\Vaccine;
+use App\Support\RfidGenerator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use App\Support\RfidGenerator;
 
 class AdminWebTest extends TestCase
 {

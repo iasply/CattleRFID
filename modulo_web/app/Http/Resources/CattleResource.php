@@ -18,10 +18,10 @@ class CattleResource extends JsonResource
             'id' => $this->id,
             'rfid_tag' => $this->rfid_tag,
             'name' => $this->name,
-            'weight' => (float) $this->weight,
+            'weight' => (float)$this->weight,
             'registration_date' => $this->registration_date,
             'user_name' => $this->whenLoaded('user', fn() => $this->user->name),
-            'vaccines_count' => $this->when(isset($this->vaccines_count), fn() => (int) $this->vaccines_count),
+            'vaccines_count' => $this->when(isset($this->vaccines_count), fn() => (int)$this->vaccines_count),
         ];
     }
 }

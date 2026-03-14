@@ -18,7 +18,15 @@ class TagLoginRequest extends FormRequest
     {
         return [
             'workstation' => 'required|string',
-            'tag' => 'required|string',
+            'tag' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    if (!\App\Support\RfidGenerator::isVetTag($value)) {
+                        $fail(__('A tag RFID do veterinário é inválida ou não possui o prefixo esperado (V).'));
+                    }
+                },
+            ],
         ];
     }
 }

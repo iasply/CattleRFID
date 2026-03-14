@@ -2,23 +2,29 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Workstation;
+use App\Support\RfidGenerator;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 class IntegrationTestDataSeeder extends Seeder
 {
     public function run(): void
     {
+        $vetRfid = 'V000002';
+        if (!RfidGenerator::isValid($vetRfid)) {
+            $vetRfid = RfidGenerator::generateVetTag();
+        }
+
         User::updateOrCreate(
-            ['vet_rfid' => 'V000002'],
+            ['vet_rfid' => $vetRfid],
             [
                 'name' => 'Vet Integration Test',
                 'email' => 'vet2@cattlerfid.com',
                 'password' => Hash::make('password123'),
                 'is_veterinarian' => true,
-                'tag_hash' => hash('sha256', 'V000002' . config('app.tag_salt')),
+                'tag_hash' => hash('sha256', $vetRfid . config('app.tag_salt')),
             ]
         );
 
@@ -27,8 +33,13 @@ class IntegrationTestDataSeeder extends Seeder
             ['desc' => 'Workstation Integration Test']
         );
 
-        User::where('vet_rfid', 'V000002')->first()->cattle()->updateOrCreate(
-            ['rfid_tag' => 'C000002'],
+        $cattleRfid = 'C000002';
+        if (!RfidGenerator::isValid($cattleRfid)) {
+            $cattleRfid = RfidGenerator::generateCattleTag();
+        }
+
+        User::where('vet_rfid', $vetRfid)->first()->cattle()->updateOrCreate(
+            ['rfid_tag' => $cattleRfid],
             [
                 'name' => 'Cattle Integration Test',
                 'weight' => 200.0,

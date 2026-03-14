@@ -11,21 +11,24 @@
             <h3 style="color: var(--secondary); font-size: 0.875rem; text-transform: uppercase;">Veterinários</h3>
             <p style="font-size: 2.5rem; font-weight: 800; margin: 0.5rem 0;">{{ $stats['vets'] }}</p>
             <a href="{{ route('admin.veterinarians.index') }}"
-                style="color: var(--primary); font-size: 0.875rem; text-decoration: none; font-weight: 600;">Ver todos →</a>
+               style="color: var(--primary); font-size: 0.875rem; text-decoration: none; font-weight: 600;">Ver todos
+                →</a>
         </div>
 
         <div class="card" style="border-left: 5px solid var(--success);">
             <h3 style="color: var(--secondary); font-size: 0.875rem; text-transform: uppercase;">Animais (Gado)</h3>
             <p style="font-size: 2.5rem; font-weight: 800; margin: 0.5rem 0;">{{ $stats['cattle'] }}</p>
             <a href="{{ route('admin.cattle.index') }}"
-                style="color: var(--primary); font-size: 0.875rem; text-decoration: none; font-weight: 600;">Ver todos →</a>
+               style="color: var(--primary); font-size: 0.875rem; text-decoration: none; font-weight: 600;">Ver todos
+                →</a>
         </div>
 
         <div class="card" style="border-left: 5px solid orange;">
             <h3 style="color: var(--secondary); font-size: 0.875rem; text-transform: uppercase;">Vacinas Aplicadas</h3>
             <p style="font-size: 2.5rem; font-weight: 800; margin: 0.5rem 0;">{{ $stats['vaccines'] }}</p>
             <a href="{{ route('admin.vaccines.index') }}"
-                style="color: var(--primary); font-size: 0.875rem; text-decoration: none; font-weight: 600;">Histórico →</a>
+               style="color: var(--primary); font-size: 0.875rem; text-decoration: none; font-weight: 600;">Histórico
+                →</a>
         </div>
     </div>
 

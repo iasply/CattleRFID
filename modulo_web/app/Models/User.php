@@ -26,6 +26,15 @@ class User extends Authenticatable
         'is_veterinarian',
         'tag_hash',
     ];
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
 
     protected static function booted()
     {
@@ -65,16 +74,6 @@ class User extends Authenticatable
     {
         return $this->hasMany(Vaccine::class);
     }
-
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
 
     /**
      * Get the attributes that should be cast.

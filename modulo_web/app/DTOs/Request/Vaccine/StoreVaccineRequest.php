@@ -14,7 +14,15 @@ class StoreVaccineRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'rfid_tag' => 'required|exists:cattle,rfid_tag|max:16',
+            'rfid_tag' => [
+                'required',
+                'exists:cattle,rfid_tag',
+                function ($attribute, $value, $fail) {
+                    if (!\App\Support\RfidGenerator::isCattleTag($value)) {
+                        $fail(__('A tag RFID do animal é inválida ou não possui o prefixo esperado (C).'));
+                    }
+                },
+            ],
             'vaccine_type' => 'required|string|max:255',
             'current_weight' => 'required|numeric|min:0',
             'vaccination_date' => 'required|date',

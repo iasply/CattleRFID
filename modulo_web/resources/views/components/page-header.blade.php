@@ -3,8 +3,8 @@
 <div style="margin-bottom: 2.5rem;">
     @if($backLink)
         <a href="{{ $backLink }}"
-            style="display: inline-flex; align-items: center; color: var(--text-muted); text-decoration: none; font-size: 0.875rem; margin-bottom: 0.75rem; transition: color 0.2s;"
-            onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">
+           style="display: inline-flex; align-items: center; color: var(--text-muted); text-decoration: none; font-size: 0.875rem; margin-bottom: 0.75rem; transition: color 0.2s;"
+           onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">
             <span style="margin-right: 0.5rem;">←</span> {{ $backText }}
         </a>
     @endif

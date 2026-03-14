@@ -7,10 +7,11 @@ use App\Models\Workstation;
 readonly class WorkstationResponse
 {
     public function __construct(
-        public int $id,
+        public int    $id,
         public string $hash,
         public string $desc,
-    ) {
+    )
+    {
     }
 
     public static function fromModel(Workstation $workstation): self

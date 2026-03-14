@@ -16,7 +16,16 @@ class StoreCattleRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'weight' => 'required|numeric|min:0',
-            'rfid_tag' => 'nullable|string|max:16|unique:cattle,rfid_tag',
+            'rfid_tag' => [
+                'nullable',
+                'string',
+                'unique:cattle,rfid_tag',
+                function ($attribute, $value, $fail) {
+                    if (!\App\Support\RfidGenerator::isCattleTag($value)) {
+                        $fail(__('A tag RFID do animal é inválida ou não possui o prefixo esperado (C).'));
+                    }
+                },
+            ],
         ];
     }
 }

@@ -9,6 +9,7 @@
     };
 @endphp
 
-<button type="{{ $type }}" {{ $attributes->merge(['class' => "btn $variantClass", 'style' => $fullWidth ? 'width: 100%;' : '']) }}>
+<button
+    type="{{ $type }}" {{ $attributes->merge(['class' => "btn $variantClass", 'style' => $fullWidth ? 'width: 100%;' : '']) }}>
     {{ $slot }}
 </button>

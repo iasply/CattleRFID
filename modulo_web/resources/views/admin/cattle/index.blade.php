@@ -18,9 +18,9 @@
                     <td>{{ \Carbon\Carbon::parse($animal->registration_date)->format('d/m/Y') }}</td>
                     <td class="text-right" style="display: flex; gap: 0.5rem; justify-content: flex-end;">
                         <a href="{{ route('admin.cattle.show', $animal->id) }}" class="btn btn-primary"
-                            style="font-size: 0.75rem; text-decoration: none; padding: 0.4rem 0.8rem;">Ver</a>
+                           style="font-size: 0.75rem; text-decoration: none; padding: 0.4rem 0.8rem;">Ver</a>
                         <a href="{{ route('admin.cattle.edit', $animal->id) }}" class="btn btn-primary"
-                            style="font-size: 0.75rem; text-decoration: none; padding: 0.4rem 0.8rem;">Editar</a>
+                           style="font-size: 0.75rem; text-decoration: none; padding: 0.4rem 0.8rem;">Editar</a>
                     </td>
                 </tr>
             @endforeach

@@ -18,17 +18,17 @@ class WorkstationController extends Controller
         return view('admin.workstations.index', compact('workstations'));
     }
 
-    public function create()
-    {
-        return view('admin.workstations.create');
-    }
-
     public function store(StoreWorkstationRequest $request)
     {
         Workstation::create($request->validated());
 
         return redirect()->route('admin.workstations.index')
             ->with('success', 'Estação de trabalho cadastrada com sucesso.');
+    }
+
+    public function create()
+    {
+        return view('admin.workstations.create');
     }
 
     public function show(Workstation $workstation)

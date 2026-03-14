@@ -19,14 +19,6 @@ class VaccineController extends Controller
         return view('admin.vaccines.index', compact('vaccines'));
     }
 
-    public function create()
-    {
-        $gattos = Cattle::all();
-        $vets = User::where('is_veterinarian', true)->get();
-
-        return view('admin.vaccines.create', compact('gattos', 'vets'));
-    }
-
     public function store(StoreVaccineRequest $request)
     {
         $vaccine = Vaccine::create(array_merge(
@@ -38,5 +30,13 @@ class VaccineController extends Controller
             ->update(['weight' => $request->current_weight]);
 
         return redirect()->route('admin.vaccines.index')->with('success', 'Vacinação registrada!');
+    }
+
+    public function create()
+    {
+        $gattos = Cattle::all();
+        $vets = User::where('is_veterinarian', true)->get();
+
+        return view('admin.vaccines.create', compact('gattos', 'vets'));
     }
 }

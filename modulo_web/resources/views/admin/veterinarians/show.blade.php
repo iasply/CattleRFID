@@ -4,7 +4,7 @@
     <x-page-header :title="'Veterinário: ' . $veterinarian->name" :backLink="route('admin.veterinarians.index')">
         <x-slot name="actions">
             <x-button variant="secondary"
-                onclick="window.location='{{ route('admin.veterinarians.edit', $veterinarian->id) }}'">
+                      onclick="window.location='{{ route('admin.veterinarians.edit', $veterinarian->id) }}'">
                 Editar Perfil
             </x-button>
         </x-slot>
@@ -20,7 +20,8 @@
                     👨‍⚕️
                 </div>
                 <h3 style="font-size: 1.25rem; font-weight: 800; text-align: center;">{{ $veterinarian->name }}</h3>
-                <span style="color: var(--primary-dark); font-weight: 600; font-size: 0.875rem;">Médico Veterinário</span>
+                <span
+                    style="color: var(--primary-dark); font-weight: 600; font-size: 0.875rem;">Médico Veterinário</span>
             </div>
 
             <div style="display: flex; flex-direction: column; gap: 1.25rem;">
@@ -73,8 +74,10 @@
                 @endforeach
                 @if($vaccinations->isEmpty())
                     <tr>
-                        <td colspan="4" style="text-align: center; color: var(--secondary); padding: 2rem;">Nenhuma vacina
-                            aplicada por este profissional.</td>
+                        <td colspan="4" style="text-align: center; color: var(--secondary); padding: 2rem;">Nenhuma
+                            vacina
+                            aplicada por este profissional.
+                        </td>
                     </tr>
                 @endif
             </x-table>

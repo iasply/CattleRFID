@@ -3,15 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use App\Models\Cattle;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ApiAuthTest extends TestCase
 {
     use RefreshDatabase;
-
-
 
 
     #[\PHPUnit\Framework\Attributes\Test]

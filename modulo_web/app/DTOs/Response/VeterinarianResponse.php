@@ -11,12 +11,13 @@ use App\Models\User;
 readonly class VeterinarianResponse
 {
     public function __construct(
-        public int $id,
+        public int    $id,
         public string $name,
         public string $email,
         public string $vet_rfid,
-        public bool $is_veterinarian,
-    ) {
+        public bool   $is_veterinarian,
+    )
+    {
     }
 
     public static function fromModel(User $user): self
@@ -26,7 +27,7 @@ readonly class VeterinarianResponse
             name: $user->name,
             email: $user->email,
             vet_rfid: $user->vet_rfid,
-            is_veterinarian: (bool) $user->is_veterinarian,
+            is_veterinarian: (bool)$user->is_veterinarian,
         );
     }
 

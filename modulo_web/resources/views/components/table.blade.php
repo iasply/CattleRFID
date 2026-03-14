@@ -3,16 +3,16 @@
 <div class="table-container">
     <table class="premium-table">
         <thead>
-            <tr>
-                @foreach($headers as $header)
-                    <th class="{{ strtolower($header) == 'ações' ? 'text-right' : '' }}">
-                        {{ $header }}
-                    </th>
-                @endforeach
-            </tr>
+        <tr>
+            @foreach($headers as $header)
+                <th class="{{ strtolower($header) == 'ações' ? 'text-right' : '' }}">
+                    {{ $header }}
+                </th>
+            @endforeach
+        </tr>
         </thead>
         <tbody>
-            {{ $slot }}
+        {{ $slot }}
         </tbody>
     </table>
 </div>
@@ -30,13 +30,16 @@
     .table-container::-webkit-scrollbar {
         height: 6px;
     }
+
     .table-container::-webkit-scrollbar-track {
         background: var(--bg-main);
     }
+
     .table-container::-webkit-scrollbar-thumb {
         background: #cbd5e1;
         border-radius: 3px;
     }
+
     .table-container::-webkit-scrollbar-thumb:hover {
         background: var(--secondary);
     }
@@ -70,8 +73,13 @@
     }
 
     /* Special alignments */
-    .text-right { text-align: right !important; }
-    .text-center { text-align: center !important; }
+    .text-right {
+        text-align: right !important;
+    }
+
+    .text-center {
+        text-align: center !important;
+    }
 
     /* Last column often needs right alignment for buttons */
     .premium-table td:last-child {

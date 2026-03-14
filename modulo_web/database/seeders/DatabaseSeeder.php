@@ -2,9 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\Cattle;
+use App\Models\User;
 use App\Models\Vaccine;
+use App\Support\RfidGenerator;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -31,11 +32,16 @@ class DatabaseSeeder extends Seeder
             'is_veterinarian' => true,
         ]);
 
-        // Animal padrão
+        // Animal padrão - Usando tag hardcoded válida ou gerada
+        $rfid = 'C1234567894';
+        if (!RfidGenerator::isValid($rfid)) {
+            $rfid = RfidGenerator::generateCattleTag();
+        }
+
         $animal = Cattle::create([
             'name' => 'Mimosa',
             'weight' => 450.00,
-            'rfid_tag' => 'C1234567894',
+            'rfid_tag' => $rfid,
             'registration_date' => now()->toDateString(),
         ]);
 

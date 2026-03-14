@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-page-header title="Nova Estação de Trabalho" :backLink="route('admin.workstations.index')" />
+    <x-page-header title="Nova Estação de Trabalho" :backLink="route('admin.workstations.index')"/>
 
     <x-card maxWidth="600px">
         <div style="margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--bg-main);">
@@ -15,7 +15,7 @@
             @csrf
 
             <x-input label="Descrição / Localização da Estação" name="desc" required
-                placeholder="Ex: Curral Principal, Laboratório A..." />
+                     placeholder="Ex: Curral Principal, Laboratório A..."/>
 
             <div style="margin-top: 2rem;">
                 <x-button type="submit" fullWidth>

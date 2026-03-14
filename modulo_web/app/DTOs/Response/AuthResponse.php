@@ -9,11 +9,12 @@ namespace App\DTOs\Response;
 readonly class AuthResponse
 {
     public function __construct(
-        public string $access_token,
-        public string $token_type,
+        public string               $access_token,
+        public string               $token_type,
         public VeterinarianResponse $user,
         public ?WorkstationResponse $workstation = null,
-    ) {
+    )
+    {
     }
 
     public function toArray(): array

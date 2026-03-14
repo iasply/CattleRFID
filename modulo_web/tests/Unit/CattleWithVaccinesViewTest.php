@@ -2,12 +2,12 @@
 
 namespace Tests\Unit;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Cattle;
-use App\Models\Vaccine;
-use App\Models\User;
 use App\Models\CattleWithVaccinesView;
+use App\Models\User;
+use App\Models\Vaccine;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class CattleWithVaccinesViewTest extends TestCase
 {

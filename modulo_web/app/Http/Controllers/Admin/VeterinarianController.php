@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\DTOs\Request\Veterinarian\StoreVeterinarianRequest;
 use App\DTOs\Request\Veterinarian\UpdateVeterinarianRequest;
-use App\DTOs\Response\VeterinarianResponse;
 use App\DTOs\Response\VaccineResponse;
+use App\DTOs\Response\VeterinarianResponse;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -20,11 +20,6 @@ class VeterinarianController extends Controller
         return view('admin.veterinarians.index', compact('vets'));
     }
 
-    public function create()
-    {
-        return view('admin.veterinarians.create');
-    }
-
     public function store(StoreVeterinarianRequest $request)
     {
         User::create(array_merge($request->validated(), [
@@ -34,6 +29,11 @@ class VeterinarianController extends Controller
 
         return redirect()->route('admin.veterinarians.index')
             ->with('success', 'Veterinário cadastrado com sucesso!');
+    }
+
+    public function create()
+    {
+        return view('admin.veterinarians.create');
     }
 
     public function show(User $veterinarian)

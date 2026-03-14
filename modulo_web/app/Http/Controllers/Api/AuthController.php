@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\DTOs\Request\Auth\CredentialLoginRequest;
 use App\DTOs\Request\Auth\TagLoginRequest;
 use App\DTOs\Response\AuthResponse;
 use App\DTOs\Response\VeterinarianResponse;
@@ -12,11 +11,18 @@ use App\Models\User;
 use App\Models\Workstation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    /**
+     * Route dispatcher: choose login .
+     */
+    public function login(Request $request): JsonResponse
+    {
+        return $this->loginWithTag(TagLoginRequest::createFrom($request));
+    }
+
     /**
      * Handle workstation + tag login (IoT / Desktop flow).
      */
@@ -56,15 +62,6 @@ class AuthController extends Controller
         );
 
         return response()->json($response->toArray());
-    }
-
-
-    /**
-     * Route dispatcher: choose login .
-     */
-    public function login(Request $request): JsonResponse
-    {
-        return $this->loginWithTag(TagLoginRequest::createFrom($request));
     }
 
     /**

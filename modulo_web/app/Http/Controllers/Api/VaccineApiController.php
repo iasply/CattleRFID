@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\DTOs\Request\Vaccine\StoreVaccineRequest;
-use App\Http\Resources\VaccineResource;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\VaccineResource;
 use App\Models\Cattle;
 use App\Models\Vaccine;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class VaccineApiController extends Controller
 {

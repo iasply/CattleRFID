@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Models\Cattle;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -30,12 +30,12 @@ class ApiSyncTest extends TestCase
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
         ])->postJson('/api/vaccines', [
-                    'rfid_tag' => $cattle->rfid_tag,
-                    'vaccine_type' => 'Anti-Rábica',
-                    'current_weight' => 310.5,
-                    'vaccination_date' => now()->toDateString(),
-                    'vaccinator_username' => $vet->username,
-                ]);
+            'rfid_tag' => $cattle->rfid_tag,
+            'vaccine_type' => 'Anti-Rábica',
+            'current_weight' => 310.5,
+            'vaccination_date' => now()->toDateString(),
+            'vaccinator_username' => $vet->username,
+        ]);
 
         $response->assertStatus(201);
         $this->assertDatabaseHas('vaccines', [

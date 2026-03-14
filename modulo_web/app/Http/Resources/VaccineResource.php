@@ -18,7 +18,7 @@ class VaccineResource extends JsonResource
             'id' => $this->id,
             'rfid_tag' => $this->rfid_tag,
             'vaccine_type' => $this->vaccine_type,
-            'current_weight' => (float) $this->current_weight,
+            'current_weight' => (float)$this->current_weight,
             'vaccination_date' => $this->vaccination_date,
             'user_id' => $this->user_id,
             'workstation_id' => $this->workstation_id,

@@ -75,8 +75,10 @@
                 @endforeach
                 @if($vaccines->isEmpty())
                     <tr>
-                        <td colspan="4" style="text-align: center; color: var(--secondary); padding: 2rem;">Nenhuma vacina
-                            registrada para este animal.</td>
+                        <td colspan="4" style="text-align: center; color: var(--secondary); padding: 2rem;">Nenhuma
+                            vacina
+                            registrada para este animal.
+                        </td>
                     </tr>
                 @endif
             </x-table>

@@ -1,11 +1,11 @@
 <?php
 
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\VeterinarianController;
 use App\Http\Controllers\Admin\CattleController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\VaccineController;
+use App\Http\Controllers\Admin\VeterinarianController;
 use App\Http\Controllers\Admin\WorkstationController;
+use App\Http\Controllers\LoginController;
 
 // Auth Routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');

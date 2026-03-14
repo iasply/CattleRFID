@@ -9,7 +9,6 @@ class Cattle extends Model
     protected $fillable = ['rfid_tag', 'name', 'weight', 'registration_date', 'user_id'];
 
 
-
     /**
      * Get the user who registered the animal.
      */

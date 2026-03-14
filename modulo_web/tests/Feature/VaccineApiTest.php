@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Models\Cattle;
-use App\Models\Workstation;
+use App\Models\User;
 use App\Models\Vaccine;
+use App\Models\Workstation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -96,11 +96,11 @@ class VaccineApiTest extends TestCase
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
         ])->postJson('/api/vaccines', [
-                    'rfid_tag' => $tag2,
-                    'vaccine_type' => 'Brucelose',
-                    'current_weight' => 410.00,
-                    'vaccination_date' => now()->format('Y-m-d'),
-                ]);
+            'rfid_tag' => $tag2,
+            'vaccine_type' => 'Brucelose',
+            'current_weight' => 410.00,
+            'vaccination_date' => now()->format('Y-m-d'),
+        ]);
 
         $response->assertStatus(201);
 

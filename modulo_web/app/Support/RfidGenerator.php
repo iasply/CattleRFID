@@ -25,4 +25,46 @@ class RfidGenerator
     {
         return 'V' . strtoupper(Str::random(10));
     }
+
+    /**
+     * Verifica se a tag é de um Animal (Cattle).
+     */
+    public static function isCattleTag(?string $rfid): bool
+    {
+        return self::isValid($rfid) && strtoupper($rfid[0]) === 'C';
+    }
+
+    /**
+     * Valida se uma tag RFID é válida para o sistema.
+     * Regras:
+     * - Começa com 'C' ou 'V'
+     * - Tamanho entre 2 e 16 caracteres
+     * - Apenas caracteres alfanuméricos
+     */
+    public static function isValid(?string $rfid): bool
+    {
+        if (empty($rfid)) {
+            return false;
+        }
+
+        $length = strlen($rfid);
+        if ($length < 2 || $length > 16) {
+            return false;
+        }
+
+        $prefix = strtoupper($rfid[0]);
+        if ($prefix !== 'C' && $prefix !== 'V') {
+            return false;
+        }
+
+        return ctype_alnum($rfid);
+    }
+
+    /**
+     * Verifica se a tag é de um Veterinário (User).
+     */
+    public static function isVetTag(?string $rfid): bool
+    {
+        return self::isValid($rfid) && strtoupper($rfid[0]) === 'V';
+    }
 }

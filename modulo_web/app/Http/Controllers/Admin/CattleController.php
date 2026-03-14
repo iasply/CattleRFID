@@ -11,7 +11,8 @@ class CattleController extends Controller
 {
     public function __construct(
         protected \App\Services\CattleService $cattleService
-    ) {
+    )
+    {
     }
 
     public function index()

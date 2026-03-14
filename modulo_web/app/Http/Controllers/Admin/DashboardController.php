@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-
-use App\Models\User;
 use App\Models\Cattle;
+use App\Models\User;
 use App\Models\Vaccine;
 
 class DashboardController extends Controller

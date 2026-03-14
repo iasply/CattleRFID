@@ -151,92 +151,93 @@
 </head>
 
 <body>
-    <div class="app-container">
-        <!-- Desktop Sidebar -->
-        <aside class="sidebar">
-            <a href="{{ route('admin.dashboard') }}" class="brand">
-                <span>🐂</span> Cattle RFID
+<div class="app-container">
+    <!-- Desktop Sidebar -->
+    <aside class="sidebar">
+        <a href="{{ route('admin.dashboard') }}" class="brand">
+            <span>🐂</span> Cattle RFID
+        </a>
+
+        <nav class="nav-list">
+            <a href="{{ route('admin.dashboard') }}"
+               class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                Dashboard
             </a>
-
-            <nav class="nav-list">
-                <a href="{{ route('admin.dashboard') }}"
-                    class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                    Dashboard
-                </a>
-                <a href="{{ route('admin.veterinarians.index') }}"
-                    class="nav-link {{ request()->routeIs('admin.veterinarians.*') ? 'active' : '' }}">
-                    Veterinários
-                </a>
-                <a href="{{ route('admin.cattle.index') }}"
-                    class="nav-link {{ request()->routeIs('admin.cattle.*') ? 'active' : '' }}">
-                    Animais
-                </a>
-                <a href="{{ route('admin.vaccines.index') }}"
-                    class="nav-link {{ request()->routeIs('admin.vaccines.*') ? 'active' : '' }}">
-                    Vacinas
-                </a>
-                <a href="{{ route('admin.workstations.index') }}"
-                    class="nav-link {{ request()->routeIs('admin.workstations.*') ? 'active' : '' }}">
-                    Estações
-                </a>
-            </nav>
-
-            <div style="margin-top: auto; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05);">
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="btn btn-danger"
-                        style="width: 100%; background: none; border-color: rgba(239, 68, 68, 0.4); color: #ef4444;">
-                        Sair do Sistema
-                    </button>
-                </form>
-            </div>
-        </aside>
-
-        <!-- Mobile Header -->
-        <header class="mobile-header">
-            <span style="font-weight: 800; color: var(--primary-dark);">🐂 Cattle RFID</span>
-            <div style="display: flex; gap: 0.75rem;">
-                <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
-                    @csrf
-                    <button type="submit"
-                        style="background: none; border: none; color: var(--danger); font-size: 1.25rem;">🚪</button>
-                </form>
-            </div>
-        </header>
-
-        <!-- Mobile Bottom Nav -->
-        <nav class="bottom-nav">
-            <div class="nav-list">
-                <a href="{{ route('admin.dashboard') }}"
-                    class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                    <span>🏠</span> Dashboard
-                </a>
-                <a href="{{ route('admin.cattle.index') }}"
-                    class="nav-link {{ request()->routeIs('admin.cattle.*') ? 'active' : '' }}">
-                    <span>🐄</span> Animais
-                </a>
-                <a href="{{ route('admin.vaccines.index') }}"
-                    class="nav-link {{ request()->routeIs('admin.vaccines.*') ? 'active' : '' }}">
-                    <span>💉</span> Vacinas
-                </a>
-                <a href="{{ route('admin.workstations.index') }}"
-                    class="nav-link {{ request()->routeIs('admin.workstations.*') ? 'active' : '' }}">
-                    <span>⚙️</span> Painel
-                </a>
-            </div>
+            <a href="{{ route('admin.veterinarians.index') }}"
+               class="nav-link {{ request()->routeIs('admin.veterinarians.*') ? 'active' : '' }}">
+                Veterinários
+            </a>
+            <a href="{{ route('admin.cattle.index') }}"
+               class="nav-link {{ request()->routeIs('admin.cattle.*') ? 'active' : '' }}">
+                Animais
+            </a>
+            <a href="{{ route('admin.vaccines.index') }}"
+               class="nav-link {{ request()->routeIs('admin.vaccines.*') ? 'active' : '' }}">
+                Vacinas
+            </a>
+            <a href="{{ route('admin.workstations.index') }}"
+               class="nav-link {{ request()->routeIs('admin.workstations.*') ? 'active' : '' }}">
+                Estações
+            </a>
         </nav>
 
-        <main class="main-content">
-            @if(session('success'))
-                <x-card
-                    style="background-color: #dcfce7; border-color: #10b981; color: #065f46; margin-bottom: 2rem; padding: 1rem;">
-                    {{ session('success') }}
-                </x-card>
-            @endif
+        <div style="margin-top: auto; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05);">
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="btn btn-danger"
+                        style="width: 100%; background: none; border-color: rgba(239, 68, 68, 0.4); color: #ef4444;">
+                    Sair do Sistema
+                </button>
+            </form>
+        </div>
+    </aside>
 
-            @yield('content')
-        </main>
-    </div>
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+        <span style="font-weight: 800; color: var(--primary-dark);">🐂 Cattle RFID</span>
+        <div style="display: flex; gap: 0.75rem;">
+            <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+                @csrf
+                <button type="submit"
+                        style="background: none; border: none; color: var(--danger); font-size: 1.25rem;">🚪
+                </button>
+            </form>
+        </div>
+    </header>
+
+    <!-- Mobile Bottom Nav -->
+    <nav class="bottom-nav">
+        <div class="nav-list">
+            <a href="{{ route('admin.dashboard') }}"
+               class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                <span>🏠</span> Dashboard
+            </a>
+            <a href="{{ route('admin.cattle.index') }}"
+               class="nav-link {{ request()->routeIs('admin.cattle.*') ? 'active' : '' }}">
+                <span>🐄</span> Animais
+            </a>
+            <a href="{{ route('admin.vaccines.index') }}"
+               class="nav-link {{ request()->routeIs('admin.vaccines.*') ? 'active' : '' }}">
+                <span>💉</span> Vacinas
+            </a>
+            <a href="{{ route('admin.workstations.index') }}"
+               class="nav-link {{ request()->routeIs('admin.workstations.*') ? 'active' : '' }}">
+                <span>⚙️</span> Painel
+            </a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        @if(session('success'))
+            <x-card
+                style="background-color: #dcfce7; border-color: #10b981; color: #065f46; margin-bottom: 2rem; padding: 1rem;">
+                {{ session('success') }}
+            </x-card>
+        @endif
+
+        @yield('content')
+    </main>
+</div>
 </body>
 
 </html>
