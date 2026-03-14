@@ -68,7 +68,7 @@ if [ "$MODE" == "docker" ]; then
 fi
 
 # Configurar o enviroment do desktop (Java) dinamicamente
-DESKTOP_ENV_FILE="../modulo_desktop/.env"
+DESKTOP_ENV_FILE="../modulo_desktop/.env.test"
 
 if [ "$MODE" == "docker" ]; then
     # Configuracao HTTPS para Docker (Localhost porta publica)

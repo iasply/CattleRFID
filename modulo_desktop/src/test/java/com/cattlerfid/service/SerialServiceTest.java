@@ -49,6 +49,38 @@ class SerialServiceTest {
         assertEquals("RES:OK:João :FW:92", receivedParsedMessage.get());
     }
 
+    @Test
+    void testSimulationMode_ConnectSuccess() {
+        SerialService service = new SerialService();
+        service.setSimulationMode(true);
+        boolean connected = service.connect("ANY_PORT");
+        assertEquals(true, connected, "Should connect successfully in simulation mode");
+        assertEquals(true, service.isOpen());
+    }
+
+    @Test
+    void testSimulationMode_InjectMessage() {
+        SerialService service = new SerialService();
+        service.setSimulationMode(true);
+        AtomicReference<String> received = new AtomicReference<>("");
+        service.addMessageListener(received::set);
+
+        service.injectMessage("TAG:123");
+
+        assertEquals("TAG:123", received.get(), "Listener should receive the injected message without brackets");
+    }
+
+    @Test
+    void testSimulationMode_SendCommandDoesNotError() {
+        SerialService service = new SerialService();
+        service.setSimulationMode(true);
+        service.connect("COM1");
+
+        // Should not throw exception and should record in logs (can't easily assert logs here without changes but confirming it doesn't fail)
+        service.sendCommand("<READ>");
+        assertEquals(true, service.isOpen());
+    }
+
     class MockSerialService extends SerialService {
         private String lastSentCommand = "";
 

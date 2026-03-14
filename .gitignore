@@ -29,4 +29,6 @@ build/
 ~*
 .agents/
 .agents/*
+modulo_desktop/.env
+modulo_desktop/.env.test
 modulo_desktop/.env.production
