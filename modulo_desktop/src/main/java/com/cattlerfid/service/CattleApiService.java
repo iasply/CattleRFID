@@ -1,22 +1,18 @@
 package com.cattlerfid.service;
 
+import com.cattlerfid.config.ApiClient;
 import com.cattlerfid.config.ApiConfig;
-import com.cattlerfid.config.HttpClientFactory;
 import com.cattlerfid.model.Cattle;
 import com.cattlerfid.model.User;
 import com.cattlerfid.model.Vaccine;
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,37 +23,33 @@ import java.util.Optional;
  */
 public class CattleApiService {
 
-    private final ApiConfig config;
+    private final ApiClient client;
     private final User user;
-    private final HttpClient http;
-    private final Gson gson = new Gson();
 
     public CattleApiService(ApiConfig config, User user) {
-        this(config, user, HttpClientFactory.create(config));
+        this(new ApiClient(config), user);
     }
 
-    public CattleApiService(ApiConfig config, User user, HttpClient http) {
-        this.config = config;
+    public CattleApiService(ApiClient client, User user) {
+        this.client = client;
         this.user = user;
-        this.http = http;
     }
 
     /**
-     * Finds a single cattle by its RFID tag content using the new show-by-tag
-     * endpoint.
+     * Finds a single cattle by its RFID tag content.
      */
     public Optional<Cattle> getCattleByTag(String rfidTag) {
         if (rfidTag == null || rfidTag.isBlank())
             return Optional.empty();
 
-        HttpRequest request = authenticatedRequest("/cattle/" + rfidTag)
+        HttpRequest request = authenticatedRequestBuilder("/cattle/" + rfidTag)
                 .GET()
                 .build();
 
         try {
-            HttpResponse<String> response = sendAndLog(request);
+            HttpResponse<String> response = client.send(request);
             if (response.statusCode() == 200) {
-                return Optional.of(gson.fromJson(response.body(), Cattle.class));
+                return Optional.of(client.getGson().fromJson(response.body(), Cattle.class));
             }
         } catch (IOException | InterruptedException e) {
             handleError("Error fetching cattle by tag", e);
@@ -69,18 +61,17 @@ public class CattleApiService {
      * Lists all cattle registered in the system.
      */
     public List<Cattle> getAllCattle() {
-        HttpRequest request = authenticatedRequest("/cattle")
+        HttpRequest request = authenticatedRequestBuilder("/cattle")
                 .GET()
                 .build();
 
         try {
-            HttpResponse<String> response = sendAndLog(request);
+            HttpResponse<String> response = client.send(request);
             if (response.statusCode() == 200) {
-                JsonObject jsonObject = gson.fromJson(response.body(), JsonObject.class);
+                JsonObject jsonObject = client.getGson().fromJson(response.body(), JsonObject.class);
                 JsonArray dataArray = jsonObject.getAsJsonArray("data");
-                Type listType = new TypeToken<ArrayList<Cattle>>() {
-                }.getType();
-                return gson.fromJson(dataArray, listType);
+                Type listType = new TypeToken<ArrayList<Cattle>>() {}.getType();
+                return client.getGson().fromJson(dataArray, listType);
             }
         } catch (IOException | InterruptedException e) {
             handleError("Error fetching all cattle", e);
@@ -92,18 +83,17 @@ public class CattleApiService {
      * Lists all cattle registered in the system along with their vaccine count.
      */
     public List<Cattle> getAllCattleWithVaccines() {
-        HttpRequest request = authenticatedRequest("/cattle-with-vaccines")
+        HttpRequest request = authenticatedRequestBuilder("/cattle-with-vaccines")
                 .GET()
                 .build();
 
         try {
-            HttpResponse<String> response = sendAndLog(request);
+            HttpResponse<String> response = client.send(request);
             if (response.statusCode() == 200) {
-                JsonObject jsonObject = gson.fromJson(response.body(), JsonObject.class);
+                JsonObject jsonObject = client.getGson().fromJson(response.body(), JsonObject.class);
                 JsonArray dataArray = jsonObject.getAsJsonArray("data");
-                Type listType = new TypeToken<ArrayList<Cattle>>() {
-                }.getType();
-                return gson.fromJson(dataArray, listType);
+                Type listType = new TypeToken<ArrayList<Cattle>>() {}.getType();
+                return client.getGson().fromJson(dataArray, listType);
             }
         } catch (IOException | InterruptedException e) {
             handleError("Error fetching all cattle with vaccines", e);
@@ -115,13 +105,13 @@ public class CattleApiService {
      * Persists new cattle data to the cloud.
      */
     public boolean saveCattle(Cattle cattle) {
-        String body = gson.toJson(cattle);
-        HttpRequest request = authenticatedRequest("/cattle")
+        String body = client.getGson().toJson(cattle);
+        HttpRequest request = authenticatedRequestBuilder("/cattle")
                 .POST(HttpRequest.BodyPublishers.ofString(body))
                 .build();
 
         try {
-            HttpResponse<String> response = sendAndLog(request);
+            HttpResponse<String> response = client.send(request);
             return response.statusCode() == 200 || response.statusCode() == 201;
         } catch (IOException | InterruptedException e) {
             handleError("Error saving cattle", e);
@@ -133,13 +123,13 @@ public class CattleApiService {
      * Updates existing cattle data on the cloud.
      */
     public boolean updateCattle(Cattle cattle) {
-        String body = gson.toJson(cattle);
-        HttpRequest request = authenticatedRequest("/cattle/" + cattle.getId())
+        String body = client.getGson().toJson(cattle);
+        HttpRequest request = authenticatedRequestBuilder("/cattle/" + cattle.getId())
                 .PUT(HttpRequest.BodyPublishers.ofString(body))
                 .build();
 
         try {
-            HttpResponse<String> response = sendAndLog(request);
+            HttpResponse<String> response = client.send(request);
             return response.statusCode() == 200;
         } catch (IOException | InterruptedException e) {
             handleError("Error updating cattle", e);
@@ -151,13 +141,13 @@ public class CattleApiService {
      * Records a new vaccination event.
      */
     public boolean saveVaccine(Vaccine vaccine) {
-        String body = gson.toJson(vaccine);
-        HttpRequest request = authenticatedRequest("/vaccines")
+        String body = client.getGson().toJson(vaccine);
+        HttpRequest request = authenticatedRequestBuilder("/vaccines")
                 .POST(HttpRequest.BodyPublishers.ofString(body))
                 .build();
 
         try {
-            HttpResponse<String> response = sendAndLog(request);
+            HttpResponse<String> response = client.send(request);
             return response.statusCode() == 200 || response.statusCode() == 201;
         } catch (IOException | InterruptedException e) {
             handleError("Error saving vaccine", e);
@@ -172,18 +162,17 @@ public class CattleApiService {
         if (rfidTag == null || rfidTag.isBlank())
             return new ArrayList<>();
 
-        HttpRequest request = authenticatedRequest("/vaccines?rfid_tag=" + rfidTag)
+        HttpRequest request = authenticatedRequestBuilder("/vaccines?rfid_tag=" + rfidTag)
                 .GET()
                 .build();
 
         try {
-            HttpResponse<String> response = sendAndLog(request);
+            HttpResponse<String> response = client.send(request);
             if (response.statusCode() == 200) {
-                JsonObject jsonObject = gson.fromJson(response.body(), JsonObject.class);
+                JsonObject jsonObject = client.getGson().fromJson(response.body(), JsonObject.class);
                 JsonArray dataArray = jsonObject.getAsJsonArray("data");
-                Type listType = new TypeToken<ArrayList<Vaccine>>() {
-                }.getType();
-                return gson.fromJson(dataArray, listType);
+                Type listType = new TypeToken<ArrayList<Vaccine>>() {}.getType();
+                return client.getGson().fromJson(dataArray, listType);
             }
         } catch (IOException | InterruptedException e) {
             handleError("Error fetching vaccines for tag: " + rfidTag, e);
@@ -193,20 +182,8 @@ public class CattleApiService {
 
     // --- Helper Methods ---
 
-    private HttpResponse<String> sendAndLog(HttpRequest request) throws IOException, InterruptedException {
-        System.out.println("[API Request] " + request.method() + " " + request.uri());
-        HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println("[API Response] Status: " + response.statusCode() + " Body: " + response.body());
-        return response;
-    }
-
-    private HttpRequest.Builder authenticatedRequest(String path) {
-        return HttpRequest.newBuilder()
-                .uri(URI.create(config.url(path)))
-                .header("Content-Type", "application/json")
-                .header("Accept", "application/json")
-                .header("Authorization", "Bearer " + user.getAccessToken())
-                .timeout(Duration.ofSeconds(10));
+    private HttpRequest.Builder authenticatedRequestBuilder(String path) {
+        return client.newAuthenticatedRequestBuilder(path, user.getAccessToken());
     }
 
     private void handleError(String message, Exception e) {

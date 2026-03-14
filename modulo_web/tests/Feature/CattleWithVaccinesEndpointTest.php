@@ -57,7 +57,7 @@ class CattleWithVaccinesEndpointTest extends TestCase
             'user_id' => $user->id,
         ]);
 
-        $response = $this->actingAs($user, 'sanctum')->getJson('/api/cattle-with-vaccines');
+        $response = $this->actingAs($user, 'sanctum')->getJson('/api/desktop/cattle-with-vaccines');
 
         $response->assertStatus(200);
         $response->assertJsonStructure([

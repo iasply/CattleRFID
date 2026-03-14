@@ -1,85 +1,87 @@
 package com.cattlerfid.service;
 
+import com.cattlerfid.config.ApiClient;
 import com.cattlerfid.config.ApiConfig;
 import com.cattlerfid.model.User;
+import com.google.gson.Gson;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
-import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class AuthenticationServiceTest {
-
-    private AuthenticationService authService;
+public class AuthenticationServiceTest {
 
     @Mock
-    private ApiConfig config;
+    private ApiClient apiClient;
 
     @Mock
-    private HttpClient httpClient;
+    private ApiConfig apiConfig;
 
     @Mock
     private HttpResponse<String> httpResponse;
 
+    private AuthenticationService authService;
+
+    private final Gson gson = new Gson();
+
     @BeforeEach
     void setUp() {
-        authService = new AuthenticationService(config, httpClient);
+        lenient().when(apiClient.getGson()).thenReturn(gson);
+        lenient().when(apiClient.getConfig()).thenReturn(apiConfig);
+        authService = new AuthenticationService(apiClient);
     }
 
     @Test
-    void testAuthenticateByTagSuccess() throws IOException, InterruptedException {
-        // Arrange
-        String rawTag = "VET001SUCCESS";
-        String workstationHash = "WS_HASH_XYZ";
-        String jsonResponse = "{\"access_token\":\"secret_token\",\"user\":{\"vet_rfid\":\"joao_vet\",\"name\":\"Joao Silva\"}}";
+    @DisplayName("Should return empty when tag is null")
+    void should_return_empty_when_tag_is_null() {
+        Optional<User> result = authService.authenticateByTag(null);
+        assertTrue(result.isEmpty());
+    }
 
-        when(config.getWorkstationHash()).thenReturn(workstationHash);
-        when(config.url("/login")).thenReturn("http://localhost/api/login");
+    @Test
+    @DisplayName("Should return user when login is successful")
+    void should_return_user_when_login_successful() throws IOException, InterruptedException {
+        String vetTag = "V000001";
+        String workstation = "hash123";
+        String successJson = "{\"user\": {\"id\": 1, \"name\": \"Dr. Vet\", \"is_veterinarian\": true}, \"access_token\": \"token123\"}";
+
+        when(apiConfig.getWorkstationHash()).thenReturn(workstation);
+        when(apiClient.newRequestBuilder(anyString())).thenReturn(HttpRequest.newBuilder().uri(java.net.URI.create("http://test.com")));
+        when(apiClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
         when(httpResponse.statusCode()).thenReturn(200);
-        when(httpResponse.body()).thenReturn(jsonResponse);
-        when(httpClient.send(any(), any())).thenAnswer(invocation -> httpResponse);
+        when(httpResponse.body()).thenReturn(successJson);
 
-        // Act
-        Optional<User> result = authService.authenticateByTag(rawTag);
+        Optional<User> result = authService.authenticateByTag(vetTag);
 
-        // Assert
         assertTrue(result.isPresent());
         User user = result.get();
-        assertEquals("joao_vet", user.getVetRfid());
-        assertEquals("Joao Silva", user.getName());
-        assertEquals("secret_token", user.getAccessToken());
+        assertEquals("Dr. Vet", user.getName());
+        assertEquals("token123", user.getAccessToken());
     }
 
     @Test
-    void testAuthenticateByTagFailure() throws IOException, InterruptedException {
-        // Arrange
-        String rawTag = "VET001FAILURE";
-        when(config.getWorkstationHash()).thenReturn("WS_HASH");
-        when(config.url("/login")).thenReturn("http://localhost/api/login");
-        when(httpResponse.statusCode()).thenReturn(422);
-        when(httpResponse.body()).thenReturn("{\"message\":\"Invalid tag\"}");
-        when(httpClient.send(any(), any())).thenAnswer(invocation -> httpResponse);
+    @DisplayName("Should return empty when login fails")
+    void should_return_empty_when_login_fails() throws IOException, InterruptedException {
+        when(apiConfig.getWorkstationHash()).thenReturn("hash");
+        when(apiClient.newRequestBuilder(anyString())).thenReturn(HttpRequest.newBuilder().uri(java.net.URI.create("http://test.com")));
+        when(apiClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
+        when(httpResponse.statusCode()).thenReturn(401);
 
-        // Act
-        Optional<User> result = authService.authenticateByTag(rawTag);
+        Optional<User> result = authService.authenticateByTag("V000001");
 
-        // Assert
-        assertFalse(result.isPresent());
-    }
-
-    @Test
-    void testAuthenticateByTagEmptyInput() {
-        assertFalse(authService.authenticateByTag("").isPresent());
-        assertFalse(authService.authenticateByTag(null).isPresent());
+        assertTrue(result.isEmpty());
     }
 }

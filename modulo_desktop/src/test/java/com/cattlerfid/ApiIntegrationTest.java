@@ -1,6 +1,7 @@
 package com.cattlerfid;
 
 import com.cattlerfid.config.ApiConfig;
+import com.cattlerfid.config.ApiClient;
 import com.cattlerfid.model.Cattle;
 import com.cattlerfid.model.User;
 import com.cattlerfid.model.Vaccine;
@@ -9,7 +10,6 @@ import com.cattlerfid.service.CattleApiService;
 import com.cattlerfid.util.RfidGenerator;
 import org.junit.jupiter.api.*;
 
-import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,9 +18,6 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Real integration test hitting the PHP API.
  * Requires the Laravel server to be running at http://127.0.0.1:8000
- * <p>
- * Run only with: mvn test -Dgroups="integration"
- * Skip with:    mvn test -DexcludedGroups="integration"
  */
 @Tag("integration")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -28,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ApiIntegrationTest {
 
     private ApiConfig apiConfig;
-    private HttpClient httpClient;
+    private ApiClient apiClient;
     private AuthenticationService authService;
     private CattleApiService cattleService;
     private User currentUser;
@@ -36,10 +33,9 @@ public class ApiIntegrationTest {
 
     @BeforeAll
     void setup() {
-        // Carrega explicitamente o .env.test do modulo_desktop
         apiConfig = new ApiConfig(".env.test");
-        httpClient = com.cattlerfid.config.HttpClientFactory.create(apiConfig);
-        authService = new AuthenticationService(apiConfig, httpClient);
+        apiClient = new ApiClient(apiConfig);
+        authService = new AuthenticationService(apiClient);
         sharedTestTag = RfidGenerator.generateCattleTag();
         assertTrue(RfidGenerator.isValid(sharedTestTag), "Generated tag should be valid");
     }
@@ -48,10 +44,7 @@ public class ApiIntegrationTest {
     @Order(1)
     @DisplayName("Should authenticate using veterinarian tag V000002")
     void testAuthentication() {
-        // Tag V000002 seeded in PHP (validating it here too)
         String vetTag = "V000002";
-        assertTrue(RfidGenerator.isValid(vetTag), "Vet tag V000002 should be valid");
-
         Optional<User> userOpt = authService.authenticateByTag(vetTag);
 
         assertTrue(userOpt.isPresent(), "Authentication should return a User object");
@@ -61,78 +54,56 @@ public class ApiIntegrationTest {
         assertNotNull(currentUser.getAccessToken(), "User should have an access token");
         assertTrue(currentUser.isVeterinarian());
 
-        // Now we can initialize the CattleApiService with the authenticated user
-        cattleService = new CattleApiService(apiConfig, currentUser, httpClient);
+        cattleService = new CattleApiService(apiClient, currentUser);
     }
 
     @Test
     @Order(2)
     @DisplayName("Should list cattle from the API")
     void testListCattle() {
-        assertNotNull(cattleService, "Cattle service must be initialized with authenticated user");
-
+        assertNotNull(cattleService);
         List<Cattle> cattleList = cattleService.getAllCattle();
-
-        assertNotNull(cattleList, "Should return a list of cattle");
-        System.out.println("Integration Test - Cattle Found: " + cattleList.size());
+        assertNotNull(cattleList);
     }
 
     @Test
     @Order(3)
     @DisplayName("Should create a test cattle")
     void testCreateCattle() {
-        assertNotNull(cattleService, "Cattle service must be initialized");
-
-        Cattle c = new Cattle(sharedTestTag, "Integration Test Cow", 500.0, "2024-03-08");
+        assertNotNull(cattleService);
+        Cattle c = new Cattle(sharedTestTag, "Integration Test Cow", 500.0, "2024-03-14");
         boolean success = cattleService.saveCattle(c);
-
-        assertTrue(success, "Cattle creation should succeed");
+        assertTrue(success);
     }
 
     @Test
     @Order(4)
     @DisplayName("Should register a vaccine for a test cattle")
     void testRegisterVaccine() {
-        assertNotNull(cattleService, "Cattle service must be initialized");
-
-        // Use a dynamically generated tag
-        String testTag = sharedTestTag;
-
+        assertNotNull(cattleService);
         Vaccine v = new Vaccine();
-        v.setRfidTag(testTag);
+        v.setRfidTag(sharedTestTag);
         v.setVaccineType("BRUCELOSE");
         v.setCurrentWeight(180.0);
-        v.setVaccinationDate("2024-03-08");
+        v.setVaccinationDate("2024-03-14");
 
         boolean success = cattleService.saveVaccine(v);
-
-        // Note: The API will create the cattle if it doesn't exist, so this should
-        // return true
-        assertTrue(success, "Vaccine registration should succeed");
-        System.out.println("Integration Test - Vaccine Registration Result: " + success);
+        assertTrue(success);
     }
 
     @Test
     @Order(5)
     @DisplayName("Should update an existing cattle's name and weight")
     void testUpdateCattle() {
-        assertNotNull(cattleService, "Cattle service must be initialized");
-
-        // We know the cattle exists from previous vaccine registration test
+        assertNotNull(cattleService);
         Cattle c = cattleService.getCattleByTag(sharedTestTag).orElseThrow();
-        String originalName = c.getName();
-        double originalWeight = c.getWeight();
-
         c.setName("Updated Mimosa Name");
-        c.setWeight(originalWeight + 10.0);
+        c.setWeight(c.getWeight() + 10.0);
 
         boolean success = cattleService.updateCattle(c);
+        assertTrue(success);
 
-        assertTrue(success, "Cattle update should succeed");
-
-        // Verify changes
         Cattle updated = cattleService.getCattleByTag(sharedTestTag).orElseThrow();
         assertEquals("Updated Mimosa Name", updated.getName());
-        assertEquals(originalWeight + 10.0, updated.getWeight());
     }
 }

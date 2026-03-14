@@ -31,7 +31,7 @@ class CattleUpdateApiTest extends TestCase
         ];
 
         $response = $this->withHeaders(['Authorization' => 'Bearer ' . $token])
-            ->putJson("/api/cattle/{$cattle->id}", $updateData);
+            ->putJson("/api/desktop/cattle/{$cattle->id}", $updateData);
 
         $response->assertStatus(200)
             ->assertJson([
@@ -68,7 +68,7 @@ class CattleUpdateApiTest extends TestCase
         ];
 
         $response = $this->withHeaders(['Authorization' => 'Bearer ' . $token])
-            ->postJson('/api/cattle', $duplicateData);
+            ->postJson('/api/desktop/cattle', $duplicateData);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['rfid_tag']);

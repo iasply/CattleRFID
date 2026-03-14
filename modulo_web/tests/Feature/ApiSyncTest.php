@@ -29,7 +29,7 @@ class ApiSyncTest extends TestCase
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->postJson('/api/vaccines', [
+        ])->postJson('/api/desktop/vaccines', [
             'rfid_tag' => $cattle->rfid_tag,
             'vaccine_type' => 'Anti-Rábica',
             'current_weight' => 310.5,

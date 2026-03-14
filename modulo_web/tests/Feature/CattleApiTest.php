@@ -26,7 +26,7 @@ class CattleApiTest extends TestCase
         ]);
 
         $response = $this->withHeaders(['Authorization' => 'Bearer ' . $token])
-            ->getJson("/api/cattle/{$tag}");
+            ->getJson("/api/desktop/cattle/{$tag}");
 
         $response->assertStatus(200)
             ->assertJson([
@@ -43,7 +43,7 @@ class CattleApiTest extends TestCase
         $token = $user->createToken('test')->plainTextToken;
 
         $response = $this->withHeaders(['Authorization' => 'Bearer ' . $token])
-            ->getJson('/api/cattle/NON-EXISTENT');
+            ->getJson('/api/desktop/cattle/NON-EXISTENT');
 
         $response->assertStatus(404)
             ->assertJson(['message' => 'Animal não encontrado.']);
@@ -59,7 +59,7 @@ class CattleApiTest extends TestCase
         Cattle::create(['rfid_tag' => \App\Support\RfidGenerator::generateCattleTag(), 'name' => 'B', 'weight' => 200, 'registration_date' => now()]);
 
         $response = $this->withHeaders(['Authorization' => 'Bearer ' . $token])
-            ->getJson('/api/cattle');
+            ->getJson('/api/desktop/cattle');
 
         $response->assertStatus(200)
             ->assertJsonCount(2, 'data');

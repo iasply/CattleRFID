@@ -31,7 +31,7 @@ class VaccineApiTest extends TestCase
         // 2. Login via Workstation to get a token bound to that workstation
         $user->update(['vet_rfid' => $vetTag]);
 
-        $loginResponse = $this->postJson('/api/login', [
+        $loginResponse = $this->postJson('/api/desktop/login', [
             'workstation' => 'WS-API-TEST',
             'tag' => $vetTag,
         ]);
@@ -59,7 +59,7 @@ class VaccineApiTest extends TestCase
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->postJson('/api/vaccines', $vaccinationData);
+        ])->postJson('/api/desktop/vaccines', $vaccinationData);
 
         // 5. Assertions
         $response->assertStatus(201);
@@ -95,7 +95,7 @@ class VaccineApiTest extends TestCase
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->postJson('/api/vaccines', [
+        ])->postJson('/api/desktop/vaccines', [
             'rfid_tag' => $tag2,
             'vaccine_type' => 'Brucelose',
             'current_weight' => 410.00,
@@ -126,7 +126,7 @@ class VaccineApiTest extends TestCase
         Vaccine::create(['rfid_tag' => $tagB, 'vaccine_type' => 'Vax3', 'current_weight' => 105, 'vaccination_date' => now()]);
 
         $response = $this->withHeaders(['Authorization' => 'Bearer ' . $token])
-            ->getJson("/api/vaccines?rfid_tag={$tagA}");
+            ->getJson("/api/desktop/vaccines?rfid_tag={$tagA}");
 
         $response->assertStatus(200)
             ->assertJsonCount(2, 'data');

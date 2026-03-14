@@ -56,8 +56,29 @@ if [ "$MODE" == "docker" ]; then
     fi
     docker compose up -d
     echo "Aguardando serviços do Docker subirem..."
-    sleep 5
-    # Usamos o banco persistente mapeado no volume
+    
+    # Check if we can communicate with the container/service
+    MAX_RETRIES=10
+    COUNT=0
+    echo -n "Checking Docker services health"
+    while [ $COUNT -lt $MAX_RETRIES ]; do
+        if docker compose exec -T laravel php artisan --version > /dev/null 2>&1; then
+            echo " ✅"
+            break
+        fi
+        echo -n "."
+        sleep 2
+        COUNT=$((COUNT + 1))
+    done
+
+    if [ $COUNT -eq $MAX_RETRIES ]; then
+        echo " ❌"
+        echo "Erro: Não foi possível comunicar com os serviços do Docker após $MAX_RETRIES tentativas. Abortando."
+        docker compose down -v
+        exit 1
+    fi
+
+    # Usamos o banco de dados persistente mapeado no volume
     docker compose exec -T laravel php artisan migrate:fresh --seed --force
 else
     php artisan migrate:fresh --seed --force
@@ -79,8 +100,7 @@ fi
 DESKTOP_ENV_FILE="../modulo_desktop/.env.test"
 
 if [ "$MODE" == "docker" ]; then
-    # Configuracao HTTPS para Docker (Localhost porta publica)
-    echo "API_BASE_URL=https://localhost/api" > $DESKTOP_ENV_FILE
+    echo "API_BASE_URL=https://localhost/api/desktop" > $DESKTOP_ENV_FILE
     echo "API_WORKSTATION_HASH=WS-XTYBQRG6" >> $DESKTOP_ENV_FILE
     echo "SSL_TRUST_ALL=true" >> $DESKTOP_ENV_FILE
     
@@ -91,7 +111,7 @@ if [ "$MODE" == "docker" ]; then
     echo "Ambiente Docker configurado (HTTPS: https://localhost/api)."
 else
     # Configuracao HTTP para porta especifica do Artisan Serve
-    echo "API_BASE_URL=http://127.0.0.1:8555/api" > $DESKTOP_ENV_FILE
+    echo "API_BASE_URL=http://127.0.0.1:8555/api/desktop" > $DESKTOP_ENV_FILE
     echo "API_WORKSTATION_HASH=WS-XTYBQRG6" >> $DESKTOP_ENV_FILE
     echo "SSL_TRUST_ALL=false" >> $DESKTOP_ENV_FILE
 

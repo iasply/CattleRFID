@@ -23,7 +23,7 @@ class ApiAuthTest extends TestCase
             'is_veterinarian' => true,
         ]);
 
-        $response = $this->postJson('/api/login', [
+        $response = $this->postJson('/api/desktop/login', [
             'workstation' => 'WS-HASH-123',
             'tag' => $user->vet_rfid, // Use the automatically generated RFID
             'device_name' => 'DesktopClient',
@@ -49,7 +49,7 @@ class ApiAuthTest extends TestCase
             'desc' => 'Main Lab',
         ]);
 
-        $response = $this->postJson('/api/login', [
+        $response = $this->postJson('/api/desktop/login', [
             'workstation' => 'WS-HASH-123',
             'tag' => 'WRONG-TAG',
             'device_name' => 'DesktopClient',
@@ -75,7 +75,7 @@ class ApiAuthTest extends TestCase
             'is_veterinarian' => false,
         ]);
 
-        $response = $this->postJson('/api/login', [
+        $response = $this->postJson('/api/desktop/login', [
             'workstation' => 'WS-HASH-123',
             'tag' => $rawTag,
             'device_name' => 'DesktopClient',
@@ -93,7 +93,7 @@ class ApiAuthTest extends TestCase
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->getJson('/api/cattle');
+        ])->getJson('/api/desktop/cattle');
 
         $response->assertStatus(200);
     }
@@ -101,7 +101,7 @@ class ApiAuthTest extends TestCase
     #[\PHPUnit\Framework\Attributes\Test]
     public function unauthenticated_user_cannot_access_protected_endpoints()
     {
-        $response = $this->getJson('/api/cattle');
+        $response = $this->getJson('/api/desktop/cattle');
         $response->assertStatus(401);
     }
 }

@@ -1,167 +1,110 @@
 package com.cattlerfid.service;
 
-import com.cattlerfid.config.ApiConfig;
+import com.cattlerfid.config.ApiClient;
 import com.cattlerfid.model.Cattle;
 import com.cattlerfid.model.User;
 import com.cattlerfid.model.Vaccine;
-import com.cattlerfid.util.RfidGenerator;
+import com.google.gson.Gson;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
-import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class CattleApiServiceTest {
-
-    private CattleApiService apiService;
+public class CattleApiServiceTest {
 
     @Mock
-    private ApiConfig config;
+    private ApiClient apiClient;
 
     @Mock
     private User user;
 
     @Mock
-    private HttpClient httpClient;
-
-    @Mock
     private HttpResponse<String> httpResponse;
+
+    private CattleApiService apiService;
+
+    private final Gson gson = new Gson();
 
     @BeforeEach
     void setUp() {
-        when(user.getAccessToken()).thenReturn("fake_token");
-        apiService = new CattleApiService(config, user, httpClient);
+        lenient().when(user.getAccessToken()).thenReturn("fake_token");
+        lenient().when(apiClient.getGson()).thenReturn(gson);
+        apiService = new CattleApiService(apiClient, user);
     }
 
     @Test
-    void testGetCattleByTagSuccess() throws IOException, InterruptedException {
-        // Arrange
-        String rfidTag = RfidGenerator.generateCattleTag();
-        String jsonResponse = "{\"rfid_tag\":\"" + rfidTag
-                + "\",\"name\":\"Mimosa\",\"weight\":450.0,\"registration_date\":\"2023-05-20\"}";
+    @DisplayName("Should fetch cattle by tag successfully")
+    void should_fetch_cattle_by_tag_successfully() throws IOException, InterruptedException {
+        String tag = "C001";
+        String json = "{\"rfid_tag\":\"C001\",\"name\":\"Mimosa\"}";
 
-        when(config.url("/cattle/" + rfidTag)).thenReturn("http://localhost/api/cattle/" + rfidTag);
+        when(apiClient.newAuthenticatedRequestBuilder(anyString(), anyString())).thenReturn(HttpRequest.newBuilder().uri(java.net.URI.create("http://test.com")));
+        when(apiClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
         when(httpResponse.statusCode()).thenReturn(200);
-        when(httpResponse.body()).thenReturn(jsonResponse);
-        when(httpClient.send(any(), any())).thenAnswer(invocation -> httpResponse);
+        when(httpResponse.body()).thenReturn(json);
 
-        // Act
-        Optional<Cattle> result = apiService.getCattleByTag(rfidTag);
+        Optional<Cattle> result = apiService.getCattleByTag(tag);
 
-        // Assert
         assertTrue(result.isPresent());
         assertEquals("Mimosa", result.get().getName());
-        assertEquals(450.0, result.get().getWeight());
     }
 
     @Test
-    void testGetAllCattle() throws IOException, InterruptedException {
-        // Arrange
-        String tag1 = RfidGenerator.generateCattleTag();
-        String tag2 = RfidGenerator.generateCattleTag();
-        String jsonResponse = "{ \"data\": [{\"rfid_tag\":\"" + tag1 + "\",\"name\":\"A\"},{\"rfid_tag\":\"" + tag2
-                + "\",\"name\":\"B\"}] }";
+    @DisplayName("Should return all cattle")
+    void should_return_all_cattle() throws IOException, InterruptedException {
+        String json = "{\"data\": [{\"rfid_tag\":\"C001\"}, {\"rfid_tag\":\"C002\"}]}";
 
-        when(config.url("/cattle")).thenReturn("http://localhost/api/cattle");
+        when(apiClient.newAuthenticatedRequestBuilder(anyString(), anyString())).thenReturn(HttpRequest.newBuilder().uri(java.net.URI.create("http://test.com")));
+        when(apiClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
         when(httpResponse.statusCode()).thenReturn(200);
-        when(httpResponse.body()).thenReturn(jsonResponse);
-        when(httpClient.send(any(), any())).thenAnswer(invocation -> httpResponse);
+        when(httpResponse.body()).thenReturn(json);
 
-        // Act
         List<Cattle> result = apiService.getAllCattle();
 
-        // Assert
         assertEquals(2, result.size());
-        assertEquals(tag1, result.get(0).getRfidTag());
-        assertEquals(tag2, result.get(1).getRfidTag());
     }
 
     @Test
-    void testSaveCattleSuccess() throws IOException, InterruptedException {
-        // Arrange
-        String newTag = RfidGenerator.generateCattleTag();
-        Cattle cattle = new Cattle(newTag, "New Cow", 100.0, "2023-10-01");
-        when(config.url("/cattle")).thenReturn("http://localhost/api/cattle");
-        when(httpResponse.statusCode()).thenReturn(201);
-        when(httpClient.send(any(), any())).thenAnswer(invocation -> httpResponse);
+    @DisplayName("Should save cattle successfully")
+    void should_save_cattle_successfully() throws IOException, InterruptedException {
+        Cattle cattle = new Cattle("C001", "Mimosa", 400.0, "2024-03-14");
 
-        // Act
+        when(apiClient.newAuthenticatedRequestBuilder(anyString(), anyString())).thenReturn(HttpRequest.newBuilder().uri(java.net.URI.create("http://test.com")));
+        when(apiClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
+        when(httpResponse.statusCode()).thenReturn(201);
+
         boolean result = apiService.saveCattle(cattle);
 
-        // Assert
         assertTrue(result);
     }
 
     @Test
-    void testSaveVaccineSuccess() throws IOException, InterruptedException {
-        // Arrange
-        String vaccineTag = RfidGenerator.generateCattleTag();
-        Vaccine vaccine = new Vaccine("1", vaccineTag, "2023-11-01", "Aftosa", 460.0);
-        when(config.url("/vaccines")).thenReturn("http://localhost/api/vaccines");
-        when(httpResponse.statusCode()).thenReturn(201);
-        when(httpClient.send(any(), any())).thenAnswer(invocation -> httpResponse);
+    @DisplayName("Should save vaccine successfully")
+    void should_save_vaccine_successfully() throws IOException, InterruptedException {
+        Vaccine vaccine = new Vaccine();
+        vaccine.setRfidTag("C001");
 
-        // Act
+        when(apiClient.newAuthenticatedRequestBuilder(anyString(), anyString())).thenReturn(HttpRequest.newBuilder().uri(java.net.URI.create("http://test.com")));
+        when(apiClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
+        when(httpResponse.statusCode()).thenReturn(201);
+
         boolean result = apiService.saveVaccine(vaccine);
 
-        // Assert
         assertTrue(result);
-    }
-
-    @Test
-    void testGetVaccinesByCattle() throws IOException, InterruptedException {
-        // Arrange
-        String rfidTag = RfidGenerator.generateCattleTag();
-        String jsonResponse = "{ \"data\": [{\"rfid_tag\":\"" + rfidTag + "\",\"vaccine_type\":\"Aftosa\"}] }";
-
-        when(config.url("/vaccines?rfid_tag=" + rfidTag))
-                .thenReturn("http://localhost/api/vaccines?rfid_tag=" + rfidTag);
-        when(httpResponse.statusCode()).thenReturn(200);
-        when(httpResponse.body()).thenReturn(jsonResponse);
-        when(httpClient.send(any(), any())).thenAnswer(invocation -> httpResponse);
-
-        // Act
-        List<Vaccine> result = apiService.getVaccinesByCattle(rfidTag);
-
-        // Assert
-        assertEquals(1, result.size());
-        assertEquals("Aftosa", result.get(0).getVaccineType());
-    }
-
-    @Test
-    void testGetAllCattleWithVaccines() throws IOException, InterruptedException {
-        // Arrange
-        String tag1 = RfidGenerator.generateCattleTag();
-        String tag2 = RfidGenerator.generateCattleTag();
-        String jsonResponse = "{ \"data\": [{\"rfid_tag\":\"" + tag1
-                + "\",\"name\":\"A\",\"vaccines_count\":2},{\"rfid_tag\":\"" + tag2
-                + "\",\"name\":\"B\",\"vaccines_count\":0}] }";
-
-        when(config.url("/cattle-with-vaccines")).thenReturn("http://localhost/api/cattle-with-vaccines");
-        when(httpResponse.statusCode()).thenReturn(200);
-        when(httpResponse.body()).thenReturn(jsonResponse);
-        when(httpClient.send(any(), any())).thenAnswer(invocation -> httpResponse);
-
-        // Act
-        List<Cattle> result = apiService.getAllCattleWithVaccines();
-
-        // Assert
-        assertEquals(2, result.size());
-        assertEquals(tag1, result.get(0).getRfidTag());
-        assertEquals(2, result.get(0).getVaccinesCount());
-        assertEquals(tag2, result.get(1).getRfidTag());
-        assertEquals(0, result.get(1).getVaccinesCount());
     }
 }

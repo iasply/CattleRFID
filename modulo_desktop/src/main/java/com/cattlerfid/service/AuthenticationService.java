@@ -1,44 +1,34 @@
 package com.cattlerfid.service;
 
 import com.cattlerfid.config.ApiConfig;
-import com.cattlerfid.config.HttpClientFactory;
+import com.cattlerfid.config.ApiClient;
 import com.cattlerfid.model.User;
 import com.cattlerfid.util.RfidGenerator;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.util.Optional;
 
 /**
  * Authenticates a veterinarian by sending the raw RFID tag + workstation hash
  * to the Laravel API (POST /api/login).
- * <p>
- * Replaces the previous hardcoded mock.
  */
 public class AuthenticationService {
 
-    private final ApiConfig config;
-    private final HttpClient http;
-    private final Gson gson = new Gson();
+    private final ApiClient client;
 
     public AuthenticationService(ApiConfig config) {
-        this(config, HttpClientFactory.create(config));
+        this(new ApiClient(config));
     }
 
-    public AuthenticationService(ApiConfig config, HttpClient http) {
-        this.config = config;
-        this.http = http;
+    public AuthenticationService(ApiClient client) {
+        this.client = client;
     }
 
     /**
      * Sends the raw RFID tag to the API alongside the workstation hash.
-     * The API hashes the tag internally and validates against its database.
      *
      * @param rawRfidTag Raw tag content read from the Arduino serial port
      * @return Optional<User> with Bearer token if authenticated, empty otherwise
@@ -49,52 +39,42 @@ public class AuthenticationService {
         }
 
         if (!RfidGenerator.isVetTag(rawRfidTag)) {
-            System.err.println("[AuthenticationService] Tag RFID inválida para login de veterinário: " + rawRfidTag);
+            System.err.println("[AuthenticationService] Invalid RFID tag for vet login: " + rawRfidTag);
             return Optional.empty();
         }
 
-        if (config.getWorkstationHash().isBlank()) {
+        String workstationHash = client.getConfig().getWorkstationHash();
+        if (workstationHash.isBlank()) {
             System.err.println("[AuthenticationService] API_WORKSTATION_HASH not set in .env");
             return Optional.empty();
         }
 
-        String body = gson.toJson(new LoginRequest(config.getWorkstationHash(), rawRfidTag));
+        String body = client.getGson().toJson(new LoginRequest(workstationHash, rawRfidTag));
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(config.url("/login")))
-                .header("Content-Type", "application/json")
-                .header("Accept", "application/json")
-                .timeout(Duration.ofSeconds(10))
+        HttpRequest request = client.newRequestBuilder("/login")
                 .POST(HttpRequest.BodyPublishers.ofString(body))
                 .build();
 
         try {
-            System.out.println("[API Request] POST " + config.url("/login"));
-            HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println("[API Response] Status: " + response.statusCode() + " Body: " + response.body());
+            HttpResponse<String> response = client.send(request);
 
             if (response.statusCode() == 200) {
-                JsonObject json = gson.fromJson(response.body(), JsonObject.class);
-
-                User user = gson.fromJson(json.getAsJsonObject("user"), User.class);
+                JsonObject json = client.getGson().fromJson(response.body(), JsonObject.class);
+                User user = client.getGson().fromJson(json.getAsJsonObject("user"), User.class);
                 user.setAccessToken(json.get("access_token").getAsString());
-
                 return Optional.of(user);
             }
 
-            // 422 = validation error (workstation not found, tag invalid, not a vet, etc.)
-            System.err.println("[AuthenticationService] Login refused. Status: "
-                    + response.statusCode() + " Body: " + response.body());
+            System.err.println("[AuthenticationService] Login refused. Status: " + response.statusCode());
             return Optional.empty();
 
         } catch (IOException | InterruptedException e) {
             System.err.println("[AuthenticationService] API unreachable: " + e.getMessage());
-            Thread.currentThread().interrupt();
+            if (e instanceof InterruptedException)
+                Thread.currentThread().interrupt();
             return Optional.empty();
         }
     }
-
-    // ---- Inner DTO ----
 
     private record LoginRequest(String workstation, String tag) {
     }
