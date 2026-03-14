@@ -12,9 +12,7 @@ class LoginController extends Controller
         if (Auth::check()) {
             return redirect()->route('admin.dashboard');
         }
-        // Regenerate token on every visit to the login page
-        // so stale browser cookies (e.g. after migrate:fresh) don't cause 419
-        $request->session()->regenerateToken();
+
         return view('auth.login');
     }
 
@@ -27,11 +25,11 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended('admin/dashboard');
+            return redirect()->intended(route('admin.dashboard'));
         }
 
         return back()->withErrors([
-            'email' => 'As credenciais fornecidas não correspondem aos nossos registros.',
+            'email' => __('auth.failed'),
         ])->onlyInput('email');
     }
 
@@ -40,6 +38,6 @@ class LoginController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/login');
+        return redirect()->route('login');
     }
 }
