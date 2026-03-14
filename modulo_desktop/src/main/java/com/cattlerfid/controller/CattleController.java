@@ -3,6 +3,7 @@ package com.cattlerfid.controller;
 import com.cattlerfid.model.Cattle;
 import com.cattlerfid.service.CattleApiService;
 import com.cattlerfid.service.SerialService;
+import com.cattlerfid.util.RfidGenerator;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -104,7 +105,7 @@ public class CattleController {
                     String readTag = parts[2].trim();
                     if (pendingWriteData != null) {
                         // Modo pre-gravação
-                        if (readTag.startsWith("V")) {
+                        if (RfidGenerator.isVetTag(readTag)) {
                             pendingWriteData = null; // aborta gravação
                             if (viewListener != null) {
                                 viewListener.onRfidWriteError(
@@ -150,15 +151,15 @@ public class CattleController {
     }
 
     private void processTagRead(String rfidTag) {
-        if (!rfidTag.startsWith("C")) {
-            if (rfidTag.startsWith("V")) {
+        if (!RfidGenerator.isCattleTag(rfidTag)) {
+            if (RfidGenerator.isVetTag(rfidTag)) {
                 if (viewListener != null) {
                     viewListener.onRfidReadError(
                             "Atenção: Você leu uma Tag de Usuário (Veterinário) ao invés de um Animal.");
                 }
             } else {
                 if (viewListener != null) {
-                    viewListener.onRfidReadError("Formato de Tag animal inválido (Requer prefixo C). Lido: " + rfidTag);
+                    viewListener.onRfidReadError("Formato de Tag animal inválido ou inválida para o sistema. Lido: " + rfidTag);
                 }
             }
             return;

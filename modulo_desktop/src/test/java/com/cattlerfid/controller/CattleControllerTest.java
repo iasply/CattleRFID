@@ -63,7 +63,7 @@ class CattleControllerTest {
     @Test
     void testHandleMessageWriteReadUserTagBlocked() {
         controller.requestWriteTag("C123456");
-        controller.handleIncomingSerialMessage("RES:OK:V_ADMIN_01:FW:92");
+        controller.handleIncomingSerialMessage("RES:OK:VADMIN01:FW:92");
 
         verify(viewListenerMock).onRfidWriteError(contains("Bloqueado"));
         verify(serialServiceMock, never()).requestWrite(anyString());
@@ -72,7 +72,7 @@ class CattleControllerTest {
     @Test
     void testHandleMessageWriteReadNewTagAllowed() {
         controller.requestWriteTag("C123456");
-        controller.handleIncomingSerialMessage("RES:OK:C_OLD_TAG:FW:92");
+        controller.handleIncomingSerialMessage("RES:OK:COLDTAG123:FW:92");
 
         verify(serialServiceMock).requestWrite("C123456");
     }
@@ -91,27 +91,27 @@ class CattleControllerTest {
 
     @Test
     void testHandleMessageReadSuccessExistingCattle() {
-        String simulatedSerialMsg = "RES:OK:C       VACA_001:FW:92";
-        Cattle existingCattle = new Cattle("C       VACA_001", "Mimosa", 400, "2023-01-01");
+        String simulatedSerialMsg = "RES:OK:CVACA00000000001:FW:92";
+        Cattle existingCattle = new Cattle("CVACA00000000001", "Mimosa", 400, "2023-01-01");
         existingCattle.setId(10);
 
-        when(apiServiceMock.getCattleByTag("C       VACA_001")).thenReturn(Optional.of(existingCattle));
+        when(apiServiceMock.getCattleByTag("CVACA00000000001")).thenReturn(Optional.of(existingCattle));
 
         controller.handleIncomingSerialMessage(simulatedSerialMsg);
 
-        verify(apiServiceMock).getCattleByTag("C       VACA_001");
+        verify(apiServiceMock).getCattleByTag("CVACA00000000001");
         verify(viewListenerMock).onRfidReadSuccess(existingCattle, false);
     }
 
     @Test
     void testHandleMessageReadSuccessNewCattle() {
-        String simulatedSerialMsg = "RES:OK:C       DESCONHE:FW:92";
+        String simulatedSerialMsg = "RES:OK:CDESCONHECIDO12:FW:92";
 
-        when(apiServiceMock.getCattleByTag("C       DESCONHE")).thenReturn(Optional.empty());
+        when(apiServiceMock.getCattleByTag("CDESCONHECIDO12")).thenReturn(Optional.empty());
 
         controller.handleIncomingSerialMessage(simulatedSerialMsg);
 
-        verify(apiServiceMock).getCattleByTag("C       DESCONHE");
+        verify(apiServiceMock).getCattleByTag("CDESCONHECIDO12");
         verify(viewListenerMock)
                 .onRfidReadError("Animal não encontrado na base de dados. Por favor, cadastre-o primeiro.");
 
@@ -121,7 +121,7 @@ class CattleControllerTest {
 
     @Test
     void testHandleMessageReadUserTagWarning() {
-        String simulatedSerialMsg = "RES:OK:V       VET_0001:FW:92";
+        String simulatedSerialMsg = "RES:OK:VVET000000000001:FW:92";
 
         controller.handleIncomingSerialMessage(simulatedSerialMsg);
 
@@ -208,11 +208,11 @@ class CattleControllerTest {
 
     @Test
     void testHandleMessageReadInvalidTagFormat() {
-        String simulatedSerialMsg = "RES:OK:X       DESCONHE:FW:92";
+        String simulatedSerialMsg = "RES:OK:XINVALID12345678:FW:92";
 
         controller.handleIncomingSerialMessage(simulatedSerialMsg);
 
-        verify(viewListenerMock).onRfidReadError(contains("Formato de Tag animal inválido"));
+        verify(viewListenerMock).onRfidReadError(contains("Formato de Tag animal inválido ou inválida para o sistema"));
     }
 
     @Test

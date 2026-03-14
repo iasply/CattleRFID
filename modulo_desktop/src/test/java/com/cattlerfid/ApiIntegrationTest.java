@@ -41,14 +41,18 @@ public class ApiIntegrationTest {
         httpClient = com.cattlerfid.config.HttpClientFactory.create(apiConfig);
         authService = new AuthenticationService(apiConfig, httpClient);
         sharedTestTag = RfidGenerator.generateCattleTag();
+        assertTrue(RfidGenerator.isValid(sharedTestTag), "Generated tag should be valid");
     }
 
     @Test
     @Order(1)
     @DisplayName("Should authenticate using veterinarian tag V000002")
     void testAuthentication() {
-        // Tag V000002 seeded in PHP
-        Optional<User> userOpt = authService.authenticateByTag("V000002");
+        // Tag V000002 seeded in PHP (validating it here too)
+        String vetTag = "V000002";
+        assertTrue(RfidGenerator.isValid(vetTag), "Vet tag V000002 should be valid");
+
+        Optional<User> userOpt = authService.authenticateByTag(vetTag);
 
         assertTrue(userOpt.isPresent(), "Authentication should return a User object");
         currentUser = userOpt.get();

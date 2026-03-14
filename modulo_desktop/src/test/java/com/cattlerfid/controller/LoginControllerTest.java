@@ -54,24 +54,24 @@ class LoginControllerTest {
     @Test
     void testHandleMessageSuccessfulReadValidUser() {
         // Simula Tag chegando pela Serial
-        String simulatedArduinoResponse = "RES:OK:V       VET_0001:FW:92";
+        String simulatedArduinoResponse = "RES:OK:V00000VET0001:FW:92";
 
         // Simula db mock
         User mockedVet = new User("joao_vet", "Joao");
-        when(authServiceMock.authenticateByTag("V       VET_0001")).thenReturn(Optional.of(mockedVet));
+        when(authServiceMock.authenticateByTag("V00000VET0001")).thenReturn(Optional.of(mockedVet));
 
         controller.handleIncomingSerialMessage(simulatedArduinoResponse);
 
-        verify(authServiceMock).authenticateByTag("V       VET_0001");
+        verify(authServiceMock).authenticateByTag("V00000VET0001");
         verify(viewListenerMock).onLoginSuccess(mockedVet);
         assertEquals(mockedVet, controller.getLoggedUser());
     }
 
     @Test
     void testHandleMessageSuccessfulReadInvalidUser() {
-        String simulatedArduinoResponse = "RES:OK:V       UNKNOWN1:FW:92";
+        String simulatedArduinoResponse = "RES:OK:V00000UNKNOWN1:FW:92";
 
-        when(authServiceMock.authenticateByTag("V       UNKNOWN1")).thenReturn(Optional.empty());
+        when(authServiceMock.authenticateByTag("V00000UNKNOWN1")).thenReturn(Optional.empty());
 
         controller.handleIncomingSerialMessage(simulatedArduinoResponse);
 
@@ -81,12 +81,12 @@ class LoginControllerTest {
 
     @Test
     void testInvalidTagPrefixLoginRejection() {
-        String simulatedArduinoResponse = "RES:OK:UNKNOWN_12345678:FW:92"; // Nao comeca com V
+        String simulatedArduinoResponse = "RES:OK:UNKNOWN12345678:FW:92"; // Nao comeca com V
 
         controller.handleIncomingSerialMessage(simulatedArduinoResponse);
 
         verify(viewListenerMock)
-                .onLoginError("Tag inválida para Login. (Requer 16 chars e prefixo V). Lido: 'UNKNOWN_12345678'");
+                .onLoginError("Tag RFID inválida para Login (Veterinário). Lido: 'UNKNOWN12345678'");
         assertNull(controller.getLoggedUser());
         verify(authServiceMock, never()).authenticateByTag(any());
     }

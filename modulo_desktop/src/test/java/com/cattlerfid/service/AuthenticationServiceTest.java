@@ -39,7 +39,7 @@ class AuthenticationServiceTest {
     @Test
     void testAuthenticateByTagSuccess() throws IOException, InterruptedException {
         // Arrange
-        String rawTag = "VET_TAG_123";
+        String rawTag = "VET001SUCCESS";
         String workstationHash = "WS_HASH_XYZ";
         String jsonResponse = "{\"access_token\":\"secret_token\",\"user\":{\"vet_rfid\":\"joao_vet\",\"name\":\"Joao Silva\"}}";
 
@@ -63,7 +63,7 @@ class AuthenticationServiceTest {
     @Test
     void testAuthenticateByTagFailure() throws IOException, InterruptedException {
         // Arrange
-        String rawTag = "INVALID_TAG";
+        String rawTag = "VET001FAILURE";
         when(config.getWorkstationHash()).thenReturn("WS_HASH");
         when(config.url("/login")).thenReturn("http://localhost/api/login");
         when(httpResponse.statusCode()).thenReturn(422);

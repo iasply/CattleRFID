@@ -3,6 +3,7 @@ package com.cattlerfid.service;
 import com.cattlerfid.config.ApiConfig;
 import com.cattlerfid.config.HttpClientFactory;
 import com.cattlerfid.model.User;
+import com.cattlerfid.util.RfidGenerator;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -44,6 +45,11 @@ public class AuthenticationService {
      */
     public Optional<User> authenticateByTag(String rawRfidTag) {
         if (rawRfidTag == null || rawRfidTag.isBlank()) {
+            return Optional.empty();
+        }
+
+        if (!RfidGenerator.isVetTag(rawRfidTag)) {
+            System.err.println("[AuthenticationService] Tag RFID inválida para login de veterinário: " + rawRfidTag);
             return Optional.empty();
         }
 

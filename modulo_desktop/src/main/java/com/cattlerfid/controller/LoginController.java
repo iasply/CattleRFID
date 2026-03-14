@@ -3,6 +3,7 @@ package com.cattlerfid.controller;
 import com.cattlerfid.model.User;
 import com.cattlerfid.service.AuthenticationService;
 import com.cattlerfid.service.SerialService;
+import com.cattlerfid.util.RfidGenerator;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -70,11 +71,11 @@ public class LoginController {
         if (parts.length >= 2) {
             if (parts[1].equals("OK")) {
                 // Sucesso de leitura
-                String tagContent = parts[2];
-                if (tagContent.length() != 16 || !tagContent.startsWith("V")) {
+                String tagContent = parts[2].trim();
+                if (!RfidGenerator.isVetTag(tagContent)) {
                     if (viewListener != null) {
                         viewListener.onLoginError(
-                                "Tag inválida para Login. (Requer 16 chars e prefixo V). Lido: '" + tagContent + "'");
+                                "Tag RFID inválida para Login (Veterinário). Lido: '" + tagContent + "'");
                     }
                     return;
                 }

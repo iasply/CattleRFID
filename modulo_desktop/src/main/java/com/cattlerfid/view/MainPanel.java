@@ -5,6 +5,7 @@ import com.cattlerfid.controller.LoginController;
 import com.cattlerfid.model.Cattle;
 import com.cattlerfid.model.User;
 import com.cattlerfid.service.AuthenticationService;
+import com.cattlerfid.util.RfidGenerator;
 import com.cattlerfid.view.utils.UIStyles;
 
 import javax.swing.*;
@@ -93,7 +94,7 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
             statusLabel.setText("Preparando formulário manual...");
 
             // Gera uma TAG automática garantindo até 16 bytes e unicidade padronizada
-            String generatedTag = com.cattlerfid.util.RfidGenerator.generateCattleTag();
+            String generatedTag = RfidGenerator.generateCattleTag();
 
             Cattle newCattle = new Cattle();
             newCattle.setRfidTag(generatedTag);
