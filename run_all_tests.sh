@@ -16,11 +16,15 @@ for arg in "$@"; do
         --keep-docker)
             KEEP_DOCKER=true
             ;;
+        --no-cache)
+            NO_CACHE=true
+            ;;
         *)
-            echo "Uso: ./run_all_tests.sh [--local | --docker] [--keep-docker]"
+            echo "Uso: ./run_all_tests.sh [--local | --docker] [--keep-docker] [--no-cache]"
             echo "  --local       : Roda usando 'php artisan serve' (HTTP, porta 8555)"
             echo "  --docker      : Roda usando 'docker compose' (HTTPS, porta 443 / porta mapeada)"
             echo "  --keep-docker : Mantém o docker rodando após os testes (apenas modo --docker)"
+            echo "  --no-cache    : Limpa imagens e volumes do docker antes de iniciar (apenas modo --docker)"
             exit 1
             ;;
     esac
@@ -46,6 +50,10 @@ mkdir -p database
 touch database/database.sqlite
 
 if [ "$MODE" == "docker" ]; then
+    if [ "$NO_CACHE" = true ]; then
+        echo "Limpando cache do Docker (imagens, volumes, orphans)..."
+        docker compose down -v --rmi all --remove-orphans
+    fi
     docker compose up -d
     echo "Aguardando serviços do Docker subirem..."
     sleep 5
