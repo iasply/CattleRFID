@@ -6,10 +6,10 @@
     <x-card>
         <x-table :headers="['Data', 'Animal (Tag)', 'Vacina', 'Peso na Aplicação', 'Veterinário']">
             @foreach($vaccines as $v)
-                <tr>
+                <tr data-testid="vaccine-row">
                     <td>{{ \Carbon\Carbon::parse($v->vaccination_date)->format('d/m/Y') }}</td>
-                    <td>{{ $v->animal_name ?? 'Desconhecido' }} (<code>{{ $v->rfid_tag }}</code>)</td>
-                    <td>{{ $v->vaccine_type }}</td>
+                    <td>{{ $v->animal_name ?? 'Desconhecido' }} (<span data-testid="vaccine-animal-tag"><code>{{ $v->rfid_tag }}</code></span>)</td>
+                    <td data-testid="vaccine-type">{{ $v->vaccine_type }}</td>
                     <td>{{ number_format($v->current_weight, 2, ',', '.') }} kg</td>
                     <td>{{ $v->veterinarian_name ?? 'Sistema' }}</td>
                 </tr>

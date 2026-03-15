@@ -10,7 +10,7 @@
 
             <div style="margin-bottom: 1rem;">
                 <label style="display: block; margin-bottom: 0.5rem;">Selecionar Animal (Tag RFID)</label>
-                <select name="rfid_tag" required
+                <select name="rfid_tag" required data-testid="vaccine-animal-select"
                         style="width: 100%; padding: 0.5rem; border-radius: 0.375rem; border: 1px solid #cbd5e1;">
                     <option value="">-- Selecione o Animal --</option>
                     @foreach($gattos as $animal)
@@ -32,7 +32,7 @@
 
             <div style="margin-bottom: 1rem;">
                 <label style="display: block; margin-bottom: 0.5rem;">Veterinário Responsável</label>
-                <select name="vaccinator_username" required
+                <select name="vaccinator_username" required data-testid="vaccine-vet-select"
                         style="width: 100%; padding: 0.5rem; border-radius: 0.375rem; border: 1px solid #cbd5e1;">
                     <option value="">-- Selecione o Veterinário --</option>
                     @foreach($vets as $vet)
@@ -47,7 +47,7 @@
                 @enderror
             </div>
 
-            <x-button type="submit" fullWidth
+            <x-button type="submit" fullWidth data-testid="vaccine-submit-button"
                       style="margin-top: 1.5rem; background-color: orange; border-color: orange;">
                 Registrar Aplicação
             </x-button>

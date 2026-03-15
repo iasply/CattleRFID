@@ -15,7 +15,7 @@
 
             <x-input label="Peso (kg)" name="weight" type="number" step="0.01" :value="$cattle->weight" required/>
 
-            <x-button type="submit" fullWidth style="margin-top: 1rem;">
+            <x-button type="submit" fullWidth style="margin-top: 1rem;" data-testid="cattle-submit-button">
                 Salvar Alterações
             </x-button>
         </form>

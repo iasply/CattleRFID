@@ -3,7 +3,7 @@
 @section('content')
     <x-page-header title="Veterinários Cadastrados">
         <x-slot name="actions">
-            <x-button onclick="window.location='{{ route('admin.veterinarians.create') }}'">
+            <x-button onclick="window.location='{{ route('admin.veterinarians.create') }}'" data-testid="create-vet-button">
                 + Novo Veterinário
             </x-button>
         </x-slot>
@@ -12,15 +12,15 @@
     <x-card>
         <x-table :headers="['Nome', 'Tag Rfid', 'Email', 'Ações']">
             @foreach($vets as $vet)
-                <tr>
-                    <td>{{ $vet->name }}</td>
-                    <td><code>{{ $vet->vet_rfid }}</code></td>
+                <tr data-testid="vet-row">
+                    <td data-testid="vet-name">{{ $vet->name }}</td>
+                    <td data-testid="vet-rfid"><code>{{ $vet->vet_rfid }}</code></td>
                     <td>{{ $vet->email }}</td>
                     <td class="text-right" style="display: flex; gap: 0.5rem; justify-content: flex-end;">
                         <a href="{{ route('admin.veterinarians.show', $vet->id) }}" class="btn btn-primary"
-                           style="font-size: 0.75rem; text-decoration: none; padding: 0.4rem 0.8rem;">Ver</a>
+                           style="font-size: 0.75rem; text-decoration: none; padding: 0.4rem 0.8rem;" data-testid="vet-show-link">Ver</a>
                         <a href="{{ route('admin.veterinarians.edit', $vet->id) }}" class="btn btn-primary"
-                           style="font-size: 0.75rem; text-decoration: none; padding: 0.4rem 0.8rem;">Editar</a>
+                           style="font-size: 0.75rem; text-decoration: none; padding: 0.4rem 0.8rem;" data-testid="vet-edit-link">Editar</a>
                     </td>
                 </tr>
             @endforeach

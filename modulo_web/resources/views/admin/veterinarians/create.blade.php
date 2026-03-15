@@ -13,7 +13,7 @@
 
             <x-input label="Senha de Acesso" name="password" type="password" required/>
 
-            <x-button type="submit" fullWidth style="margin-top: 1rem;">
+            <x-button type="submit" fullWidth style="margin-top: 1rem;" data-testid="vet-submit-button">
                 Cadastrar Veterinário
             </x-button>
         </form>

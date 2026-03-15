@@ -18,7 +18,7 @@
                      placeholder="Ex: Curral Principal, Laboratório A..."/>
 
             <div style="margin-top: 2rem;">
-                <x-button type="submit" fullWidth>
+                <x-button type="submit" fullWidth data-testid="workstation-submit-button">
                     Cadastrar Estação
                 </x-button>
             </div>
