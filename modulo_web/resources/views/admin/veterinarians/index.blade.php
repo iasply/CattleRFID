@@ -10,7 +10,7 @@
     </x-page-header>
 
     <x-card>
-        <x-table :headers="['Nome', 'Username', 'Email', 'Ações']">
+        <x-table :headers="['Nome', 'Tag Rfid', 'Email', 'Ações']">
             @foreach($vets as $vet)
                 <tr>
                     <td>{{ $vet->name }}</td>
