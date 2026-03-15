@@ -7,7 +7,8 @@
     @endif
 
     <input type="{{ $type }}" id="{{ $name }}" name="{{ $name }}" value="{{ old($name, $value) }}"
-           {{ $required ? 'required' : '' }} {{ $readonly ? 'readonly' : '' }} {{ $attributes->merge(['class' => 'form-control']) }} style="
+           {{ $required ? 'required' : '' }} {{ $readonly ? 'readonly' : '' }}
+           {{ $attributes->merge(['class' => 'form-control', 'data-testid' => $attributes->get('data-testid') ?? $name]) }} style="
             width: 100%;
             padding: 0.75rem 1rem;
             border: 1px solid #e2e8f0;

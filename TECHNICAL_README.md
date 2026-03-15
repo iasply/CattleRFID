@@ -64,6 +64,12 @@ php artisan key:generate
 php artisan migrate --seed
 npm install && npm run build
 php artisan serve
+
+# Para rodar testes E2E (Playwright)
+cd e2e
+npm install
+npx playwright install --with-deps # Se necessário
+npm test
 ```
 
 ### Módulo Desktop
@@ -95,7 +101,9 @@ mvn exec:exec
 
 ## 🧪 Estratégia de Testes
 
-- **Testes Backend (`modulo_web`):** Execute os comandos `php artisan test` ou `./vendor/bin/pest`. O sistema emula requisições à API, testando toda a cadeia de autorização, integridade de registro único do RFID, e checabilidade de vínculo do animal ao veterinário ativo.
+- **Testes Backend (`modulo_web`):**
+  - **Unitários/Feature:** Execute os comandos `php artisan test`. O sistema utiliza PHPUnit/Pest para testar a cadeia de autorização e integridade.
+  - **E2E (End-to-End):** Utiliza **Playwright** com TypeScript. Localizados em `modulo_web/e2e`. Estes testes validam fluxos críticos do usuário (como o Login) simulando interações reais em navegadores (Chromium, Firefox, Webkit). Utilize o comando `npm test` dentro do diretório `e2e`.
 - **Testes Desktop (`modulo_desktop`):** Executados através do Maven phase test (`mvn test`). Serviços dependentes são mockados com `Mockito` para rodar sem necessidade da placa serial espetada na porta USB.
 
 ---

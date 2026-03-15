@@ -86,12 +86,14 @@
                 </h2>
 
                 <x-input label="E-mail Administrativo" name="email" type="email" required :value="old('email')"
-                         placeholder="seu@email.com"/>
+                         placeholder="seu@email.com" data-testid="login-email"/>
 
-                <x-input label="Senha" name="password" type="password" required placeholder="••••••••"/>
+                <x-input label="Senha" name="password" type="password" required placeholder="••••••••"
+                         data-testid="login-password"/>
 
                 @if($errors->any())
                     <div
+                        data-testid="login-error"
                         style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--danger); padding: 1rem; margin-bottom: 1.5rem; border-radius: 4px;">
                             <span style="color: var(--danger); font-size: 0.875rem; font-weight: 600;">
                                 {{ $errors->first() }}
@@ -100,7 +102,7 @@
                 @endif
 
                 <div style="margin-top: 2rem;">
-                    <x-button type="submit" fullWidth="true">
+                    <x-button type="submit" fullWidth="true" data-testid="login-submit">
                         Entrar no Painel
                     </x-button>
                 </div>
